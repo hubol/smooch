@@ -1,0 +1,26 @@
+{
+  "name": "smooch",
+  "version": "0.1.0",
+  "description": "Generate texture atlases, audio sprites, and source code from directories",
+  "bin": {
+    "smooch": "lib/main/bin.js"
+  },
+  "author": "Hubol",
+  "license": "ISC",
+  "dependencies": {
+    "@parcel/watcher": "^2.1.0",
+    "audiosprite": "^0.7.2",
+    "chalk": "^4.1.2",
+    "change-case": "^4.1.2",
+    "glob": "^10.0.0",
+    "handlebars": "^4.7.7",
+    "maxrects-packer": "^2.7.2",
+    "sharp": "^0.32.0",
+    "superstruct": "^0.15.2",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "@types/sharp": "^0.31.1",
+    "typescript": "^5.0.4"
+  }
+}

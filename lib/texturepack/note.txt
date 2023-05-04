@@ -1,0 +1,8 @@
+"Forked" from https://github.com/devrandom52/texturepack
+Found ^that project by searching dependents of https://www.npmjs.com/package/maxrects-packer, a texture atlas packer that supports multiple texture atlas outputs.
+It was hard to find projects that supported multiple atlas outputs.
+Unfortunately, maxrects-packer does not have a CLI, and also did not have utilities for adding directories of images.
+So I wanted to use someone else's work for that part.
+texturepack is pretty good, but it actually prevents saving multiple outputs, hah!
+It also doesn't support deep imports. Addressed with glob...
+So this crude "fork" adjusts the appropriate components.
