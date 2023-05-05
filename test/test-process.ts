@@ -1,6 +1,7 @@
 import { ChildProcess, spawn } from "child_process";
 import { wait } from "../lib/common/wait";
 import chalk from "chalk";
+import kill from "tree-kill";
 
 export class TestProcess {
     private readonly _childProcess: ChildProcess;
@@ -64,6 +65,11 @@ export class TestProcess {
 
     async untilExited() {
         await wait(() => this._exited);
+        return this;
+    }
+
+    kill() {
+        kill(this._childProcess.pid!);
         return this;
     }
 }

@@ -24,5 +24,8 @@ async function runTest() {
             "outTemplateExtension": "ts",
         }]
     });
-    await TestProject.smooch().untilExited();
+    const smooch = TestProject.smooch();
+    await smooch.untilStdOutIncludes('Packed');
+    smooch.kill();
+    await smooch.untilExited();
 }
