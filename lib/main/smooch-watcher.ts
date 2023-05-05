@@ -137,6 +137,8 @@ class DirectorySubscription {
         }
 
     static async create(name: string, directory: RelativePath, snapshotDirectory: RelativePath, fn: SubscribeCallback) {
+        if (!await Fs.exists(directory.absolutePath))
+            throw new Error(`Can't create [DirectorySubscription]: ${directory.absolutePath} does not exist!`);
         const subscription = await ParcelWatcher.subscribe(directory.absolutePath, fn);
         return new DirectorySubscription(name, directory, Fs.resolve(snapshotDirectory.absolutePath, `snapshot-${name}.txt`), subscription, fn);
     }
