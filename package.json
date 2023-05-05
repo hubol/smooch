@@ -2,6 +2,9 @@
   "name": "smooch",
   "version": "0.1.0",
   "description": "Generate texture atlases, audio sprites, and source code from directories",
+  "scripts": {
+    "test": "ts-node --transpileOnly test/test.ts"
+  },
   "bin": {
     "smooch": "lib/main/bin.js"
   },

@@ -1,0 +1,10 @@
+{
+    "core": {
+        "cacheFolder": ".smooch"
+    },
+    "textures": [{
+        "folder": "src-images",
+        "outFolder": "dst",
+        "outTemplateExtension": "ts"
+    }]
+}
