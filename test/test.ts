@@ -30,10 +30,14 @@ const Commands = {
 }
 
 async function runTest() {
-    await Fs.rmdir(Paths.testEnv).catch(() => {  });
+    await Fs.rm(Paths.testEnv, { recursive: true, force: true });
     await Fs.mkdir(Paths.testEnv, { recursive: true });
     await Fs.copyFile(Paths.testPackageJson, envPath('package.json'));
-    await Fs.copyFile(Paths.testSmoochJson, envPath('smooch.json'));
+
     await new TestProcess(Commands.npm, ['i'], { cwd: Paths.testEnv }).untilExited();
+
+    await Fs.copyFile(Paths.testSmoochJson, envPath('smooch.json'));
+    await Fs.mkdir(Fs.resolve(Paths.testEnv, 'src-images'));
+    await Fs.mkdir(Fs.resolve(Paths.testEnv, 'dst-images'));
     await new TestProcess(Commands.npx, ['smooch'], { cwd: Paths.testEnv }).untilExited();
 }
