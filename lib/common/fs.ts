@@ -7,7 +7,7 @@ export const Fs = {
     writeFile: util.promisify(fs.writeFile),
     copyFile: util.promisify(fs.copyFile),
     mkdir: util.promisify(fs.mkdir),
-    rmdir: util.promisify(fs.rmdir),
+    rm: util.promisify(fs.rm),
     exists: util.promisify(fs.exists),
     ...path,
 }
