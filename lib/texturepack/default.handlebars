@@ -4,6 +4,6 @@ export const Atlases = [ {{#each atlases}}"{{fileName}}", {{/each}}];
 
 export const Txs = {
     {{#each textures}}
-    "{{pascal (noext file)}}": { atlas: "{{atlasFile}}", x: {{x}}, y: {{y}}, width: {{width}}, height: {{height}} },
+    "{{pascal (noext fileName)}}": { atlas: "{{atlasFileName}}", x: {{x}}, y: {{y}}, width: {{width}}, height: {{height}} },
     {{/each}}
 }
