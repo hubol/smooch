@@ -1,15 +1,9 @@
-import { Fs } from "../lib/common/fs";
-import { CwdRelativePath } from "../lib/common/relative-path";
+import { Fs } from "../../lib/common/fs";
+import { CwdRelativePath } from "../../lib/common/relative-path";
+import { TestFixtures } from "./test-fixtures";
 import { TestProcess } from "./test-process";
 
-function siblingPath(filename: string) {
-    return Fs.resolve(__filename, '../' + filename);
-}
-
 const Paths = {
-    imagePng: siblingPath('env-image.png'),
-    testPackageJson: siblingPath('env-package.json'),
-    testSmoochJson: siblingPath('env-smooch.json'),
     testEnv: new CwdRelativePath('.test_env').absolutePath,
 }
 
@@ -28,7 +22,7 @@ export const TestProject = {
     async initialize() {
         await TestProject.cleanUp();
         await Fs.mkdir(Paths.testEnv, { recursive: true });
-        await Fs.copyFile(Paths.testPackageJson, envPath('package.json'));
+        await TestProject.fixture('packageJson', 'package.json');
         await TestProject.spawn(Commands.npm, ['i']).untilExited();
     },
     smooch(...args: string[]) {
@@ -50,4 +44,7 @@ export const TestProject = {
     mkdirs(...paths: string[]) {
         return Promise.all(paths.map(path => TestProject.mkdir(path)));
     },
+    fixture(fixtureKey: keyof typeof TestFixtures, dstFileName: string) {
+        return Fs.copyFile(TestFixtures[fixtureKey], envPath(dstFileName));
+    }
 }

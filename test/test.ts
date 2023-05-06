@@ -1,18 +1,9 @@
-import { Fs } from "../lib/common/fs";
 import { handleFatalError } from "../lib/common/handle-fatal-error";
-import { TestProject } from "./test-project";
+import { TestProject } from "./utils/test-project";
 
 Promise.resolve()
 .then(runTest)
 .catch(handleFatalError);
-
-function siblingPath(filename: string) {
-    return Fs.resolve(__filename, '../' + filename);
-}
-
-const Paths = {
-    imagePng: siblingPath('env-image.png'),
-}
 
 async function runTest() {
     await TestProject.initialize();
