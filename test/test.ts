@@ -16,7 +16,7 @@ async function runTest() {
         }]
     });
     const smooch = TestProject.smooch();
-    await smooch.untilStdOutIncludes('Packed');
+    await smooch.stdOut.untilPrinted('Packed');
     smooch.kill();
     await smooch.untilExited();
 }
