@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import { Fs } from "../../lib/common/fs";
 import { CwdRelativePath } from "../../lib/common/relative-path";
 import { TestFixtures } from "./test-fixtures";
@@ -45,6 +46,9 @@ export const TestProject = {
         return Promise.all(paths.map(path => TestProject.mkdir(path)));
     },
     fixture(fixtureKey: keyof typeof TestFixtures, dstFileName: string) {
-        return Fs.copyFile(TestFixtures[fixtureKey], envPath(dstFileName));
+        const src = TestFixtures[fixtureKey];
+        const dst = envPath(dstFileName);
+        console.log(chalk.green`[test]` + ` Copy fixture ${src} -> ${dst}`);
+        return Fs.copyFile(src, dst);
     }
 }
