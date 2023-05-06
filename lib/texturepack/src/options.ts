@@ -6,8 +6,10 @@ import { CwdRelativePath } from "../../common/relative-path";
 const PositiveInteger = refine(integer(), "positive", (value) => value > 0);
 
 export const BinPackOptions = object({
-	maxWidth: defaulted(PositiveInteger, 1024),
-	maxHeight: defaulted(PositiveInteger, 1024),
+	// Reasonable defaults from
+	// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices#understand_system_limits
+	maxWidth: defaulted(PositiveInteger, 4096),
+	maxHeight: defaulted(PositiveInteger, 4096),
 	smart: defaulted(boolean(), true),
 	pot: defaulted(boolean(), true),
 	square: defaulted(boolean(), true),
