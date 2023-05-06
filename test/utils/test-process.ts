@@ -1,5 +1,5 @@
 import { ChildProcess, spawn } from "child_process";
-import { wait } from "../lib/common/wait";
+import { wait } from "../../lib/common/wait";
 import chalk from "chalk";
 import kill from "tree-kill";
 
