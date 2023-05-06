@@ -9,6 +9,8 @@ export const JsonFile = {
 		    return JSON.parse(jsonText);
         }
         catch (e) {
+            if (e instanceof SyntaxError)
+                throw new RethrownError(`File [${path}] does not appear to be valid JSON.`, e);
             throw new RethrownError(`Failed to read JSON file [${path}]. Does it exist?`, e);
         }
 	}
