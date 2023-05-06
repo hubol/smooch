@@ -2,65 +2,30 @@ import { ChildProcess, spawn } from "child_process";
 import { wait } from "../../lib/common/wait";
 import chalk from "chalk";
 import kill from "tree-kill";
+import { Readable } from "stream";
 
 export class TestProcess {
     private readonly _childProcess: ChildProcess;
 
-    private _stdErrText = '';
-    private _stdOutText = '';
-
     private _exited = false;
     private _exitCode: number | null = null;
 
-    private readonly _commandTitle: string;
+    readonly stdOut: TestStream;
+    readonly stdErr: TestStream;
 
     constructor(...args: Parameters<typeof spawn>) {
         this._childProcess = spawn(...args);
 
-        this._commandTitle = `[${args[0]}${args[1].length > 0 ? ' ' : ''}${args[1].join(' ')}] `;
+        const commandTitle = `[${args[0]}${args[1].length > 0 ? ' ' : ''}${args[1].join(' ')}] `;
 
-        // This is apparently why stdout is nullable https://stackoverflow.com/a/29024376
-        this._childProcess.stdout!.on('data', data => {
-            this._stdOutText += data;
-            this._printedStdOutIndex = this._print();
-        });
-        this._childProcess.stderr!.on('data', data => {
-            this._stdErrText += data;
-            this._printedStdErrIndex = this._print(this._stdErrText, this._printedStdErrIndex, console.error, chalk.red);
-        });
+        // This might explain why stdout is nullable: https://stackoverflow.com/a/29024376
+        this.stdOut = new TestStream(this._childProcess.stdout!, [ commandTitle, console.log, chalk.blue ]);
+        this.stdErr = new TestStream(this._childProcess.stderr!, [ commandTitle, console.error, chalk.red ]);
+        
         this._childProcess.on('exit', code => {
             this._exited = true;
             this._exitCode = code;
         })
-    }
-
-    private _printedStdOutIndex = -1;
-    private _printedStdErrIndex = -1;
-
-    private _print(text = this._stdOutText, index = this._printedStdOutIndex, log = console.log, color = chalk.blue) {
-        let nextIndex = text.indexOf('\n', index + 1);
-        while (nextIndex > index) {
-            const textToLog = text.substring(index, nextIndex).replace('\n', '');
-            log(color(this._commandTitle) + textToLog);
-            index = nextIndex;
-            nextIndex = text.indexOf('\n', index + 1);
-        }
-
-        return index;
-    }
-
-    get exitCode() {
-        return this._exitCode;
-    }
-
-    async untilStdOutIncludes(...args: Parameters<string['includes']>) {
-        await wait(() => !!this._stdOutText.includes(...args));
-        return this;
-    }
-
-    async untilStdErrIncludes(...args: Parameters<string['includes']>) {
-        await wait(() => !!this._stdErrText.includes(...args));
-        return this;
     }
 
     async untilExited() {
@@ -71,5 +36,45 @@ export class TestProcess {
     kill() {
         kill(this._childProcess.pid!);
         return this;
+    }
+}
+
+type RedirectArgs = [ title: string, logFn: typeof console['log'], color: typeof chalk['blue'] ];
+
+class TestStream {
+    private _text = '';
+    private _printedIndex = -1;
+    private _checkedTextIndex = -1;
+    
+    constructor(private readonly _readable: Readable, private readonly _redirect: RedirectArgs) {
+        this._readable.on('data', data => {
+            this._text += data;
+            this._tryPrint();
+        });
+    }
+
+    private _log(message: string) {
+        const [ title, logFn, color ] = this._redirect;
+        logFn(color(title) + message);
+    }
+
+    private _tryPrint() {
+        let nextIndex = this._text.indexOf('\n', this._printedIndex + 1);
+        while (nextIndex > this._printedIndex) {
+            const textToLog = this._text.substring(this._printedIndex, nextIndex).replace('\n', '');
+            this._log(textToLog);
+            this._printedIndex = nextIndex;
+            nextIndex = this._text.indexOf('\n', this._printedIndex + 1);
+        }
+    }
+
+    untilPrinted(search: string) {
+        return wait(() => {
+            const nextIndex = this._text.indexOf(search, this._checkedTextIndex + 1);
+            if (nextIndex <= this._checkedTextIndex)
+                return false;
+            this._checkedTextIndex = nextIndex;
+            return true;
+        });
     }
 }
