@@ -14,7 +14,7 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 	const { folder: imagesFolder, outFolder, outTemplate, outTemplateExtension, ...rawPackerOptions } = options;
 	const { fileName } = rawPackerOptions;
 
-	const getOutputTextFromTemplate = await Template.fromFile(outTemplate.absolutePath);
+	const template = await Template.fromFile(outTemplate.absolutePath);
 
 	console.log(`Loading images from folder ${imagesFolder}...`);
 
@@ -29,12 +29,8 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 	await Fs.mkdir(outFolder.absolutePath, { recursive: true });
 	await Promise.all(atlases.map((atlas) => Fs.writeFile(path.resolve(outFolder.absolutePath, atlas.fileName), atlas.imageBuffer)));
 
-	const templateContext = createTemplateContext(atlases, imagesFolder);
-
-	const outputText = getOutputTextFromTemplate(templateContext);
-
-	console.log("Writing templated output...");
-	await Fs.writeFile(path.resolve(outFolder.absolutePath, `${fileName}.${outTemplateExtension}`), outputText);
+	const context = createTemplateContext(atlases, imagesFolder);
+	template.renderToFile(context, path.resolve(outFolder.absolutePath, `${fileName}.${outTemplateExtension}`));
 
 	console.log("Packed");
 };
