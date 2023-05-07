@@ -13,7 +13,7 @@ export const AggregateJsonOptions = object({
 });
 
 export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>) {
-    const getOutputTextFromTemplate = await Template.fromFile(options.outTemplate.absolutePath);
+    const template = await Template.fromFile(options.outTemplate.absolutePath);
 
     const jsonPaths = await glob(`/**/*.json`, { root: options.folder.path });
     console.log(`Found ${jsonPaths.length} JSON file(s) in ${options.folder.absolutePath}...`);
@@ -28,7 +28,6 @@ export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>)
             console.error(`An error occurred while reading ${path}`, e);
         }
     }));
-
-    const text = getOutputTextFromTemplate({ files });
-    await Fs.writeFile(options.outFile.absolutePath, text);
+    
+    await template.renderToFile({ files }, options.outFile.absolutePath);
 }
