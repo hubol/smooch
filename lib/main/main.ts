@@ -5,7 +5,7 @@ import { Fs } from "../common/fs";
 import { SmoochWatcher, SmoochWorker } from "./smooch-watcher";
 import { texturePack } from "../texturepack/src/texture-pack";
 import { AggregateJsonOptions, aggregateJson } from "../json/aggregate-json";
-import { CwdRelativePath } from "../common/relative-path";
+import { CwdRelativePath, RelativePath } from "../common/relative-path";
 
 const CoreConfig = object({
     cacheFolder: SmoochStruct.CwdRelativePath,
@@ -20,21 +20,26 @@ export const MainConfig = object({
 export async function main({ core, textures, jsonFiles }: Infer<typeof MainConfig>) {
     await Fs.mkdir(core.cacheFolder.absolutePath, { recursive: true });
     
-    for (let i = 0; i < textures.length; i++) {
-        const texture = textures[i];
-        const textureWorker = new SmoochWorker(() => texturePack(texture));
-        const textureWatcher = new SmoochWatcher(`texture[${i}]`, texture.folder, texture.outFolder, core.cacheFolder, textureWorker);
-        await textureWatcher.start();
-        await textureWatcher.catchUp();
+    async function createAndStartWorkers<T>(
+        name: string,
+        configs: T[],
+        doWorkFn: (t: T) => Promise<void>,
+        inputFolderFn: (t: T) => RelativePath,
+        outputFolderFn: (t: T) => RelativePath) {
+            for (let i = 0; i < configs.length; i++) {
+                const config = configs[i];
+                const worker = new SmoochWorker(() => doWorkFn(config));
+                const watcherName = `${name}${configs.length === 1 ? '' : `[${i}]`}`;
+                const inputFolder = inputFolderFn(config);
+                const outputFolder = outputFolderFn(config);
+                const watcher = new SmoochWatcher(watcherName, inputFolder, outputFolder, core.cacheFolder, worker);
+                await watcher.start();
+                await watcher.catchUp();    
+            }      
     }
 
-    for (let i = 0; i < jsonFiles.length; i++) {
-        const jsonFile = jsonFiles[i];
-        const jsonFileWorker = new SmoochWorker(() => aggregateJson(jsonFile));
-        const outFolder = new CwdRelativePath(Fs.dirname(jsonFile.outFile.absolutePath));
-        const jsonFileWatcher = new SmoochWatcher(`jsonFile[${i}]`, jsonFile.folder, outFolder, core.cacheFolder, jsonFileWorker);
-        await jsonFileWatcher.start();
-        await jsonFileWatcher.catchUp();
-    }
+    createAndStartWorkers('texture', textures, texturePack, t => t.folder, t => t.outFolder);
+    createAndStartWorkers('jsonFile', jsonFiles, aggregateJson, j => j.folder, j => new CwdRelativePath(Fs.dirname(j.outFile.absolutePath)));
+
     // await textureWatcher.stop();
 }
