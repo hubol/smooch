@@ -60,7 +60,7 @@ class DirectorySubscriber {
 }
 
 export class SmoochWatcher {
-    private _started: boolean;
+    private _started = false;
 
     constructor(
         readonly name: string,

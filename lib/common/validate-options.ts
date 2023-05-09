@@ -6,7 +6,7 @@ export function validateOptions<T>(options: any, schema: Struct<T>) {
 		const defaultedOptions = create(options, schema);
 		assert(defaultedOptions, schema);
 		return defaultedOptions;
-	} catch (e) {
+	} catch (e: any) {
 		const { key, value, type } = e;
 		let error;
 		if (value === undefined) {
