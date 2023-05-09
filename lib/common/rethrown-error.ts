@@ -1,9 +1,9 @@
-// https://stackoverflow.com/a/42755876
+// How to rethrow an error: https://stackoverflow.com/a/42755876
 export class RethrownError extends Error {
-  public readonly originalError: Error;
+  public readonly originalError: unknown;
   public readonly stackBeforeRethrow: string | undefined;
 
-  constructor(message: string, error: Error){
+  constructor(message: string, error: unknown){
     super(message);
     this.name = this.constructor.name;
     if (!error)
@@ -13,6 +13,6 @@ export class RethrownError extends Error {
     this.stackBeforeRethrow = this.stack;
     const messageLines =  (this.message.match(/\n/g)||[]).length + 1;
     this.stack = (this.stack ?? '').split('\n').slice(0, messageLines + 1).join('\n') + '\n' +
-                 error.stack
+                 ((typeof error === 'object' && 'stack' in error) ? error.stack : '');
   }
 }
