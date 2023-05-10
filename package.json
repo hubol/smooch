@@ -25,6 +25,7 @@
   "devDependencies": {
     "@types/sharp": "^0.31.1",
     "tree-kill": "^1.2.2",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "typescript-json-schema": "^0.56.0"
   }
 }

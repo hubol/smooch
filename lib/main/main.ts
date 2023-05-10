@@ -11,13 +11,15 @@ const CoreConfig = object({
     cacheFolder: SmoochStruct.CwdRelativePath,
 })
 
-export const MainConfig = object({
+export const SmoochConfig = object({
     core: CoreConfig,
     textures: defaulted(array(PackerOptions), []),
     jsonFiles: defaulted(array(AggregateJsonOptions), []),
 });
 
-export async function main({ core, textures, jsonFiles }: Infer<typeof MainConfig>) {
+export type SmoochConfigType = Infer<typeof SmoochConfig>;
+
+export async function main({ core, textures, jsonFiles }: Infer<typeof SmoochConfig>) {
     await Fs.mkdir(core.cacheFolder.absolutePath, { recursive: true });
     
     async function createAndStartWorkers<T>(
