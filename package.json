@@ -17,7 +17,6 @@
     "chalk": "^4.1.2",
     "change-case": "^4.1.2",
     "glob": "^10.0.0",
-    "handlebars": "^4.7.7",
     "maxrects-packer": "^2.7.2",
     "sharp": "^0.32.0",
     "superstruct": "^0.15.2",

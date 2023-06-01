@@ -4,16 +4,16 @@ import { CwdRelativePath } from "../common/relative-path";
 import { Fs } from "../common/fs";
 import { glob } from "glob";
 import { JsonFile } from "../common/json-file";
-import { Template } from "../common/template";
+import { JsTemplate } from "../common/template";
 
 export const AggregateJsonOptions = object({
     folder: SmoochStruct.CwdRelativePath,
     outFile: SmoochStruct.CwdRelativePath,
-    outTemplate: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(Fs.resolve(__filename, '../default.handlebars'))),
+    outTemplate: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(Fs.resolve(__filename, '../default-template.js'))),
 });
 
 export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>) {
-    const template = await Template.fromFile(options.outTemplate.absolutePath);
+    const template = await JsTemplate.fromFile(options.outTemplate.absolutePath);
 
     const jsonPaths = await glob(`/**/*.json`, { root: options.folder.path });
     console.log(`Found ${jsonPaths.length} JSON file(s) in ${options.folder.absolutePath}...`);

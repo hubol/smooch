@@ -1,7 +1,7 @@
 import path from "path";
 import { PackerOptions } from "./options";
 import { glob } from "glob";
-import { Template } from "../../common/template";
+import { JsTemplate } from "../../common/template";
 import { packTextures } from "./raw-packer";
 import { Infer } from "superstruct";
 import { merge } from "../../common/merge";
@@ -14,7 +14,7 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 	const { folder: imagesFolder, outFolder, outTemplate, outTemplateExtension, ...rawPackerOptions } = options;
 	const { fileName } = rawPackerOptions;
 
-	const template = await Template.fromFile(outTemplate.absolutePath);
+	const template = await JsTemplate.fromFile(outTemplate.absolutePath);
 
 	console.log(`Loading images from folder ${imagesFolder}...`);
 

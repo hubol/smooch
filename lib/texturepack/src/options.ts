@@ -26,7 +26,7 @@ export const PackerOptions = assign(
 		folder: SmoochStruct.CwdRelativePath,
 		outFolder: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(process.cwd())),
 		outTemplateExtension: defaulted(string(), "js"),
-		outTemplate: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(path.resolve(__filename, '../../default.handlebars'))),
+		outTemplate: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(path.resolve(__filename, '../../default-template.js'))),
 	}),
 	RawPackerOptions
 );
