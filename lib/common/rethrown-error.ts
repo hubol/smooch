@@ -1,7 +1,7 @@
 // How to rethrow an error: https://stackoverflow.com/a/42755876
 export class RethrownError extends Error {
   public readonly originalError: unknown;
-  public readonly stackBeforeRethrow: string | undefined;
+  public readonly stackBeforeRethrow?: string;
 
   constructor(message: string, error: unknown){
     super(message);
