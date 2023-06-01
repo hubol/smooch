@@ -13,7 +13,10 @@ async function generateSmoochConfigSchema() {
     
     const transformedJsonSchema = JSON.stringify(schemaObject, undefined, 2);
     console.log(`Got transformed schema with ${countLines(transformedJsonSchema)} lines.`);
-    await Fs.writeFile('smooch-schema.json', transformedJsonSchema);
+
+    const dstFile = 'smooch-schema.json';
+    await Fs.writeFile(dstFile, transformedJsonSchema);
+    console.log(`Wrote schema to ${dstFile}.`);
 }
 
 generateSmoochConfigSchema();

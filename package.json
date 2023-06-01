@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "description": "Generate texture atlases, audio sprites, and source code from directories",
   "scripts": {
-    "test": "ts-node --transpileOnly test/test.ts"
+    "test": "ts-node --transpileOnly test/test.ts",
+    "generate:json-schema": "ts-node ./tools/generate-config-schema.ts"
   },
   "bin": {
     "smooch": "lib/main/bin.js"
