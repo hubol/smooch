@@ -1,37 +1,38 @@
 import { PathLike } from "fs";
-import Handlebars from "handlebars";
 import { pascalCase } from "pascal-case";
 import { camelCase } from "change-case";
 import { Fs } from "./fs";
 import chalk from "chalk";
 
-Handlebars.registerHelper("camel", camelCase);
-Handlebars.registerHelper("pascal", pascalCase);
-Handlebars.registerHelper("noext", string => string.replace(/\.[^/\\.]+$/, ""));
-Handlebars.registerHelper("json", object => JSON.stringify(object, undefined, 1));
-Handlebars.registerHelper("oneline", string => string.replace(/\s+/g, ' '));
+const utils = {
+	camel: camelCase,
+	pascal: pascalCase,
+	noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
+	json: (object: any) => JSON.stringify(object, undefined, 1),
+	oneline: (string: string) => string.replace(/\s+/g, ' '),
+};
 
-const HandlebarsTemplate = {
-	async fromFile(templateFile: PathLike) {
-		const templateText = await Fs.readFile(templateFile, 'utf8');
-		return Handlebars.compile(templateText);
-	}
-}
+type Utils = typeof utils;
+type JsTemplateFn = (context: Record<string, any>, utils: Utils) => string | Promise<string>;
 
-export class Template {
+export class JsTemplate {
 	private constructor(
 		private readonly _srcFile: string,
-		private readonly _delegate: HandlebarsTemplateDelegate) { }
+		private readonly _templateFn: JsTemplateFn) { }
 
 	static async fromFile(templateFile: string) {
-		const templateText = await Fs.readFile(templateFile, 'utf8');
-		return new Template(templateFile, Handlebars.compile(templateText));
+		const defaultExport = require(templateFile);
+		return new JsTemplate(templateFile, defaultExport);
+	}
+
+	private _render(context: Record<string, any>) {
+		return Promise.resolve(this._templateFn(context, utils));
 	}
 
 	async renderToFile(context: Record<string, any>, outputFile: PathLike) {
 		try {
 			console.log(this + "Rendering templated output...");
-			const text = this._delegate(context);
+			const text = await this._render(context);
 			console.log(this + `Writing output to ${outputFile}...`);
     		await Fs.writeFile(outputFile, text);
 			console.log(this + `Done!`);

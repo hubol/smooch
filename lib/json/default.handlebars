@@ -1,7 +1,0 @@
-// This file is generated.
-
-export const JsonFiles = {
-    {{#each files}}
-    "{{pascal (noext fileName)}}": {{{oneline (json this.json)}}},
-    {{/each}}
-}
