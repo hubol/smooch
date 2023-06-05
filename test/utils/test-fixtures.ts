@@ -6,5 +6,6 @@ function fixturePath(filename: string) {
 
 export const TestFixtures = {
     image256Png: fixturePath('image256.png'),
+    fixtureJson: fixturePath('fixture.json'),
     packageJson: fixturePath('package.json'),
 }
