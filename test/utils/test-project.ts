@@ -3,6 +3,8 @@ import { Fs } from "../../lib/common/fs";
 import { CwdRelativePath } from "../../lib/common/relative-path";
 import { TestFixtures } from "./test-fixtures";
 import { TestProcess } from "./test-process";
+import { TextFile } from "../../lib/common/text-file";
+import { compareText } from "./compare-text";
 
 const Paths = {
     testEnv: new CwdRelativePath('.test_env').absolutePath,
@@ -48,7 +50,14 @@ export const TestProject = {
     fixture(fixtureKey: keyof typeof TestFixtures, dstFileName: string) {
         const src = TestFixtures[fixtureKey];
         const dst = envPath(dstFileName);
-        console.log(chalk.green`[test]` + ` Copy fixture ${src} -> ${dst}`);
+        TestProject.log(`Copy fixture ${src} -> ${dst}`);
         return Fs.copyFile(src, dst);
+    },
+    check(envFileName: string, expected: string) {
+        const actual = TextFile.readSync(envPath(envFileName));
+        return compareText(actual, expected, { defaultContext: envFileName });
+    },
+    log(message: string) {
+        console.log(chalk.green`[test]` + ` ${message}`);
     }
 }
