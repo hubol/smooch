@@ -3,6 +3,7 @@ import { wait } from "../../lib/common/wait";
 import chalk from "chalk";
 import kill from "tree-kill";
 import { Readable } from "stream";
+import { Logger } from "../../lib/common/logger";
 
 export class TestProcess {
     private readonly _childProcess: ChildProcess;
@@ -16,11 +17,12 @@ export class TestProcess {
     constructor(...args: Parameters<typeof spawn>) {
         this._childProcess = spawn(...args);
 
-        const commandTitle = `[${args[0]}${args[1].length > 0 ? ' ' : ''}${args[1].join(' ')}] `;
+        const commandTitle = `${args[0]}${args[1].length > 0 ? ' ' : ''}${args[1].join(' ')}`;
 
         // This might explain why stdout is nullable: https://stackoverflow.com/a/29024376
-        this.stdOut = new TestStream(this._childProcess.stdout!, [ commandTitle, console.log, chalk.blue ]);
-        this.stdErr = new TestStream(this._childProcess.stderr!, [ commandTitle, console.error, chalk.red ]);
+        const logger = new Logger(commandTitle, 'blue');
+        this.stdOut = new TestStream(this._childProcess.stdout!, { logger, type: 'log' });
+        this.stdErr = new TestStream(this._childProcess.stderr!, { logger, type: 'error' });
         
         this._childProcess.on('exit', code => {
             this._exited = true;
@@ -39,7 +41,7 @@ export class TestProcess {
     }
 }
 
-type RedirectArgs = [ title: string, logFn: typeof console['log'], color: typeof chalk['blue'] ];
+type RedirectArgs = { logger: Logger, type: 'log' | 'error' };
 
 class TestStream {
     private _text = '';
@@ -54,8 +56,9 @@ class TestStream {
     }
 
     private _log(message: string) {
-        const [ title, logFn, color ] = this._redirect;
-        logFn(color(title) + message);
+        const { logger, type } = this._redirect;
+        const color = type === 'error' ? chalk.red : chalk.white;
+        logger[type](color(message));
     }
 
     private _tryPrint() {
