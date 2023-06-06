@@ -2,7 +2,7 @@ import { PathLike } from "fs";
 import { pascalCase } from "pascal-case";
 import { camelCase } from "change-case";
 import { Fs } from "./fs";
-import chalk from "chalk";
+import { Logger } from "./logger";
 
 const utils = {
 	camel: camelCase,
@@ -14,6 +14,8 @@ const utils = {
 
 type Utils = typeof utils;
 type JsTemplateFn = (context: Record<string, any>, utils: Utils) => string | Promise<string>;
+
+const logger = new Logger('Template', 'yellow');
 
 export class JsTemplate {
 	private constructor(
@@ -31,18 +33,14 @@ export class JsTemplate {
 
 	async renderToFile(context: Record<string, any>, outputFile: PathLike) {
 		try {
-			console.log(this + "Rendering templated output...");
+			logger.log("Rendering templated output...");
 			const text = await this._render(context);
-			console.log(this + `Writing output to ${outputFile}...`);
+			logger.log(`Writing output to ${outputFile}...`);
     		await Fs.writeFile(outputFile, text);
-			console.log(this + `Done!`);
+			logger.log(`Done!`);
 		}
 		catch (e) {
-			console.error(this + `An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context=${context}:`, e);
+			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context=${context}:`, e);
 		}
-	}
-
-	toString() {
-		return chalk.yellow`[Template] `;
 	}
 }

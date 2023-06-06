@@ -11,11 +11,19 @@ export class Logger {
     }
 
     log(message: any, ...additional: any[]) {
-        console.log(`${this._prefix}${message}`, ...additional);
+        this._print('log', message, additional);
     }
 
     error(message: any, ...additional: any[]) {
-        console.error(`${this._prefix}${message}`, ...additional);
+        this._print('error', message, additional);
+    }
+
+    warn(message: any, ...additional: any[]) {
+        this._print('warn', message, additional);
+    }
+
+    private _print(key: 'log' | 'error' | 'warn', message: any, additional: any[]) {
+        console[key](`${this._prefix}${message}`, ...additional);
     }
 }
 

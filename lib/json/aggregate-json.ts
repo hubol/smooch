@@ -5,6 +5,7 @@ import { Fs } from "../common/fs";
 import { glob } from "glob";
 import { JsonFile } from "../common/json-file";
 import { JsTemplate } from "../common/template";
+import { Logger } from "../common/logger";
 
 export const AggregateJsonOptions = object({
     folder: SmoochStruct.CwdRelativePath,
@@ -12,11 +13,13 @@ export const AggregateJsonOptions = object({
     outTemplate: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(Fs.resolve(__filename, '../default-template.js'))),
 });
 
+const logger = new Logger('JsonAggregator', 'cyan');
+
 export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>) {
     const template = await JsTemplate.fromFile(options.outTemplate.absolutePath);
 
     const jsonPaths = await glob(`/**/*.json`, { root: options.folder.path });
-    console.log(`Found ${jsonPaths.length} JSON file(s) in ${options.folder.absolutePath}...`);
+    logger.log(`Found ${jsonPaths.length} JSON file(s) in ${options.folder.absolutePath}...`);
 
     const files = await Promise.all(jsonPaths.map(async path => {
         const fileName = path.substring(options.folder.absolutePath.length);
@@ -25,7 +28,7 @@ export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>)
             return { fileName, json };
         }
         catch (e) {
-            console.error(`An error occurred while reading ${path}`, e);
+            logger.error(`An error occurred while reading ${path}`, e);
         }
     }));
     

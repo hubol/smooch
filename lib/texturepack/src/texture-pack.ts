@@ -9,6 +9,9 @@ import { AsyncReturnType } from "../../common/async-return-type";
 import { RelativePath } from "../../common/relative-path";
 import { sortArrayByKey } from "../../common/sort-array-by-key";
 import { Fs } from "../../common/fs";
+import { Logger } from "../../common/logger";
+
+const logger = new Logger('TexturePacker', 'magenta');
 
 export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 	const { folder: imagesFolder, outFolder, outTemplate, outTemplateExtension, ...rawPackerOptions } = options;
@@ -16,23 +19,23 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 
 	const template = await JsTemplate.fromFile(outTemplate.absolutePath);
 
-	console.log(`Loading images from folder ${imagesFolder}...`);
+	logger.log(`Loading images from folder ${imagesFolder}...`);
 
 	const imageFilePaths = await glob(`/**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}`, { root: imagesFolder.path });
 
 	if (!imageFilePaths.length)
-		console.warn(`No images found in ${imagesFolder}`);
+	logger.warn(`No images found in ${imagesFolder}`);
 
 	const atlases = await createAtlases(imageFilePaths, options);
 
-	console.log("Writing images...");
+	logger.log("Writing images...");
 	await Fs.mkdir(outFolder.absolutePath, { recursive: true });
 	await Promise.all(atlases.map((atlas) => Fs.writeFile(path.resolve(outFolder.absolutePath, atlas.fileName), atlas.imageBuffer)));
 
 	const context = createTemplateContext(atlases, imagesFolder);
 	template.renderToFile(context, path.resolve(outFolder.absolutePath, `${fileName}.${outTemplateExtension}`));
 
-	console.log("Packed");
+	logger.log("Packed");
 };
 
 async function createAtlases(imageFilePaths: string[], options: Infer<typeof PackerOptions>) {
