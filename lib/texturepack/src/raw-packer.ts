@@ -5,6 +5,9 @@ import { RawPackerOptions } from "./options";
 import { Bin } from "maxrects-packer";
 import { AsyncReturnType } from "../../common/async-return-type";
 import { Infer } from "superstruct";
+import { Logger } from "../../common/logger";
+
+const logger = new Logger('RawPacker', 'magenta');
 
 type Block = { width: number, height: number, file: string, atlas?: { i: number, j: number, n: number, m: number } };
 type PackedBlock = ReturnType<typeof binPack<Block>>[number]['rects'][number];
@@ -62,7 +65,7 @@ const computeMainImage = async (width: number, height: number, blocks: PackedBlo
 			};
 		})
 	);
-	console.log("Processing images...");
+	logger.log("Processing images...");
 	const maxSize = 100;
 	const packsNum = Math.ceil(list.length / maxSize);
 	const packs = new Array(packsNum);
@@ -89,7 +92,7 @@ const computeMainImage = async (width: number, height: number, blocks: PackedBlo
 		const pack = packs.pop();
 		buff = await sharp(buff).composite(pack).png().toBuffer();
 		if (packs.length > 1) {
-			console.log(
+			logger.log(
 				`Processed: ${Math.round(
 					(100 * (images += pack.length)) / list.length
 				)}%`
@@ -102,7 +105,7 @@ const computeMainImage = async (width: number, height: number, blocks: PackedBlo
 export const packTextures = async (filePaths: string[], options: Infer<typeof RawPackerOptions>) => {
 	const { pack: packOptions } = options;
 	const blocks = (await Promise.all(filePaths.map(filePathToBlocks))).flat();
-	console.log("Packing...");
+	logger.log("Packing...");
 	const bins = binPack(blocks, packOptions) as (Bin<PackedBlock> & { imageBuffer: Buffer })[];
 
 	await Promise.all(
