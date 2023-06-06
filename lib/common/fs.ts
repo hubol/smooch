@@ -4,6 +4,7 @@ import path from "path";
 
 export const Fs = {
     readFile: util.promisify(fs.readFile),
+    readFileSync: fs.readFileSync,
     writeFile: util.promisify(fs.writeFile),
     copyFile: util.promisify(fs.copyFile),
     mkdir: util.promisify(fs.mkdir),

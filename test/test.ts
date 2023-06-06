@@ -35,4 +35,12 @@ async function runTest() {
     await smooch.stdOut.untilPrinted('Packed');
     smooch.kill();
     await smooch.untilExited();
+    
+    TestProject.check('dst-jsons/result.ts', `// This file is generated.
+
+export const JsonFiles = {
+  "Json2": { "name": "Hubol", "level": 100 },
+  "Json1": { "name": "Hubol", "level": 100 },
+  "Json0": { "name": "Hubol", "level": 100 }
+}`).print();
 }
