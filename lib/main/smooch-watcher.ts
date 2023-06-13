@@ -4,6 +4,7 @@ import { RelativePath } from "../common/relative-path";
 import { RethrownError } from "../common/rethrown-error";
 import { wait } from "../common/wait";
 import chalk from "chalk";
+import { Logger } from "../common/logger";
 
 export class SmoochWorker {
     constructor(private readonly _workFn: () => Promise<void>) {}
@@ -67,13 +68,16 @@ export class SmoochWatcher {
         readonly inputDirectory: RelativePath,
         readonly outputDirectory: RelativePath,
         readonly snapshotDirectory: RelativePath,
-        readonly worker: SmoochWorker) { }
+        readonly worker: SmoochWorker,) {
+            this._logger = new Logger(this, 'yellow');
+    }
 
     private readonly _subscriptions: DirectorySubscription[] = [];
+    private readonly _logger: Logger;
 
     async start() {
         if (this._started)
-            return console.warn(`Attempting to start already-started ${this.name}!`);
+            return this._logger.warn(`Attempting to start already-started ${this.name}!`);
         
         try {
             const subscriber = new DirectorySubscriber(this.name, this.worker);
@@ -102,6 +106,7 @@ export class SmoochWatcher {
     async save() {
         try {
             await Promise.all(this._subscriptions.map(x => x.save()));
+            this._logger.debug(`Saved state.`);
         }
         catch (e) {
             throw new RethrownError(`A fatal error occurred while saving ${this}`, e);
@@ -115,14 +120,14 @@ export class SmoochWatcher {
                 await subscription.stop();
             }
             catch (e) {
-                console.warn(`An error occurred while ${this} was stopping subscription ${subscription}`);
-                console.warn(e);
+                this._logger.warn(`An error occurred while stopping subscription ${subscription}`);
+                this._logger.warn(e);
             }
         }
     }
 
     toString() {
-        return `[SmoochWatcher] ${this.name}`;
+        return `[SmoochWatcher~${this.name}]`;
     }
 }
 
