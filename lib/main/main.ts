@@ -30,7 +30,10 @@ export async function main({ core, textures, jsonFiles }: Infer<typeof SmoochCon
         outputFolderFn: (t: T) => RelativePath) {
             for (let i = 0; i < configs.length; i++) {
                 const config = configs[i];
-                const worker = new SmoochWorker(() => doWorkFn(config));
+                const worker = new SmoochWorker(async () => {
+                    await doWorkFn(config);
+                    await watcher.save();
+                });
                 const watcherName = `${name}${configs.length === 1 ? '' : `[${i}]`}`;
                 const inputFolder = inputFolderFn(config);
                 const outputFolder = outputFolderFn(config);
