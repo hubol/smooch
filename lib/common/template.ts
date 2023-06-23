@@ -3,6 +3,7 @@ import { pascalCase } from "pascal-case";
 import { camelCase } from "change-case";
 import { Fs } from "./fs";
 import { Logger } from "./logger";
+import { format } from "prettier";
 
 const utils = {
 	camel: camelCase,
@@ -10,6 +11,7 @@ const utils = {
 	noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
 	json: (object: any) => JSON.stringify(object, undefined, 1),
 	oneline: (string: string) => string.replace(/\s+/g, ' '),
+	format,
 };
 
 type Utils = typeof utils;
