@@ -25,7 +25,14 @@ function toPrintableType(events: Event[], type: string) {
     return events.length === 1 ? `[${events[0].path} ${type}]` : `[${events.length}x ${type}]`;
 }
 
-function toPrintable(events: Event[]) {
+function toPrintableMessage({ events, isCatchUp, isNascent }: FsWatcherMessage) {
+    if (isNascent)
+        return chalk.green`<Nascent message>`
+    
+    return `${ isCatchUp ? "(Catch-up) " : "" }${toPrintableEvents(events)}`;
+}
+
+function toPrintableEvents(events: FsWatcherMessage['events']) {
     if (events.length === 0)
         return chalk.gray`<no events>`;
     
@@ -37,26 +44,34 @@ function toPrintable(events: Event[]) {
 }
 
 class DirectorySubscriber {
+    private readonly _logger: Logger;
+
     constructor(
         readonly name: string,
-        private readonly _worker: SmoochWorker) { }
+        private readonly _worker: SmoochWorker) {
+            this._logger = new Logger(this, 'blue');
+        }
 
-    async onInputDirectoryEvent(err: Error | null, events: Event[]) {
-        console.debug(`${this} received InputDirectoryEvent: ${toPrintable(events)}`);
+    async onInputDirectoryMessage(message: FsWatcherMessage) {
+        this._logger.debug(`Received InputDirectoryMessage: ${toPrintableMessage(message)}`);
+        if (message.events.length === 0 && !message.isNascent)
+            return this._logger.debug(`...InputDirectoryMessage rejected (no events and is not Nascent)`);
         await this._worker.work();
     }
 
-    async onOutputDirectoryEvent(err: Error | null, events: Event[]) {
-        const deleteEvents = events.filter(ev => ev.type === 'delete');
+    async onOutputDirectoryMessage(message: FsWatcherMessage) {
+        const deleteEvents = message.events.filter(ev => ev.type === 'delete');
 
-        if (deleteEvents.length > 0) {
-            console.debug(`${this} received OutputDirectoryEvent: ${toPrintable(deleteEvents)}`);
+        this._logger.debug(`Received OutputDirectoryMessage: ${toPrintableMessage(message)}`);
+
+        if (deleteEvents.length > 0)
             await this._worker.work();
-        }
+        else
+            this._logger.debug(`...OutputDirectoryMessage rejected (no delete events)`);
     }
 
     toString() {
-        return chalk.blue`[DirectorySubscriber ${this.name}]`;
+        return `[DirectorySubscriber ${this.name}]`;
     }
 }
 
@@ -77,14 +92,14 @@ export class SmoochWatcher {
 
     async start() {
         if (this._started)
-            return this._logger.warn(`Attempting to start already-started ${this.name}!`);
+            return this._logger.warn(`Attempting to start, but was already-started!`);
         
         try {
             const subscriber = new DirectorySubscriber(this.name, this.worker);
 
             this._subscriptions.push(...await Promise.all([
-                DirectorySubscription.create(`${this.name}-input`, this.inputDirectory, this.snapshotDirectory, (...args) => subscriber.onInputDirectoryEvent(...args)),
-                DirectorySubscription.create(`${this.name}-output`, this.outputDirectory, this.snapshotDirectory, (...args) => subscriber.onOutputDirectoryEvent(...args)),
+                DirectorySubscription.create(`${this.name}-input`, this.inputDirectory, this.snapshotDirectory, (...args) => subscriber.onInputDirectoryMessage(...args)),
+                DirectorySubscription.create(`${this.name}-output`, this.outputDirectory, this.snapshotDirectory, (...args) => subscriber.onOutputDirectoryMessage(...args)),
             ]));
         }
         catch (e) {
@@ -97,6 +112,7 @@ export class SmoochWatcher {
     async catchUp() {
         try {
             await Promise.all(this._subscriptions.map(x => x.catchUp()));
+            this._logger.log(`Caught up on events.`);
         }
         catch (e) {
             throw new RethrownError(`A fatal error occurred while checking events ${this}`, e);
@@ -131,26 +147,31 @@ export class SmoochWatcher {
     }
 }
 
+type FsWatcherMessageCallback = (message: FsWatcherMessage) => unknown;
+
 class DirectorySubscription {
+    private readonly _logger: Logger;
+
     private constructor(
         readonly name: string,
         readonly directory: RelativePath,
         private readonly _snapshotFilePath: string,
         private readonly _subscription: AsyncSubscription,
-        private readonly _subscribeCallback: SubscribeCallback) {
-            console.log(`${this} started on ${this.directory.absolutePath}...`);
+        private readonly _messageCallback: FsWatcherMessageCallback) {
+            this._logger = new Logger(this, 'yellow');
+            this._logger.log(`Started on ${this.directory.absolutePath}...`);
         }
 
-    static async create(name: string, directory: RelativePath, snapshotDirectory: RelativePath, fn: SubscribeCallback) {
+    static async create(name: string, directory: RelativePath, snapshotDirectory: RelativePath, fn: FsWatcherMessageCallback) {
         if (!await Fs.exists(directory.absolutePath))
             throw new Error(`Can't create [DirectorySubscription]: ${directory.absolutePath} does not exist!`);
-        const subscription = await ParcelWatcher.subscribe(directory.absolutePath, fn);
+        const subscription = await ParcelWatcher.subscribe(directory.absolutePath, (error, events) => fn(FsWatcherMessageFactory.createMessage(error, events)));
         return new DirectorySubscription(name, directory, Fs.resolve(snapshotDirectory.absolutePath, `snapshot-${name}.txt`), subscription, fn);
     }
 
     async catchUp() {
-        const events = await ParcelWatcher.getEventsSince(this.directory.absolutePath, this._snapshotFilePath);
-        this._subscribeCallback(null, events);
+        const message = await FsWatcherMessageFactory.createCatchUpMessage(this.directory, this._snapshotFilePath);
+        this._messageCallback(message);
     }
 
     async save() {
@@ -158,12 +179,36 @@ class DirectorySubscription {
     }
 
     async stop() {
-        console.log('Stopping ' + this + '...');
+        this._logger.log('Stopping...');
         await this._subscription.unsubscribe();
-        console.log('...Stopped ' + this);
+        this._logger.log('...Stopped.');
     }
 
     toString() {
         return chalk.blue`[DirectorySubscription ${this.name}]`;
+    }
+}
+
+interface FsWatcherMessage {
+    events: Event[];
+    error: Error | null;
+    isCatchUp: boolean;
+    isNascent: boolean;
+}
+
+class FsWatcherMessageFactory {
+    private static readonly _logger = new Logger(FsWatcherMessageFactory, 'blue');
+
+    static async createCatchUpMessage(directory: RelativePath, snapshotFilePath: string): Promise<FsWatcherMessage> {
+        if (!await Fs.exists(snapshotFilePath)) {
+            this._logger.log(`Snapshot file (${snapshotFilePath}) does not exist. Creating Nascent Catch-up message...`);
+            return { events: [], isCatchUp: true, isNascent: true, error: null };
+        }
+        const events = await ParcelWatcher.getEventsSince(directory.absolutePath, snapshotFilePath);
+        return { events, isCatchUp: true, isNascent: false, error: null };
+    }
+
+    static createMessage(error: Error | null, events: Event[]): FsWatcherMessage {
+        return { error, events, isCatchUp: false, isNascent: false };
     }
 }

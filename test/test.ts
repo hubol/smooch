@@ -43,4 +43,11 @@ export const JsonFiles = {
   "Json1": { "name": "Hubol", "level": 100 },
   "Json0": { "name": "Hubol", "level": 100 }
 }`).print();
+
+    await TestProject.fixture('image256Png', `src-images/image11.png`);
+
+    const smooch2 = TestProject.smooch();
+    await smooch2.stdOut.untilPrinted('Saved state.');
+    smooch2.kill();
+    await smooch2.untilExited();
 }

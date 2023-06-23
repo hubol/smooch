@@ -29,6 +29,7 @@ export const TestProject = {
         await TestProject.spawn(Commands.npm, ['i']).untilExited();
     },
     smooch(...args: string[]) {
+        TestProject.log(`Starting smooch...`);
         return TestProject.spawn(Commands.npx, ['smooch', ...args]);
     },
     writeSmoochJson(config: any) {
