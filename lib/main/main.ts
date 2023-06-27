@@ -43,8 +43,8 @@ export async function main({ core, textures, jsonFiles }: Infer<typeof SmoochCon
             }      
     }
 
-    createAndStartWorkers('texture', textures, texturePack, t => t.folder, t => t.outFolder);
-    createAndStartWorkers('jsonFile', jsonFiles, aggregateJson, j => j.folder, j => new CwdRelativePath(Fs.dirname(j.outFile.absolutePath)));
+    createAndStartWorkers('texPack', textures, texturePack, t => t.folder, t => t.outFolder);
+    createAndStartWorkers('jsonAgg', jsonFiles, aggregateJson, j => j.folder, j => new CwdRelativePath(Fs.dirname(j.outFile.absolutePath)));
 
     // await textureWatcher.stop();
 }

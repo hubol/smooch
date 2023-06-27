@@ -7,7 +7,7 @@ export class Logger {
     }
 
     private get _prefix() {
-        return chalk[this.color]`[${getPrintableContext(this.context)}] `;
+        return chalk[this.color]`${padLeftWithSpaces(getPrintableContext(this.context))} `;
     }
 
     log(message: any, ...additional: any[]) {
@@ -28,6 +28,46 @@ export class Logger {
 
     private _print(key: 'log' | 'error' | 'warn' | 'debug', message: any, additional: any[]) {
         console[key](`${this._prefix}${message}`, ...additional);
+    }
+}
+
+const maxLength = 30;
+const spaces = new Array(maxLength).map(() => '').join(' ');
+
+function padLeftWithSpaces(source: string) {
+    const padded = spaces + eliminateVowels(source);
+    return padded.substring(padded.length - maxLength, padded.length);
+}
+
+function eliminateVowels(source: string) {
+    if (source.length <= maxLength)
+        return source;
+    
+    const characters = [...source];
+    let eliminateCount = characters.length - maxLength;
+    for (let i = 0; i < characters.length; i++) {
+        const character = characters[i];
+        const nextCharacter = eliminateVowel(character);
+        if (nextCharacter !== character) {
+            characters[i] = nextCharacter;
+            eliminateCount -= 1;
+        }
+        if (eliminateCount <= 0)
+            break;
+    }
+    return characters.join('');
+}
+
+function eliminateVowel(character: string) {
+    switch (character.toLowerCase()) {
+        case 'a':
+        case 'e':
+        case 'i':
+        case 'o':
+        case 'u':
+            return '';
+        default:
+            return character;
     }
 }
 
