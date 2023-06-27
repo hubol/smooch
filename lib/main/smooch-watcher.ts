@@ -98,8 +98,8 @@ export class SmoochWatcher {
             const subscriber = new DirectorySubscriber(this.name, this.worker);
 
             this._subscriptions.push(...await Promise.all([
-                DirectorySubscription.create(`${this.name}-input`, this.inputDirectory, this.snapshotDirectory, (...args) => subscriber.onInputDirectoryMessage(...args)),
-                DirectorySubscription.create(`${this.name}-output`, this.outputDirectory, this.snapshotDirectory, (...args) => subscriber.onOutputDirectoryMessage(...args)),
+                DirectorySubscription.create(`${this.name}(In)`, this.inputDirectory, this.snapshotDirectory, (...args) => subscriber.onInputDirectoryMessage(...args)),
+                DirectorySubscription.create(`${this.name}(Out)`, this.outputDirectory, this.snapshotDirectory, (...args) => subscriber.onOutputDirectoryMessage(...args)),
             ]));
         }
         catch (e) {
@@ -143,7 +143,7 @@ export class SmoochWatcher {
     }
 
     toString() {
-        return `[SmoochWatcher~${this.name}]`;
+        return `SmoochWatcher ${this.name}`;
     }
 }
 
@@ -185,7 +185,7 @@ class DirectorySubscription {
     }
 
     toString() {
-        return chalk.blue`[DirectorySubscription ${this.name}]`;
+        return `DirectorySubscription ${this.name}`;
     }
 }
 
