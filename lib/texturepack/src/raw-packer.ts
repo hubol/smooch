@@ -65,7 +65,7 @@ const computeMainImage = async (width: number, height: number, blocks: PackedBlo
 			};
 		})
 	);
-	logger.log("Processing images...");
+
 	const maxSize = 100;
 	const packsNum = Math.ceil(list.length / maxSize);
 	const packs = new Array(packsNum);
@@ -105,11 +105,13 @@ const computeMainImage = async (width: number, height: number, blocks: PackedBlo
 export const packTextures = async (filePaths: string[], options: Infer<typeof RawPackerOptions>) => {
 	const { pack: packOptions } = options;
 	const blocks = (await Promise.all(filePaths.map(filePathToBlocks))).flat();
-	logger.log("Packing...");
+
 	const bins = binPack(blocks, packOptions) as (Bin<PackedBlock> & { imageBuffer: Buffer })[];
 
 	await Promise.all(
 		bins.map(async bin => bin.imageBuffer = await computeMainImage(bin.width, bin.height, bin.rects)));
+
+	logger.log(`Created ${bins.length} image buffer(s) for ${filePaths.length} texture(s)`);
 
 	return bins;
 };

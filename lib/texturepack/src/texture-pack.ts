@@ -1,4 +1,3 @@
-import path from "path";
 import { PackerOptions } from "./options";
 import { glob } from "glob";
 import { JsTemplate } from "../../common/template";
@@ -28,12 +27,15 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 
 	const atlases = await createAtlases(imageFilePaths, options);
 
-	logger.log("Writing images...");
 	await Fs.mkdir(outFolder.absolutePath, { recursive: true });
-	await Promise.all(atlases.map((atlas) => Fs.writeFile(path.resolve(outFolder.absolutePath, atlas.fileName), atlas.imageBuffer)));
+	await Promise.all(atlases.map((atlas, i) => {
+		const file = Fs.resolve(outFolder.absolutePath, atlas.fileName);
+		logger.log(`Writing atlas ${i + 1} of ${atlases.length} to ${file}...`);
+		return Fs.writeFile(file, atlas.imageBuffer);
+	}));
 
 	const context = createTemplateContext(atlases, imagesFolder);
-	template.renderToFile(context, path.resolve(outFolder.absolutePath, `${fileName}.${outTemplateExtension}`));
+	await template.renderToFile(context, Fs.resolve(outFolder.absolutePath, `${fileName}.${outTemplateExtension}`));
 
 	logger.log("Packed");
 };
