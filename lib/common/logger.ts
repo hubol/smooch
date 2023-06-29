@@ -29,22 +29,30 @@ export class Logger {
     private _print(key: 'log' | 'error' | 'warn' | 'debug', message: any, additional: any[]) {
         console[key](`${this._prefix}${message}`, ...additional);
     }
+
+    static readonly globalOptions = {
+        maxContextLength: 30,
+    }
 }
 
-const maxLength = 30;
-const spaces = new Array(maxLength).map(() => '').join(' ');
+const spacesCache: Record<number, string> = {};
+function getPaddingSpaces(x: number) {
+    if (!spacesCache[x])
+        spacesCache[x] = new Array(x).map(() => '').join(' ');
+    return spacesCache[x];
+}
 
 function padLeftWithSpaces(source: string) {
-    const padded = spaces + eliminateVowels(source);
-    return padded.substring(padded.length - maxLength, padded.length);
+    const padded = getPaddingSpaces(Logger.globalOptions.maxContextLength) + eliminateVowels(source);
+    return padded.substring(padded.length - Logger.globalOptions.maxContextLength, padded.length);
 }
 
 function eliminateVowels(source: string) {
-    if (source.length <= maxLength)
+    if (source.length <= Logger.globalOptions.maxContextLength)
         return source;
     
     const characters = [...source];
-    let eliminateCount = characters.length - maxLength;
+    let eliminateCount = characters.length - Logger.globalOptions.maxContextLength;
     for (let i = 0; i < characters.length; i++) {
         const character = characters[i];
         const nextCharacter = eliminateVowel(character);

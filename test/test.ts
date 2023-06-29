@@ -1,5 +1,8 @@
 import { handleFatalError } from "../lib/common/handle-fatal-error";
+import { Logger } from "../lib/common/logger";
 import { TestProject } from "./utils/test-project";
+
+Logger.globalOptions.maxContextLength = 14;
 
 Promise.resolve()
 .then(runTest)

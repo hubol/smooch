@@ -1,10 +1,10 @@
-import chalk from "chalk";
 import { Fs } from "../../lib/common/fs";
 import { CwdRelativePath } from "../../lib/common/relative-path";
 import { TestFixtures } from "./test-fixtures";
 import { TestProcess } from "./test-process";
 import { TextFile } from "../../lib/common/text-file";
 import { compareText } from "./compare-text";
+import { Logger } from "../../lib/common/logger";
 
 const Paths = {
     testEnv: new CwdRelativePath('.test_env').absolutePath,
@@ -59,6 +59,8 @@ export const TestProject = {
         return compareText(actual, expected, { defaultContext: envFileName });
     },
     log(message: string) {
-        console.log(chalk.green`[test]` + ` ${message}`);
+        logger.log(message);
     }
 }
+
+const logger = new Logger('test', 'green');
