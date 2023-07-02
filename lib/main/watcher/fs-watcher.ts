@@ -61,7 +61,7 @@ export class FsWatcher {
 
         await Promise.all(this._subscriptions.map(async subscription => {
             try {
-                if (subscription.accept(message))
+                if (await Promise.resolve(subscription.accept(message)))
                     subscriptionAcceptedCount++;
             }
             catch (e) {

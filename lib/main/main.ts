@@ -3,11 +3,13 @@ import { PackerOptions } from "../texturepack/src/options";
 import { SmoochStruct } from "../common/custom-superstruct";
 import { Fs } from "../common/fs";
 import { SmoochWatcher, SmoochWorker } from "./smooch-watcher";
-import { texturePack } from "../texturepack/src/texture-pack";
+import { TexturePackRecipe, texturePack } from "../texturepack/src/texture-pack";
 import { AggregateJsonOptions, aggregateJson } from "../json/aggregate-json";
 import { AbsolutePath, CwdRelativePath, RelativePath } from "../common/relative-path";
 import { ParcelFsResources } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
+import { SmoochWorkers } from "./pipeline/smooch-worker";
+import { SmoochWorkPipeline } from "./pipeline/smooch-work-pipeline";
 
 const CoreConfig = object({
     cacheFolder: SmoochStruct.CwdRelativePath,
@@ -26,7 +28,14 @@ export async function main({ core, textures, jsonFiles }: Infer<typeof SmoochCon
 
     const resources = await ParcelFsResources.create(new CwdRelativePath(''), new AbsolutePath(core.cacheFolder, 'snapshot.txt'));
     const watcher = new FsWatcher(resources);
+
+    const pipeline1 = SmoochWorkPipeline.create(TexturePackRecipe, textures[0]);
+    watcher.subscribe({ identity: 'test', accept: x => pipeline1.accept(x) });
+
+    SmoochWorkers.startAll();
+
     await watcher.catchUp();
+    await watcher.start();
     
     // async function createAndStartWorkers<T>(
     //     name: string,
