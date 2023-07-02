@@ -162,10 +162,18 @@ class DirectorySubscription {
             this._logger.log(`Started on ${this.directory.absolutePath}...`);
         }
 
+    private static readonly _subscribeCallbackLogger = new Logger('SubscribeCallback', 'yellow');
+
     static async create(name: string, directory: RelativePath, snapshotDirectory: RelativePath, fn: FsWatcherMessageCallback) {
         if (!await Fs.exists(directory.absolutePath))
             throw new Error(`Can't create [DirectorySubscription]: ${directory.absolutePath} does not exist!`);
-        const subscription = await ParcelWatcher.subscribe(directory.absolutePath, (error, events) => fn(FsWatcherMessageFactory.createMessage(error, events)));
+        
+        const cb: SubscribeCallback = (error, events) => {
+            if (!error)
+                return fn(FsWatcherMessageFactory.createMessage(events));
+            this._subscribeCallbackLogger.error(`@parcel/watcher gave an error`, error);
+        }
+        const subscription = await ParcelWatcher.subscribe(directory.absolutePath, cb);
         return new DirectorySubscription(name, directory, Fs.resolve(snapshotDirectory.absolutePath, `snapshot-${name}.txt`), subscription, fn);
     }
 
@@ -191,7 +199,6 @@ class DirectorySubscription {
 
 interface FsWatcherMessage {
     events: Event[];
-    error: Error | null;
     isCatchUp: boolean;
     isNascent: boolean;
 }
@@ -202,13 +209,13 @@ class FsWatcherMessageFactory {
     static async createCatchUpMessage(directory: RelativePath, snapshotFilePath: string): Promise<FsWatcherMessage> {
         if (!await Fs.exists(snapshotFilePath)) {
             this._logger.log(`Snapshot file (${snapshotFilePath}) does not exist. Creating Nascent Catch-up message...`);
-            return { events: [], isCatchUp: true, isNascent: true, error: null };
+            return { events: [], isCatchUp: true, isNascent: true };
         }
         const events = await ParcelWatcher.getEventsSince(directory.absolutePath, snapshotFilePath);
-        return { events, isCatchUp: true, isNascent: false, error: null };
+        return { events, isCatchUp: true, isNascent: false };
     }
 
-    static createMessage(error: Error | null, events: Event[]): FsWatcherMessage {
-        return { error, events, isCatchUp: false, isNascent: false };
+    static createMessage(events: Event[]): FsWatcherMessage {
+        return { events, isCatchUp: false, isNascent: false };
     }
 }
