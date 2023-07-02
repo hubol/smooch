@@ -9,6 +9,7 @@ import { ParcelFsResources } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
 import { SmoochWorkers } from "./pipeline/smooch-worker";
 import { SmoochWorkPipeline } from "./pipeline/smooch-work-pipeline";
+import { wait, waitHold } from "../common/wait";
 
 const CoreConfig = object({
     cacheFolder: SmoochStruct.CwdRelativePath,
@@ -42,4 +43,14 @@ export async function main({ core, textures, jsonFiles }: Infer<typeof SmoochCon
 
     await watcher.catchUp();
     await watcher.start();
+
+    setTimeout(() => saveAfter500msOfNoWork(watcher));
+}
+
+async function saveAfter500msOfNoWork(watcher: FsWatcher) {
+    while (true) {
+        await wait(() => SmoochWorkers.anyWorking);
+        await waitHold(() => !SmoochWorkers.anyWorking, 500);
+        await watcher.save();
+    }
 }
