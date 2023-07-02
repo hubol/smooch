@@ -39,7 +39,8 @@ export class FsWatcher {
     }
 
     async save() {
-        return await ParcelSnapshot.write(this._parcelSnapshot);
+        await ParcelSnapshot.write(this._parcelSnapshot);
+        FsWatcher._logger.debug(`Saved state.`);
     }
 
     async stop() {
