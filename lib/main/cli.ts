@@ -1,7 +1,8 @@
 import { handleFatalError } from "../common/handle-fatal-error";
 import { JsonFile } from "../common/json-file";
 import { validateOptions } from "../common/validate-options";
-import { SmoochConfig, main } from "./main";
+import { main } from "./main";
+import { SmoochConfig } from "./smooch-config";
 
 Promise.resolve()
 .then(async () => {
