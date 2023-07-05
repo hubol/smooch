@@ -1,11 +1,28 @@
+import { Infer, Struct } from "superstruct";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { SmoochWorkFn, SmoochWorker, SmoochWork } from "./smooch-worker";
 
-export interface SmoochWorkPipelineRecipe<TConfig> {
+type InferLoose<T> =
+    T extends Struct<any, any>
+    ? Infer<T>
+    : T extends any
+    ? any
+    : never;
+
+export interface SmoochWorkPipelineRecipe<T> {
     readonly name: string;
-    acceptorFactory: (t: TConfig) => ISmoochWorkAcceptor;
-    queueFactory: (t: TConfig) => ISmoochWorkQueue;
-    workFnFactory: (t: TConfig) => SmoochWorkFn;
+    configSchema: T;
+    acceptorFactory: (t: InferLoose<T>) => ISmoochWorkAcceptor;
+    queueFactory: (t: InferLoose<T>) => ISmoochWorkQueue;
+    workFnFactory: (t: InferLoose<T>) => SmoochWorkFn;
+}
+
+export class SmoochWorkPipelineRecipeFactory {
+    private constructor() { }
+
+    static create<T>(t: SmoochWorkPipelineRecipe<T>) {
+        return t;
+    }
 }
 
 export class SmoochWorkPipeline {
@@ -15,7 +32,7 @@ export class SmoochWorkPipeline {
 
         }
 
-    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: TConfig) {
+    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: InferLoose<TConfig>) {
         const acceptor = recipe.acceptorFactory(config);
         const queue = recipe.queueFactory(config);
         const workFn = recipe.workFnFactory(config);
