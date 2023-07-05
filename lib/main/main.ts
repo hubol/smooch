@@ -8,7 +8,7 @@ import { AbsolutePath, CwdRelativePath } from "../common/relative-path";
 import { ParcelFsResources } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
 import { SmoochWorkers } from "./pipeline/smooch-worker";
-import { SmoochWorkPipeline } from "./pipeline/smooch-work-pipeline";
+import { SmoochWorkPipeline, SmoochWorkPipelineRecipe } from "./pipeline/smooch-work-pipeline";
 import { wait, waitHold } from "../common/wait";
 
 const CoreConfig = object({
@@ -23,20 +23,29 @@ export const SmoochConfig = object({
 
 export type SmoochConfigType = Infer<typeof SmoochConfig>;
 
-export async function main({ core, textures, jsonFiles }: Infer<typeof SmoochConfig>) {
+type SmoochConfigToRecipe<T = Omit<SmoochConfigType, 'core'>> = {
+    [k in keyof T]: T[k] extends Array<infer E>
+        ? SmoochWorkPipelineRecipe<E>
+        : never;
+};
+
+const configToRecipe: SmoochConfigToRecipe = {
+    jsonFiles: AggregateJsonRecipe,
+    textures: TexturePackRecipe,
+}
+
+export async function main({ core, ...rest }: Infer<typeof SmoochConfig>) {
     await Fs.mkdir(core.cacheFolder.absolutePath, { recursive: true });
 
     const resources = await ParcelFsResources.create(new CwdRelativePath(''), new AbsolutePath(core.cacheFolder, 'snapshot.txt'));
     const watcher = new FsWatcher(resources);
 
-    for (const texture of textures) {
-        const pipeline = SmoochWorkPipeline.create(TexturePackRecipe, texture);
-        watcher.subscribe({ identity: 'texPack', accept: x => pipeline.accept(x) });
-    }
-
-    for (const jsonFile of jsonFiles) {
-        const pipeline = SmoochWorkPipeline.create(AggregateJsonRecipe, jsonFile);
-        watcher.subscribe({ identity: 'jsonAgg', accept: x => pipeline.accept(x) });
+    for (const key in configToRecipe) {
+        const recipe = configToRecipe[key];
+        for (const config of rest[key]) {
+            const pipeline = SmoochWorkPipeline.create(recipe, config);
+            watcher.subscribe({ identity: recipe.name, accept: x => pipeline.accept(x) });    
+        }
     }
 
     SmoochWorkers.startAll();

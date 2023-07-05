@@ -2,6 +2,7 @@ import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { SmoochWorkFn, SmoochWorker, SmoochWork } from "./smooch-worker";
 
 export interface SmoochWorkPipelineRecipe<TConfig> {
+    readonly name: string;
     acceptorFactory: (t: TConfig) => ISmoochWorkAcceptor;
     queueFactory: (t: TConfig) => ISmoochWorkQueue;
     workFnFactory: (t: TConfig) => SmoochWorkFn;
