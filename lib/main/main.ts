@@ -1,9 +1,8 @@
-import { Infer, array, defaulted, object } from "superstruct";
-import { PackerOptions } from "../texturepack/src/options";
+import { Infer, Struct, array, defaulted, object } from "superstruct";
 import { SmoochStruct } from "../common/custom-superstruct";
 import { Fs } from "../common/fs";
 import { TexturePackRecipe } from "../texturepack/src/texture-pack";
-import { AggregateJsonOptions, AggregateJsonRecipe } from "../json/aggregate-json";
+import { AggregateJsonRecipe } from "../json/aggregate-json";
 import { AbsolutePath, CwdRelativePath } from "../common/relative-path";
 import { ParcelFsResources } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
@@ -15,24 +14,17 @@ const CoreConfig = object({
     cacheFolder: SmoochStruct.CwdRelativePath,
 })
 
-export const SmoochConfig = object({
-    core: CoreConfig,
-    textures: defaulted(array(PackerOptions), []),
-    jsonFiles: defaulted(array(AggregateJsonOptions), []),
-});
-
-export type SmoochConfigType = Infer<typeof SmoochConfig>;
-
-type SmoochConfigToRecipe<T = Omit<SmoochConfigType, 'core'>> = {
-    [k in keyof T]: T[k] extends Array<infer E>
-        ? SmoochWorkPipelineRecipe<E>
-        : never;
-};
-
-const configToRecipe: SmoochConfigToRecipe = {
+const recipes = {
     jsonFiles: AggregateJsonRecipe,
     textures: TexturePackRecipe,
 }
+
+export const SmoochConfig = object({
+    core: CoreConfig,
+    ...getRecipeConfigs(),
+});
+
+export type SmoochConfigType = Infer<typeof SmoochConfig>;
 
 export async function main({ core, ...rest }: Infer<typeof SmoochConfig>) {
     await Fs.mkdir(core.cacheFolder.absolutePath, { recursive: true });
@@ -40,8 +32,8 @@ export async function main({ core, ...rest }: Infer<typeof SmoochConfig>) {
     const resources = await ParcelFsResources.create(new CwdRelativePath(''), new AbsolutePath(core.cacheFolder, 'snapshot.txt'));
     const watcher = new FsWatcher(resources);
 
-    for (const key in configToRecipe) {
-        const recipe = configToRecipe[key];
+    for (const key in recipes) {
+        const recipe = recipes[key];
         for (const config of rest[key]) {
             const pipeline = SmoochWorkPipeline.create(recipe, config);
             watcher.subscribe({ identity: recipe.name, accept: x => pipeline.accept(x) });    
@@ -63,3 +55,17 @@ async function saveAfter500msOfNoWork(watcher: FsWatcher) {
         await watcher.save();
     }
 }
+
+function getRecipeConfigs(): RecipeToConfigSchema<typeof recipes> {
+    const obj = {};
+    for (const key in recipes)
+        obj[key] = defaulted(array(recipes[key].configSchema), []);
+
+    return obj as any;
+}
+
+type RecipeToConfigSchema<T> = {
+    [k in keyof T]: T[k] extends SmoochWorkPipelineRecipe<infer E extends Struct<any, any>>
+        ? Struct<Infer<T[k]['configSchema']>[], T[k]['configSchema']>
+        : never;
+};

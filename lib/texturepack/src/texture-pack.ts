@@ -9,21 +9,22 @@ import { RelativePath } from "../../common/relative-path";
 import { sortArrayByKey } from "../../common/sort-array-by-key";
 import { Fs } from "../../common/fs";
 import { Logger } from "../../common/logger";
-import { SmoochWorkPipelineRecipe } from "../../main/pipeline/smooch-work-pipeline";
+import { SmoochWorkPipelineRecipeFactory } from "../../main/pipeline/smooch-work-pipeline";
 import { SmoochWorkAcceptor } from "../../main/pipeline/smooch-work-acceptor";
 import { SmoochWorkQueue } from "../../main/pipeline/smooch-work-queue";
 
 const logger = new Logger('TexturePacker', 'magenta');
 
-export const TexturePackRecipe: SmoochWorkPipelineRecipe<Infer<typeof PackerOptions>> = {
+export const TexturePackRecipe = SmoochWorkPipelineRecipeFactory.create({
 	name: 'texPack',
+	configSchema: PackerOptions,
 	acceptorFactory: options => {
 		const imagesFolder = Fs.resolve(options.folder.absolutePath, '**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}');
 		return new SmoochWorkAcceptor([ imagesFolder ], []);
 	},
 	queueFactory: () => new SmoochWorkQueue(),
 	workFnFactory: options => () => texturePack(options),
-}
+});
 
 export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 	const { folder: imagesFolder, outFolder, outTemplate, outTemplateExtension, ...rawPackerOptions } = options;
