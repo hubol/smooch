@@ -56,16 +56,20 @@ async function saveAfter500msOfNoWork(watcher: FsWatcher) {
     }
 }
 
+function getRecipeConfig<T extends Struct<any, unknown>>(recipe: SmoochWorkPipelineRecipe<T>) {
+    return defaulted(array(recipe.configSchema), []);
+}
+
 function getRecipeConfigs(): RecipeToConfigSchema<typeof recipes> {
     const obj = {};
     for (const key in recipes)
-        obj[key] = defaulted(array(recipes[key].configSchema), []);
+        obj[key] = getRecipeConfig(recipes[key].configSchema);
 
     return obj as any;
 }
 
 type RecipeToConfigSchema<T> = {
     [k in keyof T]: T[k] extends SmoochWorkPipelineRecipe<infer E extends Struct<any, any>>
-        ? Struct<Infer<T[k]['configSchema']>[], T[k]['configSchema']>
+        ? ReturnType<typeof getRecipeConfig<T[k]['configSchema']>>
         : never;
 };
