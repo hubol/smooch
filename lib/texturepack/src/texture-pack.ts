@@ -16,6 +16,7 @@ import { SmoochWorkQueue } from "../../main/pipeline/smooch-work-queue";
 const logger = new Logger('TexturePacker', 'magenta');
 
 export const TexturePackRecipe: SmoochWorkPipelineRecipe<Infer<typeof PackerOptions>> = {
+	name: 'texPack',
 	acceptorFactory: options => {
 		const imagesFolder = Fs.resolve(options.folder.absolutePath, '**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}');
 		return new SmoochWorkAcceptor([ imagesFolder ], []);

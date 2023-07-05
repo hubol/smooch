@@ -17,6 +17,7 @@ export const AggregateJsonOptions = object({
 });
 
 export const AggregateJsonRecipe: SmoochWorkPipelineRecipe<Infer<typeof AggregateJsonOptions>> = {
+    name: 'jsonAgg',
 	acceptorFactory: options => {
 		const jsonFolder = Fs.resolve(options.folder.absolutePath, '**/*.json');
 		return new SmoochWorkAcceptor([ jsonFolder ], []);
