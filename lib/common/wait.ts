@@ -31,3 +31,7 @@ export function waitHold(predicateFn: () => boolean, ms: number) {
         })
     })
 }
+
+export function sleep(ms: number) {
+    return new Promise<void>(r => setTimeout(r, ms));
+}

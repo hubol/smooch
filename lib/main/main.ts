@@ -4,7 +4,6 @@ import { ParcelFsResources } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
 import { SmoochWorkers } from "./pipeline/smooch-worker";
 import { SmoochWorkPipeline } from "./pipeline/smooch-work-pipeline";
-import { wait, waitHold } from "../common/wait";
 import { SmoochConfigType } from "./smooch-config";
 import { SmoochRecipes } from "./smooch-recipes";
 
@@ -22,18 +21,8 @@ export async function main({ core, ...rest }: SmoochConfigType) {
         }
     }
 
-    SmoochWorkers.startAll();
+    SmoochWorkers.startAll(watcher);
 
     await watcher.catchUp();
     await watcher.start();
-
-    setTimeout(() => saveAfter500msOfNoWork(watcher));
-}
-
-async function saveAfter500msOfNoWork(watcher: FsWatcher) {
-    while (true) {
-        await wait(() => SmoochWorkers.anyWorking);
-        await waitHold(() => !SmoochWorkers.anyWorking, 500);
-        await watcher.save();
-    }
 }
