@@ -1,4 +1,5 @@
  import { Logger } from "../../common/logger";
+import { sleep } from "../../common/wait";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { ISmoochWorkDequeue } from "./smooch-work-pipeline";
 
@@ -38,23 +39,49 @@ export class SmoochWorkers {
 
     private constructor() { }
 
-    static startAll() {
-        setInterval(() => {
-            for (const worker of _smoochWorkers) {
-                if (!worker.isWorking && worker.queue.isWorkReady) {
-                    try {
-                        worker.work(worker.queue.dequeue());
-                    }
-                    catch (e) {
-                        this._logger.error(`An error occurred while giving ${worker} work from ${worker.queue}`);
-                        this._logger.error(e);
+    static startAll(saveable: ISaveable) {
+        setTimeout(async () => {
+            let anyWorkCompletedSinceLastSave = false;
+
+            while (true) {
+                try {
+                    this._step();
+
+                    if (!anyWorkCompletedSinceLastSave)
+                        anyWorkCompletedSinceLastSave = this.anyWorking;
+                    else if (!this.anyWorking) {
+                        anyWorkCompletedSinceLastSave = false;
+                        await saveable.save();
                     }
                 }
+                catch (e) {
+                    this._logger.error(`An error occurred during _step()`);
+                    this._logger.error(e);
+                }
+                await sleep(16);
             }
         });
+    }
+
+    private static _step() {
+        for (const worker of _smoochWorkers) {
+            if (!worker.isWorking && worker.queue.isWorkReady) {
+                try {
+                    worker.work(worker.queue.dequeue());
+                }
+                catch (e) {
+                    this._logger.error(`An error occurred while giving ${worker} work from ${worker.queue}`);
+                    this._logger.error(e);
+                }
+            }
+        }
     }
 
     static get anyWorking() {
         return _smoochWorkers.some(x => x.isWorking);
     }
+}
+
+interface ISaveable {
+    save(): Promise<void>;
 }
