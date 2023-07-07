@@ -59,7 +59,7 @@ export class FsWatcherMessageFactory {
             this._logger.log(`Snapshot file (${snapshot.filePath}) does not exist. Creating Nascent Catch-up message...`);
             return this._createFsWatcherMessage({ events: [], isCatchUp: true, isNascent: true });
         }
-        const events = await ParcelWatcher.getEventsSince(snapshot.watchedDirectoryPath.absolutePath, snapshot.filePath.absolutePath);
+        const events = await ParcelSnapshot.getEventsSince(snapshot);
         return this._createFsWatcherMessage({ events, isCatchUp: true, isNascent: false });
     }
 

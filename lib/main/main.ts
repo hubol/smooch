@@ -10,7 +10,13 @@ import { SmoochRecipes } from "./smooch-recipes";
 export async function main({ core, ...rest }: SmoochConfigType) {
     await Fs.mkdir(core.cacheFolder.absolutePath, { recursive: true });
 
-    const resources = await ParcelFsResources.create(new CwdRelativePath(''), new AbsolutePath(core.cacheFolder, 'snapshot.txt'));
+    const workspaceDirectory = new CwdRelativePath('');
+    const snapshotFile = new AbsolutePath(core.cacheFolder, 'snapshot.txt');
+
+    const resources = await ParcelFsResources.create(
+        workspaceDirectory,
+        snapshotFile,
+        { ignore: [ 'node_modules/', '.git/', snapshotFile.absolutePath ] });
     const watcher = new FsWatcher(resources);
 
     for (const key in SmoochRecipes.available) {

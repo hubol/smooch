@@ -7,10 +7,18 @@ export class ParcelSnapshot {
     constructor(
         readonly watchedDirectoryPath: RelativePath,
         readonly filePath: RelativePath,
+        readonly options: ParcelWatcher.Options,
     ) {}
 
     static async write(snapshot: ParcelSnapshot) {
-        return await ParcelWatcher.writeSnapshot(snapshot.watchedDirectoryPath.absolutePath, snapshot.filePath.absolutePath);
+        return await ParcelWatcher.writeSnapshot(
+            snapshot.watchedDirectoryPath.absolutePath,
+            snapshot.filePath.absolutePath,
+            snapshot.options);
+    }
+
+    static getEventsSince(snapshot: ParcelSnapshot) {
+        return ParcelWatcher.getEventsSince(snapshot.watchedDirectoryPath.absolutePath, snapshot.filePath.absolutePath, snapshot.options);
     }
 }
 
@@ -23,6 +31,7 @@ export class ParcelSubscription {
 
     constructor(
         readonly watchedDirectoryPath: RelativePath,
+        readonly options: ParcelWatcher.Options,
     ) {}
 
     async start(cb: SubscribeCallback) {
@@ -30,7 +39,7 @@ export class ParcelSubscription {
             return ParcelSubscription._logger.warn(`Attempting to start, but already-started or starting!`);
         this._started = true;
         this._stopped = false;
-        this._asyncSubscription = await ParcelWatcher.subscribe(this.watchedDirectoryPath.absolutePath, cb);
+        this._asyncSubscription = await ParcelWatcher.subscribe(this.watchedDirectoryPath.absolutePath, cb, this.options);
     }
 
     async stop() {
@@ -59,13 +68,13 @@ export class ParcelFsResources {
         readonly subscription: ParcelSubscription,
     ) { }
 
-    static async create(directory: RelativePath, snapshotFile: RelativePath) {
+    static async create(directory: RelativePath, snapshotFile: RelativePath, options: ParcelWatcher.Options) {
         if (!await Fs.exists(directory.absolutePath))
             throw new Error(`Can't create ${ParcelFsResources}: ${directory.absolutePath} does not exist!`);
 
         return new ParcelFsResources(
-            new ParcelSnapshot(directory, snapshotFile),
-            new ParcelSubscription(directory),
+            new ParcelSnapshot(directory, snapshotFile, options),
+            new ParcelSubscription(directory, options),
         )
     }
 }
