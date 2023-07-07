@@ -1,5 +1,6 @@
  import { Logger } from "../../common/logger";
 import { sleep } from "../../common/wait";
+import { FsWatcher } from "../watcher/fs-watcher";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { ISmoochWorkDequeue } from "./smooch-work-pipeline";
 
@@ -39,7 +40,7 @@ export class SmoochWorkers {
 
     private constructor() { }
 
-    static startAll(saveable: ISaveable) {
+    static startAll(saveable: Pick<FsWatcher, 'save'>) {
         setTimeout(async () => {
             let anyWorkCompletedSinceLastSave = false;
 
@@ -80,8 +81,4 @@ export class SmoochWorkers {
     static get anyWorking() {
         return _smoochWorkers.some(x => x.isWorking);
     }
-}
-
-interface ISaveable {
-    save(): Promise<void>;
 }
