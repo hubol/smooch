@@ -11,7 +11,7 @@ const recipes = {
 function getRecipeConfigs(): RecipeToConfigSchema<typeof recipes> {
     const obj = {};
     for (const key in recipes)
-        obj[key] = getRecipeConfig(recipes[key].configSchema);
+        obj[key] = getRecipeConfig(recipes[key]);
 
     return obj as any;
 }
