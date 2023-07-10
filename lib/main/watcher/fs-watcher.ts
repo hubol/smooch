@@ -70,8 +70,12 @@ export class FsWatcher {
                     `An error occurred while Subscription ${subscription.identity} was accepting ${FsWatcherMessageDescriber.describeBrief(message)}`, e);
             }
         }));
-
-        FsWatcher._logger.debug(chalk[subscriptionAcceptedCount ? 'white' : 'gray']
+        
+        if (subscriptionAcceptedCount)
+            FsWatcher._logger.debug(chalk.white
             `${subscriptionAcceptedCount} subscription(s) accepted ${FsWatcherMessageDescriber.describe(message)}`);
+        else
+            FsWatcher._logger.debug(chalk.gray
+                `Ignored ${FsWatcherMessageDescriber.describe(message)}`);
     }
 }
