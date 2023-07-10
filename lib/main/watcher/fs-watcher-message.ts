@@ -34,7 +34,9 @@ export class FsWatcherMessageDescriber {
     private static _toPrintableType(events: Event[], type: string) {
         if (events.length === 0)
             return '';
-        return events.length === 1 ? `[${events[0].path} ${type}]` : `[${events.length}x ${type}]`;
+        return events.length <= 3
+            ? events.map(event => `[${event.path} ${type}]`).join(' ')
+            : `[${events.length}x ${type}]`;
     }
     
     private static _toPrintableEvents(events: FsWatcherMessage['events']) {
