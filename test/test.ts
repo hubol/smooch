@@ -36,6 +36,7 @@ async function runTest() {
         await TestProject.fixture('image256Png', `src-images/image${i}.png`);
     }
     await smooch.stdOut.untilPrinted('Packed');
+    await smooch.stdOut.untilPrinted('Saved state.');
     smooch.kill();
     await smooch.untilExited();
     

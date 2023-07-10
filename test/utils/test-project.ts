@@ -1,13 +1,13 @@
 import { Fs } from "../../lib/common/fs";
-import { CwdRelativePath } from "../../lib/common/relative-path";
 import { TestFixtures } from "./test-fixtures";
 import { TestProcess } from "./test-process";
 import { TextFile } from "../../lib/common/text-file";
 import { compareText } from "./compare-text";
 import { Logger } from "../../lib/common/logger";
+import { Path } from "../../lib/common/path";
 
 const Paths = {
-    testEnv: new CwdRelativePath('.test_env').absolutePath,
+    testEnv: Path.Directory.create('./.test_env'),
 }
 
 function envPath(filename: string) {
