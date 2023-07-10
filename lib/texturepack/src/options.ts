@@ -1,7 +1,7 @@
 import path from "path";
 import { object, integer, boolean, string, defaulted, refine, create, assign } from "superstruct";
 import { SmoochStruct } from "../../common/custom-superstruct";
-import { CwdRelativePath } from "../../common/relative-path";
+import { Path } from "../../common/path";
 
 const PositiveInteger = refine(integer(), "positive", (value) => value > 0);
 
@@ -23,10 +23,10 @@ export const RawPackerOptions = object({
 
 export const PackerOptions = assign(
 	object({
-		folder: SmoochStruct.CwdRelativePath,
-		outFolder: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(process.cwd())),
+		folder: SmoochStruct.DirectoryPath,
+		outFolder: defaulted(SmoochStruct.DirectoryPath, Path.Directory.create(process.cwd())),
 		outTemplateExtension: defaulted(string(), "js"),
-		outTemplate: defaulted(SmoochStruct.CwdRelativePath, new CwdRelativePath(path.resolve(__filename, '../../default-template.js'))),
+		outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(path.resolve(__filename, '../../default-template.js'))),
 	}),
 	RawPackerOptions
 );

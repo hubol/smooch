@@ -3,7 +3,7 @@ import { SmoochStruct } from "../common/custom-superstruct";
 import { SmoochRecipes } from "./smooch-recipes";
 
 const CoreConfig = object({
-    cacheFolder: SmoochStruct.CwdRelativePath,
+    cacheFolder: SmoochStruct.DirectoryPath,
 })
 
 export const SmoochConfig = object({

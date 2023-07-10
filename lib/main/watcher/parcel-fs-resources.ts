@@ -1,24 +1,24 @@
 import ParcelWatcher, { SubscribeCallback, AsyncSubscription } from "@parcel/watcher";
 import { Fs } from "../../common/fs";
-import { RelativePath } from "../../common/relative-path";
 import { Logger } from "../../common/logger";
+import { Path } from "../../common/path";
 
 export class ParcelSnapshot {
     constructor(
-        readonly watchedDirectoryPath: RelativePath,
-        readonly filePath: RelativePath,
+        readonly watchedDirectoryPath: Path.Directory.t,
+        readonly filePath: Path.File.t,
         readonly options: ParcelWatcher.Options,
     ) {}
 
     static async write(snapshot: ParcelSnapshot) {
         return await ParcelWatcher.writeSnapshot(
-            snapshot.watchedDirectoryPath.absolutePath,
-            snapshot.filePath.absolutePath,
+            snapshot.watchedDirectoryPath,
+            snapshot.filePath,
             snapshot.options);
     }
 
     static getEventsSince(snapshot: ParcelSnapshot) {
-        return ParcelWatcher.getEventsSince(snapshot.watchedDirectoryPath.absolutePath, snapshot.filePath.absolutePath, snapshot.options);
+        return ParcelWatcher.getEventsSince(snapshot.watchedDirectoryPath, snapshot.filePath, snapshot.options);
     }
 }
 
@@ -30,7 +30,7 @@ export class ParcelSubscription {
     private _asyncSubscription?: AsyncSubscription;
 
     constructor(
-        readonly watchedDirectoryPath: RelativePath,
+        readonly watchedDirectoryPath: Path.Directory.t,
         readonly options: ParcelWatcher.Options,
     ) {}
 
@@ -39,7 +39,7 @@ export class ParcelSubscription {
             return ParcelSubscription._logger.warn(`Attempting to start, but already-started or starting!`);
         this._started = true;
         this._stopped = false;
-        this._asyncSubscription = await ParcelWatcher.subscribe(this.watchedDirectoryPath.absolutePath, cb, this.options);
+        this._asyncSubscription = await ParcelWatcher.subscribe(this.watchedDirectoryPath, cb, this.options);
     }
 
     async stop() {
@@ -58,7 +58,7 @@ export class ParcelSubscription {
     }
 
     static async write(snapshot: ParcelSnapshot) {
-        return await ParcelWatcher.writeSnapshot(snapshot.watchedDirectoryPath.absolutePath, snapshot.filePath.absolutePath);
+        return await ParcelWatcher.writeSnapshot(snapshot.watchedDirectoryPath, snapshot.filePath);
     }
 }
 
@@ -68,9 +68,9 @@ export class ParcelFsResources {
         readonly subscription: ParcelSubscription,
     ) { }
 
-    static async create(directory: RelativePath, snapshotFile: RelativePath, options: ParcelWatcher.Options) {
-        if (!await Fs.exists(directory.absolutePath))
-            throw new Error(`Can't create ${ParcelFsResources}: ${directory.absolutePath} does not exist!`);
+    static async create(directory: Path.Directory.t, snapshotFile: Path.File.t, options: ParcelWatcher.Options) {
+        if (!await Fs.exists(directory))
+            throw new Error(`Can't create ${ParcelFsResources}: ${directory} does not exist!`);
 
         return new ParcelFsResources(
             new ParcelSnapshot(directory, snapshotFile, options),

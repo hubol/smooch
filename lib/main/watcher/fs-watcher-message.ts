@@ -1,4 +1,4 @@
-import ParcelWatcher, { Event } from "@parcel/watcher";
+import { Event } from "@parcel/watcher";
 import chalk from "chalk";
 import { ParcelSnapshot } from "./parcel-fs-resources";
 import { Fs } from "../../common/fs";
@@ -55,7 +55,7 @@ export class FsWatcherMessageFactory {
     private constructor() { }
 
     static async createCatchUpMessage(snapshot: ParcelSnapshot): Promise<FsWatcherMessage> {
-        if (!await Fs.exists(snapshot.filePath.absolutePath)) {
+        if (!await Fs.exists(snapshot.filePath)) {
             this._logger.log(`Snapshot file (${snapshot.filePath}) does not exist. Creating Nascent Catch-up message...`);
             return this._createFsWatcherMessage({ events: [], isCatchUp: true, isNascent: true });
         }
