@@ -4,6 +4,8 @@ import { camelCase } from "change-case";
 import { Fs } from "./fs";
 import { Logger } from "./logger";
 import { format } from "prettier";
+import chalk from "chalk";
+import { describeBrief } from "./describe-brief";
 
 const utils = {
 	camel: camelCase,
@@ -35,14 +37,14 @@ export class JsTemplate {
 
 	async renderToFile(context: Record<string, any>, outputFile: PathLike) {
 		try {
-			logger.log("Rendering templated output...");
+			logger.log(`Rendering templated output with context ${chalk.magenta(describeBrief(context))}...`);
 			const text = await this._render(context);
 			logger.log(`Writing output to ${outputFile}...`);
     		await Fs.writeFile(outputFile, text);
 			logger.log(`Done!`);
 		}
 		catch (e) {
-			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context=${context}:`, e);
+			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context=${describeBrief(context)}:`, e);
 		}
 	}
 }
