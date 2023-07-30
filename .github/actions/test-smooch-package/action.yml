@@ -1,0 +1,21 @@
+name: Test Smooch Package
+description: Run test suite against Smooch package tarball
+inputs:
+  node-version:
+    default: '16'
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: 'npm'
+    
+    - run: npm ci
+    - uses: actions/download-artifact@v3
+      with:
+        name: smooch.tgz
+        path: ./
+
+    - run: npm run test
