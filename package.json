@@ -22,15 +22,15 @@
     "sharp": "^0.32.0"
   },
   "devDependencies": {
-    "@types/prettier": "^2.7.3",
+    "@types/js-beautify": "^1.13.3",
     "@types/sharp": "^0.31.1",
     "@vercel/ncc": "^0.36.1",
     "chalk": "^4.1.2",
     "change-case": "^4.1.2",
     "glob": "^10.3.3",
+    "js-beautify": "^1.14.9",
     "maxrects-packer": "^2.7.3",
     "minimatch": "^9.0.3",
-    "prettier": "^3.0.0",
     "superstruct": "^0.15.5",
     "tree-kill": "^1.2.2",
     "ts-loader": "^9.4.4",

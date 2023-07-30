@@ -69,9 +69,15 @@ jobs:
           path: ./
 
       - run: npm run test
+
+  all-tested:
+    needs: [test-win, test-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "🍆"
   
   cleanup:
-    needs: [test-win]
+    needs: [test-win, test-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: geekyeggo/delete-artifact@v2
