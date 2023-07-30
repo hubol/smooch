@@ -6,7 +6,8 @@
     "test": "ts-node --transpileOnly test/test.ts",
     "generate:json-schema": "ts-node ./tools/generate-config-schema.ts",
     "build": "webpack",
-    "build-and-test": "npm run build && npm pack && npm run test"
+    "pack": "ts-node ./tools/pack.ts",
+    "build-and-test": "npm run build && npm run pack && npm run test"
   },
   "bin": {
     "smooch": "dist/index.js"
