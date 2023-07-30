@@ -2,14 +2,10 @@ name: Build and push
 on:
   push:
     branches: [feature/v1-ncc]
-jobs:
-  cancel-previous:
-    runs-on: ubuntu-latest
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}
-      cancel-in-progress: true
-    steps:
-      - run: echo "🍆"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
   
   build:
     runs-on: ubuntu-latest
@@ -29,7 +25,7 @@ jobs:
 
       - run: npm run pack
 
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: smooch.tgz
           path: smooch.tgz
@@ -46,6 +42,10 @@ jobs:
       
       - run: npm ci
       - uses: actions/download-artifact@v2
+
+      - name: Display structure of downloaded files
+        run: ls -R
+
       - run: npm run test
   
   cleanup:
