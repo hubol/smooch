@@ -77,7 +77,7 @@ jobs:
       - run: echo "🍆"
   
   cleanup:
-    needs: [test-win, test-linux]
+    needs: all-tested
     runs-on: ubuntu-latest
     steps:
       - uses: geekyeggo/delete-artifact@v2
