@@ -1,7 +1,5 @@
-name: Build and push
-on:
-  push:
-    branches: [feature/v1-ncc]
+name: Run tests on push
+on: push
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
