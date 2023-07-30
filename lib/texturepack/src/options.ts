@@ -26,7 +26,7 @@ export const PackerOptions = assign(
 		folder: SmoochStruct.DirectoryPath,
 		outFolder: defaulted(SmoochStruct.DirectoryPath, Path.Directory.create(process.cwd())),
 		outTemplateExtension: defaulted(string(), "js"),
-		outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(path.resolve(__filename, '../../default-template.js'))),
+		outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(require.resolve('../default-template.js'))),
 	}),
 	RawPackerOptions
 );
