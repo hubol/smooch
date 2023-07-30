@@ -6,7 +6,6 @@ import { compareText } from "./compare-text";
 import { Logger } from "../../lib/common/logger";
 import { Path } from "../../lib/common/path";
 import { TestCommands } from "./test-commands";
-import { TestSmoochCodebase } from "./smooch-codebase";
 
 const Paths = {
     testEnv: Path.Directory.create('./.test_env'),
@@ -18,11 +17,8 @@ function envPath(filename: string) {
 
 export const TestProject = {
     async initialize() {
-        await TestSmoochCodebase.compile().untilExited();
         await TestProject.cleanUp();
         await Fs.mkdir(Paths.testEnv, { recursive: true });
-
-        await TestSmoochCodebase.createTarBall(Paths.testEnv).untilExited();
 
         await TestProject.fixture('packageJson', 'package.json');
         await TestProject.spawn(TestCommands.npm, ['i']).untilExited();
