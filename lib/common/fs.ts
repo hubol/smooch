@@ -10,5 +10,6 @@ export const Fs = {
     mkdir: util.promisify(fs.mkdir),
     rm: util.promisify(fs.rm),
     exists: util.promisify(fs.exists),
+    rename: util.promisify(fs.rename),
     ...path,
 }
