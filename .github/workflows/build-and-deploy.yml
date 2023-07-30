@@ -1,7 +1,7 @@
 name: Build and push
 on:
   push:
-    branches: [v1-ncc]
+    branches: [feature/v1-ncc]
 jobs:
   cancel-previous:
     runs-on: ubuntu-latest
