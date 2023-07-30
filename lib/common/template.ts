@@ -6,6 +6,7 @@ import { Logger } from "./logger";
 import { format } from "prettier";
 import chalk from "chalk";
 import { describeBrief } from "./describe-brief";
+import { requireModule } from "./require-module";
 
 const utils = {
 	camel: camelCase,
@@ -27,7 +28,7 @@ export class JsTemplate {
 		private readonly _templateFn: JsTemplateFn) { }
 
 	static async fromFile(templateFile: string) {
-		const defaultExport = require(templateFile);
+		const defaultExport = requireModule(templateFile);
 		return new JsTemplate(templateFile, defaultExport);
 	}
 

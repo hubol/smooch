@@ -8,12 +8,12 @@ import { Logger } from "../common/logger";
 import { SmoochWorkAcceptor } from "../main/pipeline/smooch-work-acceptor";
 import { SmoochWorkPipelineRecipeFactory } from "../main/pipeline/smooch-work-pipeline";
 import { SmoochWorkQueue } from "../main/pipeline/smooch-work-queue";
-import { Path } from "../common/path";
+import { defaultTemplateFile } from "../common/default-template";
 
 export const AggregateJsonOptions = object({
     folder: SmoochStruct.DirectoryPath,
     outFile: SmoochStruct.FilePath,
-    outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(require.resolve('./default-template.js'))),
+    outTemplate: defaulted(SmoochStruct.FilePath, defaultTemplateFile('json-aggregate.js')),
 });
 
 export const AggregateJsonRecipe = SmoochWorkPipelineRecipeFactory.create({

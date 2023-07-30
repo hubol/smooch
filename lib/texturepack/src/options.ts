@@ -1,7 +1,7 @@
-import path from "path";
 import { object, integer, boolean, string, defaulted, refine, create, assign } from "superstruct";
 import { SmoochStruct } from "../../common/custom-superstruct";
 import { Path } from "../../common/path";
+import { defaultTemplateFile } from "../../common/default-template";
 
 const PositiveInteger = refine(integer(), "positive", (value) => value > 0);
 
@@ -26,7 +26,7 @@ export const PackerOptions = assign(
 		folder: SmoochStruct.DirectoryPath,
 		outFolder: defaulted(SmoochStruct.DirectoryPath, Path.Directory.create(process.cwd())),
 		outTemplateExtension: defaulted(string(), "js"),
-		outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(require.resolve('../default-template.js'))),
+		outTemplate: defaulted(SmoochStruct.FilePath, defaultTemplateFile('texture-pack.js')),
 	}),
 	RawPackerOptions
 );
