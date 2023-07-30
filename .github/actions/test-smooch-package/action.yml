@@ -12,9 +12,11 @@ runs:
         cache: 'npm'
     
     - run: npm ci
+      shell: bash
     - uses: actions/download-artifact@v3
       with:
         name: smooch.tgz
         path: ./
 
     - run: npm run test
+      shell: bash
