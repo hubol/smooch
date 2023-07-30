@@ -44,6 +44,9 @@ jobs:
       
       - run: npm ci
       - uses: actions/download-artifact@v2
+        with:
+          name: smooch.tgz
+          path: ./
 
       - name: Display structure of downloaded files
         run: ls -R
