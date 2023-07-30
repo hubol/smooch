@@ -4,30 +4,31 @@
   "description": "Generate texture atlases, audio sprites, and source code from directories",
   "scripts": {
     "test": "ts-node --transpileOnly test/test.ts",
-    "generate:json-schema": "ts-node ./tools/generate-config-schema.ts"
+    "generate:json-schema": "ts-node ./tools/generate-config-schema.ts",
+    "build": "ncc build lib/main/cli.ts -o dist/compiled"
   },
   "bin": {
-    "smooch": "lib/main/bin.js"
+    "smooch": "dist/index.js"
   },
   "author": "Hubol",
   "license": "ISC",
   "dependencies": {
     "@parcel/watcher": "^2.1.0",
-    "audiosprite": "^0.7.2",
-    "chalk": "^4.1.2",
-    "change-case": "^4.1.2",
-    "glob": "^10.0.0",
-    "maxrects-packer": "^2.7.2",
-    "minimatch": "^9.0.2",
-    "prettier": "^2.8.8",
-    "sharp": "^0.32.0",
-    "superstruct": "^0.15.2",
-    "ts-node": "^10.9.1"
+    "sharp": "^0.32.0"
   },
   "devDependencies": {
     "@types/prettier": "^2.7.3",
     "@types/sharp": "^0.31.1",
+    "@vercel/ncc": "^0.36.1",
+    "chalk": "^4.1.2",
+    "change-case": "^4.1.2",
+    "glob": "^10.3.3",
+    "maxrects-packer": "^2.7.3",
+    "minimatch": "^9.0.3",
+    "prettier": "^3.0.0",
+    "superstruct": "^1.0.3",
     "tree-kill": "^1.2.2",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
     "typescript-json-schema": "^0.56.0"
   }

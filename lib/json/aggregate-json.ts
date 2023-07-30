@@ -13,7 +13,7 @@ import { Path } from "../common/path";
 export const AggregateJsonOptions = object({
     folder: SmoochStruct.DirectoryPath,
     outFile: SmoochStruct.FilePath,
-    outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(Fs.resolve(__filename, '../default-template.js'))),
+    outTemplate: defaulted(SmoochStruct.FilePath, Path.File.create(require.resolve('./default-template.js'))),
 });
 
 export const AggregateJsonRecipe = SmoochWorkPipelineRecipeFactory.create({
