@@ -5,6 +5,8 @@ import { TextFile } from "../../lib/common/text-file";
 import { compareText } from "./compare-text";
 import { Logger } from "../../lib/common/logger";
 import { Path } from "../../lib/common/path";
+import { TestCommands } from "./test-commands";
+import { TestSmoochCodebase } from "./smooch-codebase";
 
 const Paths = {
     testEnv: Path.Directory.create('./.test_env'),
@@ -14,23 +16,20 @@ function envPath(filename: string) {
     return Fs.resolve(Paths.testEnv, filename);
 }
 
-const isWindows = /^win/.test(process.platform);
-
-const Commands = {
-    npm: isWindows ? 'npm.cmd' : 'npm',
-    npx: isWindows ? 'npx.cmd' : 'npx',
-}
-
 export const TestProject = {
     async initialize() {
+        await TestSmoochCodebase.compile().untilExited();
         await TestProject.cleanUp();
         await Fs.mkdir(Paths.testEnv, { recursive: true });
+
+        await TestSmoochCodebase.createTarBall(Paths.testEnv).untilExited();
+
         await TestProject.fixture('packageJson', 'package.json');
-        await TestProject.spawn(Commands.npm, ['i']).untilExited();
+        await TestProject.spawn(TestCommands.npm, ['i']).untilExited();
     },
     smooch(...args: string[]) {
         TestProject.log(`Starting smooch...`);
-        return TestProject.spawn(Commands.npx, ['smooch', ...args]);
+        return TestProject.spawn(TestCommands.npx, ['smooch', ...args]);
     },
     writeSmoochJson(config: any) {
         const configWithDefaults = { core: { cacheFolder: ".smooch" }, ...config };

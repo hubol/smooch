@@ -5,11 +5,14 @@
   "scripts": {
     "test": "ts-node --transpileOnly test/test.ts",
     "generate:json-schema": "ts-node ./tools/generate-config-schema.ts",
-    "build": "ncc build lib/main/cli.ts -o dist/compiled"
+    "build": "rimraf dist/compiled && ncc build lib/main/cli.ts -o dist/compiled"
   },
   "bin": {
     "smooch": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "author": "Hubol",
   "license": "ISC",
   "dependencies": {
