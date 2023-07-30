@@ -3,10 +3,10 @@ import { pascalCase } from "pascal-case";
 import { camelCase } from "change-case";
 import { Fs } from "./fs";
 import { Logger } from "./logger";
-import { format } from "prettier";
 import chalk from "chalk";
 import { describeBrief } from "./describe-brief";
 import { requireModule } from "./require-module";
+import { js_beautify } from "js-beautify";
 
 const utils = {
 	camel: camelCase,
@@ -14,7 +14,7 @@ const utils = {
 	noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
 	json: (object: any) => JSON.stringify(object, undefined, 1),
 	oneline: (string: string) => string.replace(/\s+/g, ' '),
-	format,
+	beautify: js_beautify,
 };
 
 type Utils = typeof utils;
@@ -28,7 +28,7 @@ export class JsTemplate {
 		private readonly _templateFn: JsTemplateFn) { }
 
 	static async fromFile(templateFile: string) {
-		const defaultExport = requireModule(templateFile);
+		const defaultExport = requireModule(Fs.resolve(templateFile));
 		return new JsTemplate(templateFile, defaultExport);
 	}
 
