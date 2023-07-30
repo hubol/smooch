@@ -1,0 +1,60 @@
+name: Build and push
+on:
+  push:
+    branches: [v1-ncc]
+jobs:
+  cancel-previous:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - run: echo "🍆"
+  
+  build:
+    runs-on: ubuntu-latest
+    outputs: 
+      version: ${{ steps.publish_version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: sudo apt-get update && sudo apt-get install -y sox libsox-fmt-mp3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: npm run pack
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: smooch.tgz
+          path: smooch.tgz
+  
+  test-win:
+    runs-on: windows-2019
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+      
+      - run: npm ci
+      - uses: actions/download-artifact@v2
+      - run: npm run test
+  
+  cleanup:
+    needs: [smooch.tgz]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: geekyeggo/delete-artifact@v2
+        with:
+          name: |
+            smooch.tgz
