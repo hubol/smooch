@@ -1,4 +1,5 @@
 const path = require('path');
+const ShebangPlugin = require('webpack-shebang-plugin');
 
 const externals = (...items) => {
 	const obj = {};
@@ -15,7 +16,7 @@ module.exports = {
 	entry: './lib/main/cli.ts', // make sure this matches the main root of your code 
 	output: {
 		path: path.join(__dirname, 'dist'), // this can be any path and directory you want
-		filename: './bundle.js',
+		filename: './index.js',
 	},
 	optimization: {
 		minimize: false, // enabling this reduces file size and readability
@@ -29,5 +30,6 @@ module.exports = {
 			}
 		]
 	},
+	plugins: [ new ShebangPlugin() ],
 	resolve: { extensions: [ '.js', '.ts', '.json' ] },
 };
