@@ -39,6 +39,7 @@
     "typescript": "^5.0.4",
     "typescript-json-schema": "^0.56.0",
     "webpack": "^5.88.2",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^5.1.4",
+    "webpack-shebang-plugin": "^1.1.8"
   }
 }
