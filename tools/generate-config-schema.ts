@@ -9,12 +9,14 @@ async function generateSmoochConfigSchema() {
     console.log(`Got raw schema with ${countLines(rawJsonSchema)} lines.`);
 
     const schemaObject = JSON.parse(rawJsonSchema);
-    schemaObject.definitions.CwdRelativePath = { type: 'string' };
+    for (const key of [ "Path.Directory.t", "Path.File.t", "Path.Glob.t" ]) {
+        schemaObject.definitions[key] = { type: 'string' };    
+    }
     
     const transformedJsonSchema = JSON.stringify(schemaObject, undefined, 2);
     console.log(`Got transformed schema with ${countLines(transformedJsonSchema)} lines.`);
 
-    const dstFile = 'smooch-schema.json';
+    const dstFile = 'dist/schema.json';
     await Fs.writeFile(dstFile, transformedJsonSchema);
     console.log(`Wrote schema to ${dstFile}.`);
 }

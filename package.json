@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "description": "Generate texture atlases, audio sprites, and source code from directories",
   "scripts": {
-    "test": "ts-node --transpileOnly test/test.ts",
-    "generate:json-schema": "ts-node ./tools/generate-config-schema.ts",
-    "build": "webpack",
-    "pack": "ts-node ./tools/pack.ts",
-    "build-and-test": "npm run build && npm run pack && npm run test"
+    "build": "npm run build:json-schema && npm run build:bundle && npm run build:npm-pack",
+    "build:json-schema": "ts-node ./tools/generate-config-schema.ts",
+    "build:bundle": "webpack",
+    "build:npm-pack": "ts-node ./tools/pack.ts",
+    "dev:build-and-test": "npm run build && npm run test",
+    "test": "ts-node --transpileOnly test/test.ts"
   },
   "bin": {
     "smooch": "dist/index.js"
