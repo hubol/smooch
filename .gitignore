@@ -1,5 +1,4 @@
 node_modules/
 .test_env/
-dist/bundle.js
 dist/schema.json
 smooch*.tgz
