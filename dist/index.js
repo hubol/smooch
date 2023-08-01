@@ -1,2 +1,2 @@
 #!/usr/bin/env node
-require("./bundle/index.js");
+require("./bundle.js");
