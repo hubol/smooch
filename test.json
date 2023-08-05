@@ -1,0 +1,23 @@
+{
+    "$schema": "dist/schema.json",
+    "core": {
+        "cacheFolder": "aaaa"
+    },
+    "textures": [
+      {
+        "folder": "src-images",
+        "outFolder": "dst-images",
+        "outTemplateExtension": "ts",
+        "pack": {
+          "maxWidth": 1024,
+          "maxHeight": 1024
+        }
+      }
+    ],
+    "jsonFiles": [
+      {
+        "folder": "src-jsons",
+        "outFile": "dst-jsons/result.ts"
+      }
+    ]
+  }
