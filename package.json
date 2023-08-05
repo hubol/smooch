@@ -3,19 +3,17 @@
   "version": "0.1.0",
   "description": "Generate texture atlases, audio sprites, and source code from directories",
   "scripts": {
-    "build": "npm run build:json-schema && npm run build:bundle && npm run build:npm-pack",
+    "build": "npm run build:json-schema && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-pack",
     "build:json-schema": "ts-node ./tools/generate-config-schema.ts",
     "build:bundle": "webpack",
-    "build:npm-pack": "ts-node ./tools/pack.ts",
+    "build:distributable-package-json": "ts-node ./tools/generate-distributable-package-json.ts",
+    "build:npm-pack": "ts-node ./tools/pack.ts ../smooch.tgz",
     "dev:build-and-test": "npm run build && npm run test",
     "test": "ts-node --transpileOnly test/test.ts"
   },
   "bin": {
-    "smooch": "dist/index.js"
+    "smooch": "index.js"
   },
-  "files": [
-    "dist"
-  ],
   "author": "Hubol",
   "license": "ISC",
   "dependencies": {
