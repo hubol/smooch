@@ -1,3 +1,6 @@
+import chalk from "chalk";
+import { indent } from "./indent";
+
 export class ErrorPrinter {
     private constructor() { }
 
@@ -11,11 +14,11 @@ export class ErrorPrinter {
         const properties = propertiesList ? `[ ${propertiesList} ]` : `<No Additional Properties>`;
         const stack = error?.stack ?? '<No Stack>';
     
-        return `Constructor: ${constructor}
-Name: ${name}
-Message: ${message}
-Properties: ${properties}
-Stack: ${stack}`;
+        return `${chalk.gray`Constructor: `}${constructor}
+${chalk.gray`Name: `}${name}
+${chalk.gray`Message: `}${indent(message, 'Message: '.length)}
+${chalk.gray`Properties: `}${properties}
+${chalk.gray`Stack: `}${indent(stack, 'Stack: '.length)}`;
     }
 }
 
