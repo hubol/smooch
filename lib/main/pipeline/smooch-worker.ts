@@ -1,15 +1,18 @@
- import { Logger } from "../../common/logger";
+import chalk from "chalk";
+import { Logger } from "../../common/logger";
 import { sleep } from "../../common/wait";
 import { FsWatcher } from "../watcher/fs-watcher";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { ISmoochWorkDequeue } from "./smooch-work-pipeline";
-
+import { ErrorPrinter } from "../../common/error-printer";
 
 export type SmoochWork = FsWatcherMessage[];
 export type SmoochWorkFn = (work: SmoochWork) => unknown;
 const _smoochWorkers: SmoochWorker[] = [];
 
 export class SmoochWorker {
+    private static readonly _logger = new Logger(SmoochWorker, 'yellow');
+
     isWorking = false;
 
     constructor(
@@ -28,11 +31,38 @@ export class SmoochWorker {
         this.isWorking = true;
 
         setTimeout(async () => {
-            // TODO log errors
-            await Promise.resolve(this._workFn(work));
+            let errorCount = 0;
+
+            while (true) {
+                try {
+                    await Promise.resolve(this._workFn(work));
+                    break;
+                }
+                catch (e) {
+                    errorCount += 1;
+
+                    SmoochWorker._logger.error(chalk.red`Encountered error while working:`);
+                    SmoochWorker._logger.error(ErrorPrinter.toPrintable(e));
+
+                    const retryMs = SmoochWorker._retryMs[errorCount - 1];
+
+                    if (retryMs === undefined) {
+                        console.log(chalk.red`Aborting work...`);
+                        break;
+                    }
+
+                    const ms = (errorCount - 1) * 67;
+                    SmoochWorker._logger.log(chalk.green`Retrying${ms ? ` (in ${ms}ms)` : ''}...`);
+                    await sleep(ms);
+                    SmoochWorker._logger.log(chalk.green`Retry #${errorCount}`);
+                }
+            }
+            
             this.isWorking = false;
         });
     }
+
+    private static readonly _retryMs = [ 0, 67, 250, 1000 ];
 }
 
 export class SmoochWorkers {
