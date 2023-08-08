@@ -17,15 +17,17 @@
   "author": "Hubol",
   "license": "ISC",
   "dependencies": {
-    "@parcel/watcher": "^2.1.0",
-    "sharp": "^0.32.0"
+    "@parcel/watcher": "^2.1.0"
   },
   "devDependencies": {
+    "@jimp/custom": "^0.22.10",
+    "@jimp/types": "^0.22.10",
     "@types/js-beautify": "^1.13.3",
     "@types/sharp": "^0.31.1",
     "chalk": "^4.1.2",
     "change-case": "^4.1.2",
     "glob": "^10.3.3",
+    "image-size": "^1.0.2",
     "js-beautify": "^1.14.9",
     "maxrects-packer": "^2.7.3",
     "minimatch": "^9.0.3",
