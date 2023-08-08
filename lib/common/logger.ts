@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import { ForegroundColor } from "chalk";
+import { indent } from "./indent";
 
 export class Logger {
     constructor(readonly context: any, readonly color: typeof ForegroundColor) {
@@ -27,7 +28,7 @@ export class Logger {
     }
 
     private _print(key: 'log' | 'error' | 'warn' | 'debug', message: any, additional: any[]) {
-        console[key](`${this._prefix}${message}`, ...additional);
+        console[key](`${this._prefix}${indent(message, Logger.globalOptions.maxContextLength + 1)}`, ...additional);
     }
 
     static readonly globalOptions = {
