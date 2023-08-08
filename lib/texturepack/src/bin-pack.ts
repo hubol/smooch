@@ -1,7 +1,7 @@
-import { Bin, IRectangle, MaxRectsPacker } from "maxrects-packer";
+import { Bin, MaxRectsPacker } from "maxrects-packer";
 import { BinPackOptions } from "./options";
 
-export const binPack = <T extends { width: number; height: number }>(input: T[], packOptions: typeof BinPackOptions['TYPE']): Bin<(T & IRectangle)>[] => {
+export const binPack = <T extends { width: number; height: number }>(input: T[], packOptions: typeof BinPackOptions['TYPE']): Bin<(T & { x: number; y: number; })>[] => {
 	const { padding, maxWidth, maxHeight, smart, pot, square } = packOptions;
 	const options = {
 		smart,
