@@ -12,7 +12,7 @@ const externals = (...items) => {
 
 module.exports = {
 	target: 'node',
-	externals: externals('@parcel/watcher'), // removes node_modules from your final bundle
+	externals: externals('@parcel/watcher', '@ffmpeg-installer/ffmpeg'), // removes node_modules from your final bundle
 	entry: './lib/main/cli.ts', // make sure this matches the main root of your code 
 	output: {
 		path: path.join(__dirname, 'dist'), // this can be any path and directory you want
