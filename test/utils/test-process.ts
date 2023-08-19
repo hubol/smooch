@@ -44,6 +44,8 @@ export class TestProcess {
 type RedirectArgs = { logger: Logger, type: 'log' | 'error' };
 
 class TestStream {
+    private static _logger = new Logger(TestStream, 'green');
+
     private _text = '';
     private _printedIndex = -1;
     private _checkedTextIndex = -1;
@@ -76,6 +78,7 @@ class TestStream {
             const nextIndex = this._text.indexOf(search, this._checkedTextIndex + 1);
             if (nextIndex <= this._checkedTextIndex)
                 return false;
+            TestStream._logger.log(chalk.bgGreen`PASSED` + ' ' + search);
             this._checkedTextIndex = nextIndex;
             return true;
         });
