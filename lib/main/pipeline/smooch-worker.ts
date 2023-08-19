@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import { Logger } from "../../common/logger";
-import { sleep } from "../../common/wait";
+import { sleep, wait } from "../../common/wait";
 import { FsWatcher } from "../watcher/fs-watcher";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { ISmoochWorkDequeue } from "./smooch-work-pipeline";
@@ -8,7 +8,6 @@ import { ErrorPrinter } from "../../common/error-printer";
 
 export type SmoochWork = FsWatcherMessage[];
 export type SmoochWorkFn = (work: SmoochWork) => unknown;
-const _smoochWorkers: SmoochWorker[] = [];
 
 export class SmoochWorker {
     private static readonly _logger = new Logger(SmoochWorker, 'yellow');
@@ -18,7 +17,7 @@ export class SmoochWorker {
     constructor(
         readonly queue: ISmoochWorkDequeue,
         private readonly _workFn: SmoochWorkFn) {
-        _smoochWorkers.push(this);
+        
     }
 
     work(work: SmoochWork) {
@@ -66,21 +65,29 @@ export class SmoochWorker {
 }
 
 export class SmoochWorkers {
-    private static readonly _logger = new Logger(SmoochWorkers, 'yellow');
+    private readonly _logger = new Logger(SmoochWorkers, 'yellow');
 
-    private constructor() { }
+    private _stopping = false;
+    private _stopped = false;
 
-    static startAll(saveable: Pick<FsWatcher, 'save'>) {
+    private readonly _workers: SmoochWorker[] = [];
+
+    constructor() { }
+
+    startAll(saveable: Pick<FsWatcher, 'save'>) {
         setTimeout(async () => {
             let anyWorkCompletedSinceLastSave = false;
 
             while (true) {
+                if (this._stopping)
+                    break;
+                
                 try {
                     this._step();
 
                     if (!anyWorkCompletedSinceLastSave)
-                        anyWorkCompletedSinceLastSave = this.anyWorking;
-                    else if (!this.anyWorking) {
+                        anyWorkCompletedSinceLastSave = this._anyWorking;
+                    else if (!this._anyWorking) {
                         anyWorkCompletedSinceLastSave = false;
                         await saveable.save();
                     }
@@ -91,11 +98,24 @@ export class SmoochWorkers {
                 }
                 await sleep(16);
             }
+
+            this._stopped = true;
         });
     }
 
-    private static _step() {
-        for (const worker of _smoochWorkers) {
+    async stop() {
+        this._logger.log('Waiting for work to complete before stopping...');
+        this._stopping = true;
+        await wait(() => this._stopped);
+        this._logger.log('...Stopped!');
+    }
+
+    register(worker: SmoochWorker) {
+        this._workers.push(worker);
+    }
+
+    private _step() {
+        for (const worker of this._workers) {
             if (!worker.isWorking && worker.queue.isWorkReady) {
                 try {
                     worker.work(worker.queue.dequeue());
@@ -108,7 +128,11 @@ export class SmoochWorkers {
         }
     }
 
-    static get anyWorking() {
-        return _smoochWorkers.some(x => x.isWorking);
+    private get _anyWorking() {
+        for (const worker of this._workers) {
+            if (worker.isWorking)
+                return true;
+        }
+        return false;
     }
 }

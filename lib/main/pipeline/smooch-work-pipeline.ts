@@ -1,6 +1,6 @@
 import { Infer, Struct } from "superstruct";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
-import { SmoochWorkFn, SmoochWorker, SmoochWork } from "./smooch-worker";
+import { SmoochWorkFn, SmoochWorker, SmoochWork, SmoochWorkers } from "./smooch-worker";
 
 type InferLoose<T> =
     T extends Struct<any, any>
@@ -27,17 +27,19 @@ export class SmoochWorkPipelineRecipeFactory {
 
 export class SmoochWorkPipeline {
     private constructor(
+        readonly recipe: SmoochWorkPipelineRecipe<unknown>,
         private readonly _acceptor: ISmoochWorkAcceptor,
         private readonly _queue: ISmoochWorkEnqueue) {
 
         }
 
-    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: InferLoose<TConfig>) {
+    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: InferLoose<TConfig>, context: SmoochWorkers) {
         const acceptor = recipe.acceptorFactory(config);
         const queue = recipe.queueFactory(config);
         const workFn = recipe.workFnFactory(config);
-        new SmoochWorker(queue, workFn);
-        return new SmoochWorkPipeline(acceptor, queue);
+        const worker = new SmoochWorker(queue, workFn);
+        context.register(worker);
+        return new SmoochWorkPipeline(recipe, acceptor, queue);
     }
 
     async accept(message: FsWatcherMessage): Promise<boolean> {

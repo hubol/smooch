@@ -11,7 +11,8 @@ Promise.resolve()
 async function runTest() {
     await TestProject.initialize();
     await TestProject.mkdirs('src-images', 'dst-images', 'src-jsons', 'dst-jsons');
-    await TestProject.writeSmoochJson({
+
+    const config = {
         "textures": [{
             "folder": "src-images",
             "outFolder": "dst-images",
@@ -25,7 +26,9 @@ async function runTest() {
             "folder": "src-jsons",
             "outFile": "dst-jsons/result.ts",
         }]
-    });
+    };
+
+    await TestProject.writeSmoochJson(config);
     for (let i = 0; i < 3; i++)
         await TestProject.fixture('fixtureJson', `src-jsons/json${i}.json`);
     const smooch = TestProject.smooch();
@@ -52,6 +55,15 @@ export const JsonFiles = {
 
     const smooch2 = TestProject.smooch();
     await smooch2.stdOut.untilPrinted('Saved state.');
+
+    config.textures[0].pack.maxHeight = 4096;
+    config.textures[0].pack.maxWidth = 4096;
+    await TestProject.writeSmoochJson(config);
+
+    await smooch2.stdOut.untilPrinted('Restarting application...');
+    await smooch2.stdOut.untilPrinted('Created 1 image buffer');
+    await smooch2.stdOut.untilPrinted('Saved state.');
+
     smooch2.kill();
     await smooch2.untilExited();
 }

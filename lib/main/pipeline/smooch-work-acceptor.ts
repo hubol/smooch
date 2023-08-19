@@ -1,11 +1,16 @@
-import { minimatch } from "minimatch";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { ISmoochWorkAcceptor } from "./smooch-work-pipeline";
+import { Fs } from "../../common/fs";
+import { globMatch } from "../../common/glob-match";
 
 export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
-    constructor(readonly dependencyGlobs: string[],
-        readonly outputGlobs: string[]) {
-        
+    readonly dependencyGlobs: string[];
+
+    constructor(dependencyGlobs: string[],
+        readonly outputGlobs: string[],
+        dependsOnConfig = true) {
+        const configGlobs = dependsOnConfig ? [ Fs.resolve('smooch.json') ] : [];
+        this.dependencyGlobs = [ ...dependencyGlobs, ...configGlobs ];
     }
 
     accept(message: FsWatcherMessage) {
@@ -13,14 +18,14 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
             return true;
 
         for (const dependencyGlob of this.dependencyGlobs) {
-            const filter = minimatch.filter(dependencyGlob.replace(/\\/g, '/'));
-            if (message.events.some(x => filter(x.path)))
+            const match = globMatch(dependencyGlob);
+            if (message.events.some(x => match(x.path)))
                 return true;
         }
 
         for (const outputGlob of this.outputGlobs) {
-            const filter = minimatch.filter(outputGlob.replace(/\\/g, '/'));
-            if (message.events.some(x => x.type === 'delete' && filter(x.path)))
+            const match = globMatch(outputGlob);
+            if (message.events.some(x => x.type === 'delete' && match(x.path)))
                 return true;
         }
 
