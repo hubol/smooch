@@ -9,6 +9,7 @@
     "build:distributable-package-json": "ts-node ./tools/generate-distributable-package-json.ts",
     "build:npm-pack": "ts-node ./tools/pack.ts ../smooch.tgz",
     "dev:build-and-test": "npm run build && npm run test",
+    "dev:start": "node --nolazy -r ts-node/register ./lib/main/dev.ts",
     "test": "ts-node --transpileOnly test/test.ts"
   },
   "bin": {
@@ -23,10 +24,12 @@
   "devDependencies": {
     "@jimp/custom": "^0.22.10",
     "@jimp/types": "^0.22.10",
+    "@types/fluent-ffmpeg": "^2.1.21",
     "@types/js-beautify": "^1.13.3",
     "@types/sharp": "^0.31.1",
     "chalk": "^4.1.2",
     "change-case": "^4.1.2",
+    "fluent-ffmpeg": "^2.1.2",
     "glob": "^10.3.3",
     "image-size": "^1.0.2",
     "js-beautify": "^1.14.9",
