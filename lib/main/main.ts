@@ -7,13 +7,12 @@ import { SmoochConfig, SmoochConfigType } from "./smooch-config";
 import { SmoochRecipes } from "./smooch-recipes";
 import { Path } from "../common/path";
 import { validateOptions } from "../common/validate-options";
-import { minimatch } from "minimatch";
 import { JsonFile } from "../common/json-file";
 import { sleep, wait } from "../common/wait";
 import { Logger } from "../common/logger";
 import { ErrorPrinter } from "../common/error-printer";
 import { SubscribeCallback } from "@parcel/watcher";
-import { globMatch } from "../common/glob-match";
+import { Gwob } from "../common/gwob";
 
 const logger = new Logger('Main', 'green');
 
@@ -21,7 +20,7 @@ export async function main() {
     const subscription =
         new ParcelSubscription(Path.Directory.create('./'), { ignore: [ 'node_modules/', '.git/' ] });
     
-    const smoochJsonMatch = globMatch(Fs.resolve('smooch.json'));
+    const smoochJsonMatch = Gwob.match(Fs.resolve('smooch.json'));
 
     let smoochJsonEvents = 0;
 
@@ -74,6 +73,7 @@ export async function main() {
 
 export async function createApplicationFromSmoochJson() {
     const configJson = await JsonFile.read('smooch.json');
+    delete configJson['$schema'];
 	const smoochConfig = validateOptions(configJson, SmoochConfig);
     return await Application.create(smoochConfig);
 }

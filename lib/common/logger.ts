@@ -1,6 +1,10 @@
 import chalk from "chalk";
 import { ForegroundColor } from "chalk";
 import { indent } from "./indent";
+import { normalizeWindowsPathSeparator } from "./gwob";
+
+const cwd = process.cwd();
+const pathRegExp = new RegExp(`(${cwd.replace(/\\/g, '\\\\')}|${normalizeWindowsPathSeparator(cwd)})[\\/\\\\]*`, 'g');
 
 export class Logger {
     constructor(readonly context: any, readonly color: typeof ForegroundColor) {
@@ -9,6 +13,10 @@ export class Logger {
 
     private get _prefix() {
         return chalk[this.color]`${padLeftWithSpaces(getPrintableContext(this.context))} `;
+    }
+
+    info(message: any, ...additional: any[]) {
+        this._print('info', message, additional);
     }
 
     log(message: any, ...additional: any[]) {
@@ -27,8 +35,8 @@ export class Logger {
         this._print('warn', message, additional);
     }
 
-    private _print(key: 'log' | 'error' | 'warn' | 'debug', message: any, additional: any[]) {
-        console[key](`${this._prefix}${indent(message, Logger.globalOptions.maxContextLength + 1)}`, ...additional);
+    private _print(key: 'log' | 'error' | 'warn' | 'debug' | 'info', message: any, additional: any[]) {
+        console[key](`${this._prefix}${indent(message.replace(pathRegExp, ''), Logger.globalOptions.maxContextLength + 1)}`, ...additional);
     }
 
     static readonly globalOptions = {
