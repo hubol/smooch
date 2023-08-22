@@ -20,7 +20,7 @@ export async function main() {
     const subscription =
         new ParcelSubscription(Path.Directory.create('./'), { ignore: [ 'node_modules/', '.git/' ] });
     
-    const smoochJsonMatch = Gwob.match(Fs.resolve('smooch.json'));
+    const smoochJsonMatch = Gwob.match(Path.Glob.create('smooch.json'));
 
     let smoochJsonEvents = 0;
 

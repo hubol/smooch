@@ -1,9 +1,10 @@
 import { glob } from "glob";
 import { minimatch } from "minimatch";
+import { Path } from "./path";
 
-function globMatch(path: string) {
+function globMatch(path: Path.Glob.t) {
     if (!cache[path])
-        cache[path] = minimatch.filter(normalizeWindowsPathSeparator(path));
+        cache[path] = minimatch.filter(path);
     return cache[path];
 }
 
@@ -13,10 +14,8 @@ export function normalizeWindowsPathSeparator(path: string) {
     return path.replace(/\\/g, '/');
 }
 
-const globFiles: typeof glob = function (patterns, ...args) {
-    if (Array.isArray(patterns))
-        return glob(patterns.map(normalizeWindowsPathSeparator), ...args);
-    return glob(normalizeWindowsPathSeparator(patterns), ...args);
+const globFiles: typeof glob = function (patterns: Path.Glob.t | Path.Glob.t[], ...args) {
+    return glob(patterns, ...args);
 } as any;
 
 export const Gwob = {

@@ -2,11 +2,10 @@ import chalk from "chalk";
 import { Logger } from "../../common/logger";
 import { sleep, wait } from "../../common/wait";
 import { FsWatcher } from "../watcher/fs-watcher";
-import { FsWatcherMessage } from "../watcher/fs-watcher-message";
-import { ISmoochWorkDequeue } from "./smooch-work-pipeline";
+import { AcceptResult, ISmoochWorkDequeue } from "./smooch-work-pipeline";
 import { ErrorPrinter } from "../../common/error-printer";
 
-export type SmoochWork = FsWatcherMessage[];
+export type SmoochWork = AcceptResult.Accepted.t[];
 export type SmoochWorkFn = (work: SmoochWork) => unknown;
 
 export class SmoochWorker {

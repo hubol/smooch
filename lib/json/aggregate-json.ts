@@ -9,6 +9,7 @@ import { SmoochWorkAcceptor } from "../main/pipeline/smooch-work-acceptor";
 import { SmoochWorkPipelineRecipeFactory } from "../main/pipeline/smooch-work-pipeline";
 import { SmoochWorkQueue } from "../main/pipeline/smooch-work-queue";
 import { defaultTemplateFile } from "../common/default-template";
+import { Path } from "../common/path";
 
 export const AggregateJsonOptions = object({
     folder: SmoochStruct.DirectoryPath,
@@ -20,8 +21,8 @@ export const AggregateJsonRecipe = SmoochWorkPipelineRecipeFactory.create({
     name: 'jsonAgg',
     configSchema: AggregateJsonOptions,
 	acceptorFactory: options => {
-		const jsonFolder = Fs.resolve(options.folder, '**/*.json');
-		return new SmoochWorkAcceptor([ jsonFolder ], []);
+		const jsonFolder = Path.Glob.create(options.folder, '**/*.json');
+		return new SmoochWorkAcceptor([ jsonFolder ], [], []);
 	},
 	queueFactory: () => new SmoochWorkQueue(),
 	workFnFactory: options => () => aggregateJson(options),
