@@ -1,14 +1,13 @@
-import { FsWatcherMessage } from "../watcher/fs-watcher-message";
-import { ISmoochWorkQueue } from "./smooch-work-pipeline";
+import { AcceptResult, ISmoochWorkQueue } from "./smooch-work-pipeline";
 
 export class SmoochWorkQueue implements ISmoochWorkQueue {
-    private readonly _queue: FsWatcherMessage[] = [];
+    private readonly _queue: AcceptResult.Accepted.t[] = [];
 
     get isWorkReady() {
         return this._queue.length > 0;
     }
 
-    enqueue(message: FsWatcherMessage) {
+    enqueue(message: AcceptResult.Accepted.t) {
         this._queue.push(message);
     }
 

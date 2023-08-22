@@ -1,6 +1,7 @@
 import { Infer, Struct } from "superstruct";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { SmoochWorkFn, SmoochWorker, SmoochWork, SmoochWorkers } from "./smooch-worker";
+import ParcelWatcher from "@parcel/watcher";
 
 type InferLoose<T> =
     T extends Struct<any, any>
@@ -43,20 +44,59 @@ export class SmoochWorkPipeline {
     }
 
     async accept(message: FsWatcherMessage): Promise<boolean> {
-        if (!await Promise.resolve(this._acceptor.accept(message)))
+        const acceptResult = await Promise.resolve(this._acceptor.accept(message));
+        if (acceptResult.type === 'Rejected')
             return false;
         
-        this._queue.enqueue(message);
+        this._queue.enqueue(acceptResult);
         return true;
     }
 }
 
 export interface ISmoochWorkAcceptor {
-    accept(message: FsWatcherMessage): Promise<boolean> | boolean;
+    accept(message: FsWatcherMessage): Promise<AcceptResult.t> | AcceptResult.t;
+}
+
+export const symbolFn = Symbol;
+
+export namespace AcceptResult {
+    export namespace Accepted {
+        export interface WithMatches {
+            type: 'AcceptedWithMatches';
+            assetMatches: ParcelWatcher.Event[];
+            dependencyMatches: ParcelWatcher.Event[];
+            outputMatches: ParcelWatcher.Event[];
+            sourceMessage: FsWatcherMessage;
+        }
+
+        export namespace Nascent {
+            export interface t {
+                type: 'AcceptedNascent'
+            }
+    
+            export const Instance: t = {
+                type: 'AcceptedNascent'
+            }
+        }
+
+        export type t = WithMatches | Nascent.t;
+    }
+
+    export namespace Rejected {
+        export interface t {
+            type: 'Rejected'
+        }
+
+        export const Instance: t = {
+            type: 'Rejected'
+        }
+    }
+
+    export type t = Rejected.t | Accepted.t;
 }
 
 interface ISmoochWorkEnqueue {
-    enqueue(message: FsWatcherMessage): void;
+    enqueue(message: AcceptResult.Accepted.t): void;
 }
 
 export interface ISmoochWorkDequeue {

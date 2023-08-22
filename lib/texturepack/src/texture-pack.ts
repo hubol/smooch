@@ -19,8 +19,8 @@ export const TexturePackRecipe = SmoochWorkPipelineRecipeFactory.create({
 	name: 'texPack',
 	configSchema: PackerOptions,
 	acceptorFactory: options => {
-		const imagesFolder = Fs.resolve(options.folder, '**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}');
-		return new SmoochWorkAcceptor([ imagesFolder ], []);
+		const imagesFolder = Path.Glob.create(options.folder, '**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}');
+		return new SmoochWorkAcceptor([ imagesFolder ], [], []);
 	},
 	queueFactory: () => new SmoochWorkQueue(),
 	workFnFactory: options => () => texturePack(options),
