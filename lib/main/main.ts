@@ -36,12 +36,14 @@ export async function main() {
     }
 
     await subscription.start(cb);
+
+    let deleteSnapshotFile = false;
     
     while (true) {
         let application: Application | undefined;
 
         try {
-            application = await createApplicationFromSmoochJson();
+            application = await createApplicationFromSmoochJson(deleteSnapshotFile);
             await application.start();
         }
         catch (e) {
@@ -51,6 +53,8 @@ export async function main() {
 
         smoochJsonEvents = 0;
         await wait(() => smoochJsonEvents > 0);
+
+        deleteSnapshotFile = true;
 
         logger.log('smooch.json change detected, triggering restart...');
 
@@ -71,11 +75,11 @@ export async function main() {
     }
 }
 
-export async function createApplicationFromSmoochJson() {
+export async function createApplicationFromSmoochJson(deleteSnapshotFile: boolean) {
     const configJson = await JsonFile.read('smooch.json');
     delete configJson['$schema'];
 	const smoochConfig = validateOptions(configJson, SmoochConfig);
-    return await Application.create(smoochConfig);
+    return await Application.create(smoochConfig, deleteSnapshotFile);
 }
 
 class Application {
@@ -85,13 +89,18 @@ class Application {
 
     }
 
-    static async create(config: SmoochConfigType) {
+    static async create(config: SmoochConfigType, deleteSnapshotFile: boolean) {
         const { core } = config;
 
         await Fs.mkdir(core.cacheFolder, { recursive: true });
 
         const workspaceDirectory = Path.Directory.create('./');
         const snapshotFile = Path.File.create(Fs.resolve(core.cacheFolder, 'snapshot.txt'));
+
+        if (deleteSnapshotFile && await Fs.exists(snapshotFile)) {
+            logger.log(`Deleting snapshot file ${snapshotFile} to force Nascent message...`);
+            await Fs.rm(snapshotFile);
+        }
 
         const resources = await ParcelFsResources.create(
             workspaceDirectory,
