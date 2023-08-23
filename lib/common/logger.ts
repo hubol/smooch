@@ -6,6 +6,8 @@ import { normalizeWindowsPathSeparator } from "./gwob";
 const cwd = process.cwd();
 const pathRegExp = new RegExp(`(${cwd.replace(/\\/g, '\\\\')}|${normalizeWindowsPathSeparator(cwd)})[\\/\\\\]*`, 'g');
 
+const windowsPathSeparatorRegExp = /\\/g;
+
 export class Logger {
     constructor(readonly context: any, readonly color: typeof ForegroundColor) {
         
@@ -36,7 +38,8 @@ export class Logger {
     }
 
     private _print(key: 'log' | 'error' | 'warn' | 'debug' | 'info', message: any, additional: any[]) {
-        console[key](`${this._prefix}${indent(message.replace(pathRegExp, ''), Logger.globalOptions.maxContextLength + 1)}`, ...additional);
+        const filteredMessage = message.replace(pathRegExp, '').replace(windowsPathSeparatorRegExp, '/');
+        console[key](`${this._prefix}${indent(filteredMessage, Logger.globalOptions.maxContextLength + 1)}`, ...additional);
     }
 
     static readonly globalOptions = {
