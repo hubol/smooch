@@ -1,5 +1,5 @@
 node_modules/
 .test_env/
-dist/
+dist/*
 !dist/templates
 smooch*.tgz

@@ -1,7 +1,6 @@
 import { GlobOptionsWithFileTypesUnset, glob } from "glob";
 import { minimatch } from "minimatch";
 import { Path } from "./path";
-import { Logger } from "./logger";
 
 function globMatch(path: Path.Glob.t) {
     if (!cache[path])
@@ -17,8 +16,9 @@ export function normalizeWindowsPathSeparator(path: string) {
     return path.replace(windowsPathSeparatorRegExp, '/');
 }
 
-function globFiles(patterns: Path.Glob.t | Path.Glob.t[], options?: GlobOptionsWithFileTypesUnset) {
-    return glob(patterns, options);
+async function globFiles(patterns: Path.Glob.t | Path.Glob.t[], options?: GlobOptionsWithFileTypesUnset) {
+    const paths = await glob(patterns, options);
+    return paths.map(normalizeWindowsPathSeparator);
 }
 
 const wildcardRegExp = /[*?[]+/;

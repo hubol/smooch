@@ -1,6 +1,11 @@
 import fs from "fs";
 import util from "util";
 import path from "path";
+import { normalizeWindowsPathSeparator } from "./gwob";
+
+function resolve(...paths: string[]) {
+    return normalizeWindowsPathSeparator(path.resolve(...paths));
+}
 
 export const Fs = {
     readFile: util.promisify(fs.readFile),
@@ -12,4 +17,5 @@ export const Fs = {
     exists: util.promisify(fs.exists),
     rename: util.promisify(fs.rename),
     ...path,
+    resolve
 }
