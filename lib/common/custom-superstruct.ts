@@ -1,8 +1,16 @@
-import { Struct, coerce, string } from "superstruct";
+import { Struct, coerce, object, string } from "superstruct";
 import { Path } from "./path";
 
+const FilePath = coerce(string() as unknown as Struct<Path.File.t, null>, string(), (value) => Path.File.create(value));
+const DirectoryPath = coerce(string() as unknown as Struct<Path.Directory.t, null>, string(), (value) => Path.Directory.create(value));
+const GlobPath = coerce(string() as unknown as Struct<Path.Glob.t, null>, string(), (value) => Path.Glob.create(value));
+
 export const SmoochStruct = {
-    FilePath: coerce(string() as unknown as Struct<Path.File.t, null>, string(), (value) => Path.File.create(value)),
-    DirectoryPath: coerce(string() as unknown as Struct<Path.Directory.t, null>, string(), (value) => Path.Directory.create(value)),
-    GlobPath: coerce(string() as unknown as Struct<Path.Glob.t, null>, string(), (value) => Path.Glob.create(value)),
+    FilePath,
+    DirectoryPath,
+    GlobPath,
+    Template: object({
+        program: FilePath,
+        out: FilePath,
+    }),
 }
