@@ -34,8 +34,10 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
         for (const dependencyGlob of this.dependencyGlobs) {
             const match = Gwob.match(dependencyGlob);
             for (const event of message.events) {
-                if (match(event.path))
+                if (match(event.path)) {
                     this._workingDependencyMatches.push(event);
+                    delete require.cache[event.path];
+                }
             }
         }
 
