@@ -6,6 +6,7 @@ import { compareText } from "./compare-text";
 import { Logger } from "../../lib/common/logger";
 import { Path } from "../../lib/common/path";
 import { TestCommands } from "./test-commands";
+import { SmoochConfigType } from "../../lib/main/smooch-config";
 
 const Paths = {
     testEnv: Path.Directory.create('./.test_env'),
@@ -28,7 +29,7 @@ export const TestProject = {
         return TestProject.spawn(TestCommands.npx, ['smooch', ...args]);
     },
     writeSmoochJson(config: any) {
-        const configWithDefaults = { core: { cacheFolder: ".smooch" }, ...config };
+        const configWithDefaults = { core: { cacheFolder: ".smooch" }, "$schema": "./node_modules/smooch/schema.json", ...config };
         return Fs.writeFile(envPath('smooch.json'), JSON.stringify(configWithDefaults, undefined, 2));
     },
     cleanUp() {
@@ -59,3 +60,19 @@ export const TestProject = {
 }
 
 const logger = new Logger('test', 'green');
+
+type LoosenPathTypes<T> = {
+    [k in keyof T]: T[k] extends Path.Directory.t
+        ? string
+        : T[k] extends Path.File.t
+        ? string
+        : T[k] extends Path.Glob.t
+        ? string
+        : T[k] extends Record<string, unknown>
+        ? Partial<LoosenPathTypes<T[k]>>
+        : T[k] extends Array<infer ArrayType>
+        ? Array<Partial<LoosenPathTypes<ArrayType>>>
+        : T[k];
+};
+
+export type TestInlineConfig = Partial<LoosenPathTypes<SmoochConfigType>>;

@@ -2,10 +2,12 @@ import { Struct, array, defaulted } from "superstruct";
 import { TexturePackRecipe } from "../texturepack/src/texture-pack";
 import { AggregateJsonRecipe } from "../json/aggregate-json";
 import { SmoochWorkPipelineRecipe } from "./pipeline/smooch-work-pipeline";
+import { ConvertAudioRecipe } from "../audio/convert-audio";
 
 const recipes = {
     jsonFiles: AggregateJsonRecipe,
     textures: TexturePackRecipe,
+    audioFiles: ConvertAudioRecipe,
 }
 
 function getRecipeConfigs(): RecipeToConfigSchema<typeof recipes> {

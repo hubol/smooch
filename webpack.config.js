@@ -1,5 +1,6 @@
 const path = require('path');
 const ShebangPlugin = require('webpack-shebang-plugin');
+const webpack = require('webpack');
 
 const externals = (...items) => {
 	const obj = {};
@@ -31,6 +32,12 @@ module.exports = {
 			}
 		]
 	},
-	plugins: [ new ShebangPlugin() ],
+	plugins: [
+		new ShebangPlugin(),
+		// https://github.com/fluent-ffmpeg/node-fluent-ffmpeg/issues/573#issuecomment-305408048
+		new webpack.DefinePlugin({
+			'process.env.FLUENTFFMPEG_COV': false
+		})
+	],
 	resolve: { extensions: [ '.js', '.ts', '.json' ] },
 };

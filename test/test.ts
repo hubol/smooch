@@ -1,6 +1,6 @@
 import { handleFatalError } from "../lib/common/handle-fatal-error";
 import { Logger } from "../lib/common/logger";
-import { TestProject } from "./utils/test-project";
+import { TestInlineConfig, TestProject } from "./utils/test-project";
 
 Logger.globalOptions.maxContextLength = 14;
 
@@ -10,9 +10,9 @@ Promise.resolve()
 
 async function runTest() {
     await TestProject.initialize();
-    await TestProject.mkdirs('src-images', 'dst-images', 'src-jsons', 'dst-jsons');
+    await TestProject.mkdirs('src-images', 'dst-images', 'src-jsons', 'dst-jsons', 'src-audio');
 
-    const config = {
+    const config: TestInlineConfig = {
         "textures": [{
             "folder": "src-images",
             "outFolder": "dst-images",
@@ -56,12 +56,39 @@ export const JsonFiles = {
     const smooch2 = TestProject.smooch();
     await smooch2.stdOut.untilPrinted('Saved state.');
 
-    config.textures[0].pack.maxHeight = 4096;
-    config.textures[0].pack.maxWidth = 4096;
+    config.textures![0].pack!.maxHeight = 4096;
+    config.textures![0].pack!.maxWidth = 4096;
     await TestProject.writeSmoochJson(config);
 
     await smooch2.stdOut.untilPrinted('Restarting application...');
     await smooch2.stdOut.untilPrinted('Created 1 image buffer');
+    await smooch2.stdOut.untilPrinted('Saved state.');
+
+    await TestProject.fixture('soundWav', 'src-audio/sound0.wav');
+    await TestProject.fixture('soundTemplateProgramJs', 'sound-template-program.js');
+
+    config.audioFiles = [{
+        glob: "src-audio/**/*.wav",
+        out: [
+            {
+                directory: 'dst-audio/ogg',
+                format: 'ogg',
+            },
+            {
+                directory: 'dst-audio/mp3',
+                format: 'mp3',
+            }
+        ],
+        template: {
+            program: 'sound-template-program.js',
+            out: 'dst-audio/sound.ts'
+        }
+    }];
+
+    await TestProject.writeSmoochJson(config);
+
+    await smooch2.stdOut.untilPrinted('smooch.json change detected');
+    await smooch2.stdOut.untilPrinted('AudioConverter Done converting 1 file');
     await smooch2.stdOut.untilPrinted('Saved state.');
 
     smooch2.kill();
