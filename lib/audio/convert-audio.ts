@@ -26,7 +26,7 @@ export const ConvertAudioRecipe = SmoochWorkPipelineRecipeFactory.create({
     name: 'audiCnv',
     configSchema: ConvertAudioOptions,
 	acceptorFactory: options => {
-		return new SmoochWorkAcceptor([ options.glob ], [], []);
+		return new SmoochWorkAcceptor([ options.glob ], [ Path.Glob.create(options.template.program) ], []);
 	},
 	queueFactory: () => new SmoochWorkQueue(),
 	workFnFactory: options => (work) => convertAudio(options, work),

@@ -22,7 +22,7 @@ export const AggregateJsonRecipe = SmoochWorkPipelineRecipeFactory.create({
     configSchema: AggregateJsonOptions,
 	acceptorFactory: options => {
 		const jsonFolder = Path.Glob.create(options.folder, '**/*.json');
-		return new SmoochWorkAcceptor([ jsonFolder ], [], []);
+		return new SmoochWorkAcceptor([ jsonFolder ], [ Path.Glob.create(options.outTemplate) ], []);
 	},
 	queueFactory: () => new SmoochWorkQueue(),
 	workFnFactory: options => () => aggregateJson(options),
