@@ -1,5 +1,7 @@
-// This file is generated.
-
+/**
+@param {import("smooch/template-api").TemplateContext.JsonAggregate} context;
+@param {import("smooch/template-api").Utils} utils;
+*/
 module.exports = function ({ files }, { pascal, noext, oneline, json }) {
     return `// This file is generated.
 

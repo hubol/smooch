@@ -6,7 +6,7 @@ import { PackTextureTemplateContext } from "./texturepack/src/texture-pack";
 export { Utils };
 
 export namespace TemplateContext {
-    export type AggregateJson = AggregateJsonTemplateContext;
-    export type ConvertAudio = ConvertAudioTemplateContext;
-    export type PackTexture = PackTextureTemplateContext;
+    export type JsonAggregate = AggregateJsonTemplateContext;
+    export type AudioConvert = ConvertAudioTemplateContext;
+    export type TexturePack = PackTextureTemplateContext;
 }
