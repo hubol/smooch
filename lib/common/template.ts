@@ -6,7 +6,7 @@ import { Logger } from "./logger";
 import chalk from "chalk";
 import { describeBrief } from "./describe-brief";
 import { requireModule } from "./require-module";
-import { js_beautify } from "js-beautify";
+import { jsBeautify } from "./js-beautify";
 
 const utils = {
 	camel: camelCase,
@@ -14,10 +14,10 @@ const utils = {
 	noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
 	json: (object: any) => JSON.stringify(object, undefined, 1),
 	oneline: (string: string) => string.replace(/\s+/g, ' '),
-	beautify: js_beautify,
+	beautify: jsBeautify,
 };
 
-type Utils = typeof utils;
+export type Utils = typeof utils;
 type JsTemplateFn = (context: Record<string, any>, utils: Utils) => string | Promise<string>;
 
 const logger = new Logger('Template', 'yellow');

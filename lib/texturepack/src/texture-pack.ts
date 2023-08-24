@@ -66,6 +66,8 @@ function createTemplateContext(atlases: Atlases, imagesFolder: Path.Directory.t)
 	return { atlases, textures };
 }
 
+export type PackTextureTemplateContext = ReturnType<typeof createTemplateContext>;
+
 const convertRectsToContextTextures = (atlas: Atlases[number], imagesFolder: Path.Directory.t) => atlas.rects.map(rect => ({
 	atlasFileName: atlas.fileName,
 	fileName: rect.filePath.substring(Fs.resolve(imagesFolder).length),
