@@ -91,6 +91,12 @@ export const JsonFiles = {
     await smooch2.stdOut.untilPrinted('AudioConverter Done converting 1 file');
     await smooch2.stdOut.untilPrinted('Saved state.');
 
+    TestProject.check('dst-audio/sound.ts', `// This file is generated
+
+export const Sfx = {
+   "Sound0": { ogg: "sound0.ogg", mp3: "sound0.mp3", }
+}`).print();
+
     smooch2.kill();
     await smooch2.untilExited();
 }
