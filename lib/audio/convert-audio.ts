@@ -62,7 +62,11 @@ export async function convertAudio(options: Infer<typeof ConvertAudioOptions>, w
 
     const files = await getTemplateContextFilesFromDirectories(options);
 
-    await template.renderToFile({ files }, options.template.out);
+    await template.renderToFile(<ConvertAudioTemplateContext>{ files }, options.template.out);
+}
+
+export interface ConvertAudioTemplateContext {
+    files: TemplateContextFile[];
 }
 
 interface TemplateContextFile {

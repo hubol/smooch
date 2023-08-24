@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "description": "Generate texture atlases, audio sprites, and source code from directories",
   "scripts": {
-    "build": "npm run build:json-schema && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-pack",
+    "build": "npm run build:json-schema && npm run build:template-api-dts && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-pack",
     "build:json-schema": "ts-node ./tools/generate-config-schema.ts",
+    "build:template-api-dts": "npx tsup lib/template-api.ts --dts-only --dts-resolve",
     "build:bundle": "webpack",
     "build:distributable-package-json": "ts-node ./tools/generate-distributable-package-json.ts",
     "build:npm-pack": "ts-node ./tools/pack.ts ../smooch.tgz",
@@ -39,6 +40,7 @@
     "tree-kill": "^1.2.2",
     "ts-loader": "^9.4.4",
     "ts-node": "^10.9.1",
+    "tsup": "^7.2.0",
     "typescript": "^5.0.4",
     "typescript-json-schema": "^0.56.0",
     "webpack": "^5.88.2",

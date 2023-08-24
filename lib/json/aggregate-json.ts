@@ -47,5 +47,9 @@ export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>)
         }
     }));
     
-    await template.renderToFile({ files }, options.outFile);
+    await template.renderToFile(<AggregateJsonTemplateContext>{ files }, options.outFile);
+}
+
+export interface AggregateJsonTemplateContext {
+    files: { fileName: string, json: any }[];
 }
