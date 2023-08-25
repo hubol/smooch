@@ -42,7 +42,7 @@ async function runTest() {
     
     await TestProject.writeSmoochJson(config);
     await smooch.stdOut.untilPrinted('restart');
-    
+
     await smooch.stdOut.untilPrinted('Packed');
     await TestProject.fixture('image256Png', 'src-images/image0.png');
     await smooch.stdOut.untilPrinted('Packed');
@@ -82,11 +82,11 @@ export const JsonFiles = {
         out: [
             {
                 directory: 'dst-audio/ogg',
-                format: 'ogg',
+                format: 'OGG ',
             },
             {
                 directory: 'dst-audio/mp3',
-                format: 'mp3',
+                format: ' Mp3  ',
             }
         ],
         template: {
