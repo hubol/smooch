@@ -1,8 +1,10 @@
 import { Path } from "../../common/path";
 import { copyTemplateProgram } from "./copy-template-program";
+import { initializeSmoochConfig } from "./initialize";
 
 const cliUtilsCommands: Record<string, (...args: string[]) => Promise<unknown>> = {
-    'copy-program': (src, dst) => copyTemplateProgram(src, Path.File.create(dst))
+    'copy-program': (src, dst) => copyTemplateProgram(src, Path.File.create(dst)),
+    'init': initializeSmoochConfig,
 }
 
 export async function runCliUtilCommand() {
