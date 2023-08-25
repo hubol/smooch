@@ -13,10 +13,14 @@ import { Logger } from "../common/logger";
 import { ErrorPrinter } from "../common/error-printer";
 import { SubscribeCallback } from "@parcel/watcher";
 import { Gwob } from "../common/gwob";
+import { runCliUtilCommand } from "./cli-utils/commands";
 
 const logger = new Logger('Main', 'green');
 
 export async function main() {
+    if (await runCliUtilCommand())
+        return;
+
     const subscription =
         new ParcelSubscription(Path.Directory.create('./'), { ignore: [ 'node_modules/', '.git/' ] });
     

@@ -28,6 +28,10 @@ async function runTest() {
         }]
     };
 
+    for (const templateProgram of ['audio-convert', 'json-aggregate', 'texture-pack']) {
+        await TestProject.smooch('copy-program', templateProgram).untilExited()
+    }
+
     await TestProject.writeSmoochJson(config);
     for (let i = 0; i < 3; i++)
         await TestProject.fixture('fixtureJson', `src-jsons/json${i}.json`);
@@ -65,7 +69,6 @@ export const JsonFiles = {
     await smooch2.stdOut.untilPrinted('Saved state.');
 
     await TestProject.fixture('soundWav', 'src-audio/sound0.wav');
-    await TestProject.fixture('soundTemplateProgramJs', 'sound-template-program.js');
 
     config.audioFiles = [{
         glob: "src-audio/**/*.wav",
@@ -80,7 +83,7 @@ export const JsonFiles = {
             }
         ],
         template: {
-            program: 'sound-template-program.js',
+            program: 'audio-convert.js',
             out: 'dst-audio/sound.ts'
         }
     }];
