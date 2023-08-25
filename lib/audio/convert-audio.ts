@@ -18,7 +18,7 @@ export const ConvertAudioOptions = object({
     template: SmoochStruct.Template,
     out: array(object({
         directory: SmoochStruct.DirectoryPath,
-        format: string(),
+        format: SmoochStruct.FileExtension,
     })),
 });
 
