@@ -12,6 +12,18 @@ async function runTest() {
     await TestProject.initialize();
     await TestProject.mkdirs('src-images', 'dst-images', 'src-jsons', 'dst-jsons', 'src-audio');
 
+    for (const templateProgram of ['audio-convert', 'json-aggregate', 'texture-pack'])
+        await TestProject.smooch('copy-program', templateProgram).untilExited();
+
+    for (let i = 0; i < 3; i++)
+        await TestProject.fixture('fixtureJson', `src-jsons/json${i}.json`);
+
+    await TestProject.smooch('init').untilExited();
+
+    const smooch = TestProject.smooch();
+
+    await smooch.stdOut.untilPrinted('Nascent');
+
     const config: TestInlineConfig = {
         "textures": [{
             "folder": "src-images",
@@ -27,15 +39,10 @@ async function runTest() {
             "outFile": "dst-jsons/result.ts",
         }]
     };
-
-    for (const templateProgram of ['audio-convert', 'json-aggregate', 'texture-pack']) {
-        await TestProject.smooch('copy-program', templateProgram).untilExited()
-    }
-
+    
     await TestProject.writeSmoochJson(config);
-    for (let i = 0; i < 3; i++)
-        await TestProject.fixture('fixtureJson', `src-jsons/json${i}.json`);
-    const smooch = TestProject.smooch();
+    await smooch.stdOut.untilPrinted('restart');
+    
     await smooch.stdOut.untilPrinted('Packed');
     await TestProject.fixture('image256Png', 'src-images/image0.png');
     await smooch.stdOut.untilPrinted('Packed');
