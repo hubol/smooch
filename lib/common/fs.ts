@@ -8,6 +8,7 @@ function resolve(...paths: string[]) {
 }
 
 export const Fs = {
+    createWriteStream: fs.createWriteStream,
     readFile: util.promisify(fs.readFile),
     readFileSync: fs.readFileSync,
     writeFile: util.promisify(fs.writeFile),
