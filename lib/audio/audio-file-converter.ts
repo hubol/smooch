@@ -3,6 +3,7 @@ import Ffmpeg from "fluent-ffmpeg";
 import { Path } from "../common/path";
 import { Logger } from "../common/logger";
 import { Now } from "../common/now";
+import { printMs } from "../common/print-ms";
 
 Ffmpeg.setFfmpegPath(ffmpegBinary.path);
 
@@ -26,6 +27,3 @@ export class AudioFileConverter {
     }
 }
 
-function printMs(ms: number) {
-    return ms < 1 ? '<1ms' : (Math.round(ms) + 'ms');
-}
