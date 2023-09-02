@@ -16,7 +16,7 @@ import chalk from "chalk";
 export const ConvertAudioOptions = object({
     glob: SmoochStruct.GlobPath,
     template: SmoochStruct.Template,
-    out: array(object({
+    convert: array(object({
         directory: SmoochStruct.DirectoryPath,
         format: SmoochStruct.FileExtension,
     })),
@@ -44,12 +44,12 @@ export async function convertAudio(options: Infer<typeof ConvertAudioOptions>, w
 
     const uniqueFiles = [ ...new Set(filesToConvert) ];
 
-    logger.log(`Found ${filesToConvert.length} file(s) to convert to formats: ${chalk.white(describeList(options.out.map(x => x.format)))}`);
+    logger.log(`Found ${filesToConvert.length} file(s) to convert to formats: ${chalk.white(describeList(options.convert.map(x => x.format)))}`);
 
-    await Promise.all(options.out.map(({ directory }) => Fs.mkdir(directory, { recursive: true })));
+    await Promise.all(options.convert.map(({ directory }) => Fs.mkdir(directory, { recursive: true })));
 
     const globRoot = Gwob.root(options.glob);
-    await Promise.all(options.out.flatMap(({ directory, format }) => uniqueFiles.map(async srcFile => {
+    await Promise.all(options.convert.flatMap(({ directory, format }) => uniqueFiles.map(async srcFile => {
         const parsed = Fs.parse(srcFile);
         const fileNameNoExt = Fs.resolve(parsed.dir, parsed.name).substring(globRoot.length);
         const dstFile = Path.File.create(Fs.resolve(directory, fileNameNoExt + "." + format));
@@ -88,7 +88,7 @@ async function getTemplateContextFilesFromDirectories(options: Infer<typeof Conv
         sourceFileToDestFiles[fileNameNoExt] = { path, convertedPaths: { } };
     }
 
-    for (const { format, directory } of options.out) {
+    for (const { format, directory } of options.convert) {
         const glob = Path.Glob.create(directory, '**/*.' + format);
         const root = Gwob.root(glob);
         const dstFiles = await Gwob.files(glob);
