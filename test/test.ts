@@ -79,7 +79,7 @@ export const JsonFiles = {
 
     config.audioFiles = [{
         glob: "src-audio/**/*.wav",
-        out: [
+        convert: [
             {
                 directory: 'dst-audio/ogg',
                 format: 'OGG ',
