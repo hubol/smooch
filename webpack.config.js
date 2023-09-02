@@ -40,4 +40,8 @@ module.exports = {
 		})
 	],
 	resolve: { extensions: [ '.js', '.ts', '.json' ] },
+	ignoreWarnings: [
+		{ module: /lib\/common\/require-module.ts/, },
+		{ module: /node_modules\/fluent-ffmpeg\/lib\/options\/misc.js/, },
+	],
 };
