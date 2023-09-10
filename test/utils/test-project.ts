@@ -61,13 +61,14 @@ export const TestProject = {
 
 const logger = new Logger('test', 'green');
 
+type PathType = Path.Directory.t | Path.File.t | Path.Glob.t
+
 type LoosenPathTypes<T> = {
-    [k in keyof T]: T[k] extends Path.Directory.t
+    [k in keyof T]:
+        T[k] extends PathType
         ? string
-        : T[k] extends Path.File.t
-        ? string
-        : T[k] extends Path.Glob.t
-        ? string
+        : T[k] extends PathType | undefined
+        ? string | undefined
         : T[k] extends Record<string, unknown>
         ? Partial<LoosenPathTypes<T[k]>>
         : T[k] extends Array<infer ArrayType>

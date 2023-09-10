@@ -89,8 +89,9 @@ export async function createApplicationFromSmoochJson(deleteSnapshotFile: boolea
 class Application {
     private constructor(
         private readonly _watcher: FsWatcher,
-        private readonly _workers: SmoochWorkers) {
-
+        private readonly _workers: SmoochWorkers,
+        readonly config: SmoochConfigType,) {
+            ApplicationSingleton = this;
     }
 
     static async create(config: SmoochConfigType, deleteSnapshotFile: boolean) {
@@ -118,7 +119,7 @@ class Application {
         for (const pipeline of pipelines)
             watcher.subscribe({ identity: pipeline.recipe.name, accept: x => pipeline.accept(x) });    
 
-        return new Application(watcher, workers);
+        return new Application(watcher, workers, config);
     }
 
     async start() {
@@ -133,6 +134,8 @@ class Application {
         await this._workers.stop();
     }
 }
+
+export let ApplicationSingleton: Application; 
 
 function createPipelinesFromSmoochConfig({ core, ...rest }: SmoochConfigType, workers: SmoochWorkers) {
     const pipelines: SmoochWorkPipeline[] = [];
