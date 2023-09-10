@@ -3,6 +3,7 @@ import { AcceptResult, ISmoochWorkAcceptor } from "./smooch-work-pipeline";
 import { Gwob } from "../../common/gwob";
 import ParcelWatcher from "@parcel/watcher";
 import { Path } from "../../common/path";
+import { requireImpl } from "../../common/require-module";
 
 export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
     constructor(
@@ -36,7 +37,7 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
             for (const event of message.events) {
                 if (match(event.path)) {
                     this._workingDependencyMatches.push(event);
-                    delete require.cache[event.path];
+                    delete requireImpl.cache[event.path];
                 }
             }
         }
