@@ -142,6 +142,10 @@ export const Sfx = {
     await smooch2.stdOut.untilPrinted('Zipping .smooch/wav__dst_audio_mp3_zip__hbhuollbblououbh/**/* to dst-audio/mp3.zip...');
     await smooch2.stdOut.untilPrinted('Saved state.');
 
+    await TestProject.fixture('dummyProgram', 'audio-convert.js');
+    await smooch2.stdOut.untilPrinted('Saved state.');
+    TestProject.check('dst-audio/sound.ts', `// Dummy`).print();
+
     smooch2.kill();
     await smooch2.untilExited();
 }

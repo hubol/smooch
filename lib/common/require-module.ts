@@ -1,7 +1,7 @@
 import { Environment } from "./environment";
 
 // @ts-ignore
-const requireImpl = Environment.isDev ? require : __non_webpack_require__;
+export const requireImpl = Environment.isDev ? require : __non_webpack_require__;
 
 export function requireModule(path: string) {
     return requireImpl(path);
