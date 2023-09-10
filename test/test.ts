@@ -107,6 +107,41 @@ export const Sfx = {
    "Sound0": { ogg: "sound0.ogg", mp3: "sound0.mp3", }
 }`).print();
 
+    delete config.textures;
+    delete config.jsonFiles;
+    config.audioFiles = [{
+        glob: "src-audio/**/*.wav",
+        convert: [
+            {
+                zip: 'dst-audio/both.zip',
+                format: 'OGG ',
+            },
+            {
+                zip: 'dst-audio/both.zip',
+                format: ' Mp3  ',
+            },
+            {
+                zip: 'dst-audio/ogg.zip',
+                format: 'OGG ',
+            },
+            {
+                zip: 'dst-audio/mp3.zip',
+                format: ' Mp3  ',
+            }
+        ],
+        template: {
+            program: 'audio-convert.js',
+            out: 'dst-audio/sound.ts'
+        }
+    }];
+
+    await TestProject.writeSmoochJson(config);
+
+    await smooch2.stdOut.untilPrinted('smooch.json change detected');
+    await smooch2.stdOut.untilPrinted('AudioConverter Done converting 1 file');
+    await smooch2.stdOut.untilPrinted('Zipping .smooch/wav__dst_audio_mp3_zip__hbhuollbblououbh/**/* to dst-audio/mp3.zip...');
+    await smooch2.stdOut.untilPrinted('Saved state.');
+
     smooch2.kill();
     await smooch2.untilExited();
 }

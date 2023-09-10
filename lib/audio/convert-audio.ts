@@ -1,4 +1,4 @@
-import { Infer, array, object, string } from "superstruct";
+import { Infer, array, object, optional, string } from "superstruct";
 import { SmoochStruct } from "../common/custom-superstruct";
 import { Fs } from "../common/fs";
 import { JsTemplate } from "../common/template";
@@ -12,15 +12,23 @@ import { AudioFileConverter } from "./audio-file-converter";
 import { Path } from "../common/path";
 import { describeList } from "../common/describe-list";
 import chalk from "chalk";
+import { zipGlob } from "../zip/zip-glob";
+import { hubhash } from "../common/hubhash";
+import { ApplicationSingleton } from "../main/main";
+import { WithRequired } from "../common/with-required";
 
 export const ConvertAudioOptions = object({
     glob: SmoochStruct.GlobPath,
     template: SmoochStruct.Template,
     convert: array(object({
-        directory: SmoochStruct.DirectoryPath,
+        directory: optional(SmoochStruct.DirectoryPath),
+        zip: optional(SmoochStruct.FilePath),
         format: SmoochStruct.FileExtension,
     })),
 });
+
+type ValidatedConvertOption = WithRequired<Infer<typeof ConvertAudioOptions>['convert'][0], 'directory'>;
+type ValidatedOptions = Omit<Infer<typeof ConvertAudioOptions>, 'convert'> & { convert: ValidatedConvertOption[] };
 
 export const ConvertAudioRecipe = SmoochWorkPipelineRecipeFactory.create({
     name: 'audiCnv',
@@ -34,7 +42,8 @@ export const ConvertAudioRecipe = SmoochWorkPipelineRecipeFactory.create({
 
 const logger = new Logger('AudioConverter', 'cyan');
 
-export async function convertAudio(options: Infer<typeof ConvertAudioOptions>, work: SmoochWork) {
+export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>, work: SmoochWork) {
+    const options = validateOptions(rawOptions);
     const template = await JsTemplate.fromFile(options.template.program);
     const filesToConvertResult = FilesToConvert.infer(work);
 
@@ -60,13 +69,55 @@ export async function convertAudio(options: Infer<typeof ConvertAudioOptions>, w
 
     logger.log(`Done converting ${filesToConvert.length} file(s).`);
 
-    const files = await getTemplateContextFilesFromDirectories(options);
+    const [ files, zipFiles ] = await Promise.all([
+        getTemplateContextFilesFromDirectories(options),
+        createZipFiles(options.convert.filter(isZipConvertOption)),
+    ]);
 
-    await template.renderToFile(<ConvertAudioTemplateContext>{ files }, options.template.out);
+    const context: ConvertAudioTemplateContext = { files, zipFiles };
+    await template.renderToFile(context, options.template.out);
 }
+
+function validateOptions(options: Infer<typeof ConvertAudioOptions>) {
+    for (const convert of options.convert) {
+        if (convert.directory)
+            continue;
+        
+        convert.directory = Path.Directory.create(
+            Fs.resolve(
+                ApplicationSingleton.config.core.cacheFolder,
+                makeDirectoryName(options.glob, convert.zip ?? 'nozip', hubhash(`${options.glob}%${convert.zip}`))
+            ));
+        logger.log(`Generated directory name in cache folder for audio conversion ${options.glob} -> ${convert.format} -> ${convert.directory}${convert.zip ? ` -> ${convert.zip}` : ''}`);
+    }
+
+    return options as ValidatedOptions;
+}
+
+function isZipConvertOption(convertOption: ValidatedConvertOption): convertOption is ZipConvertOption {
+    return !!convertOption.zip;
+}
+
+type ZipConvertOption = WithRequired<ValidatedConvertOption, 'zip'>;
+
+function makeDirectoryName(...parts: string[]) {
+    const name = parts
+        .map(p => p.replace(nonAlphaNumRegex, ' ').trim().replace(whitespaceRegex, '_'))
+        .join('__');
+
+    return name.substring(name.length - 40);
+}
+
+const nonAlphaNumRegex = /[^a-zA-Z0-9]+/g;
+const whitespaceRegex = /[\s]+/g;
 
 export interface ConvertAudioTemplateContext {
     files: TemplateContextFile[];
+    zipFiles: TemplateContextZipFile[];
+}
+
+interface TemplateContextZipFile {
+    path: string;
 }
 
 interface TemplateContextFile {
@@ -74,7 +125,39 @@ interface TemplateContextFile {
     convertedPaths: Record<string, string>;
 }
 
-async function getTemplateContextFilesFromDirectories(options: Infer<typeof ConvertAudioOptions>): Promise<TemplateContextFile[]> {
+function createZipFileGlobCommands(commands: ZipConvertOption[]) {
+    const zipFilesToGlob: Record<string, Path.Glob.t> = {};
+
+    for (const command of commands) {
+        const zipFile = Fs.resolve(command.zip);
+        const previous = zipFilesToGlob[zipFile];
+        const current = Path.Glob.create(command.directory, '**/*');
+        if (previous && previous !== current) {
+            logger.warn(`Zip file ${zipFile} needs more than one glob to be created:
+- ${previous}
+- ${current}
+This should not be possible!`);
+        }
+        zipFilesToGlob[zipFile] = current;
+    }
+
+    return Object.entries(zipFilesToGlob).map(([ zipFile, glob ]) => ({ zipFile: Path.File.create(zipFile), glob }));
+}
+
+async function createZipFiles(commands: ZipConvertOption[]): Promise<TemplateContextZipFile[]> {
+    const root = process.cwd();
+    const zipFileGlobCommands = createZipFileGlobCommands(commands);
+
+    return await Promise.all(zipFileGlobCommands.map(async ({ zipFile, glob }) => {
+        await zipGlob(glob, zipFile);
+
+        return {
+            path: Fs.resolve(zipFile).substring(root.length),
+        }
+    }));
+}
+
+async function getTemplateContextFilesFromDirectories(options: ValidatedOptions): Promise<TemplateContextFile[]> {
     const sourceFileToDestFiles: Record<string, TemplateContextFile> = {};
 
     const sourceFiles = await Gwob.files(options.glob);
