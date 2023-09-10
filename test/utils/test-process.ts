@@ -24,10 +24,13 @@ export class TestProcess {
         this.stdOut = new TestStream(this._childProcess.stdout!, { logger, type: 'log' });
         this.stdErr = new TestStream(this._childProcess.stderr!, { logger, type: 'error' });
         
+        this._childProcess.on('close', () => logger.log('Closed'));
+
         this._childProcess.on('exit', code => {
+            logger.log('Exited with code: ' + code);
             this._exited = true;
             this._exitCode = code;
-        })
+        });
     }
 
     async untilExited() {
