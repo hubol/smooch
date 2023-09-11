@@ -39,6 +39,7 @@ export class FsWatcher {
     }
 
     async save() {
+        FsWatcher._logger.debug(`Saving state...`);
         await ParcelSnapshot.write(this._parcelSnapshot);
         FsWatcher._logger.debug(`Saved state.`);
     }
