@@ -63,7 +63,11 @@ export class SmoochWorker {
     private static readonly _retryMs = [ 0, 67, 250, 1000 ];
 }
 
-export class SmoochWorkers {
+export interface ISmoochWorkers {
+    register(worker: SmoochWorker): void;
+}
+
+export class SmoochWorkers implements ISmoochWorkers {
     private readonly _logger = new Logger(SmoochWorkers, 'yellow');
 
     private _stopping = false;

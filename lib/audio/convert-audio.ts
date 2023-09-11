@@ -14,8 +14,8 @@ import { describeList } from "../common/describe-list";
 import chalk from "chalk";
 import { zipGlob } from "../zip/zip-glob";
 import { hubhash } from "../common/hubhash";
-import { ApplicationSingleton } from "../main/main";
 import { WithRequired } from "../common/with-required";
+import { SmoochConfigSingleton } from "../main/smooch-config-singleton";
 
 export const ConvertAudioOptions = object({
     glob: SmoochStruct.GlobPath,
@@ -92,7 +92,7 @@ function validateOptions(options: Infer<typeof ConvertAudioOptions>) {
         
         convert.directory = Path.Directory.create(
             Fs.resolve(
-                ApplicationSingleton.config.core.cacheFolder,
+                SmoochConfigSingleton.value.core.cacheFolder,
                 makeDirectoryName(options.glob, convert.zip ?? 'nozip', hubhash(`${options.glob}%${convert.zip}`))
             ));
         logger.log(`Generated directory name in cache folder for audio conversion ${options.glob} -> ${convert.format} -> ${convert.directory}${convert.zip ? ` -> ${convert.zip}` : ''}`);

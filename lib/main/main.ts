@@ -1,7 +1,7 @@
 import { Fs } from "../common/fs";
 import { ParcelFsResources, ParcelSubscription } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
-import { SmoochWorkers } from "./pipeline/smooch-worker";
+import { ISmoochWorkers, SmoochWorkers } from "./pipeline/smooch-worker";
 import { SmoochWorkPipeline } from "./pipeline/smooch-work-pipeline";
 import { SmoochConfig, SmoochConfigType } from "./smooch-config";
 import { SmoochRecipes } from "./smooch-recipes";
@@ -14,6 +14,7 @@ import { ErrorPrinter } from "../common/error-printer";
 import { SubscribeCallback } from "@parcel/watcher";
 import { Gwob } from "../common/gwob";
 import { runCliUtilCommand } from "./cli-utils/commands";
+import { SmoochConfigSingleton } from "./smooch-config-singleton";
 
 const logger = new Logger('Main', 'green');
 
@@ -47,7 +48,8 @@ export async function main() {
         let application: Application | undefined;
 
         try {
-            application = await createApplicationFromSmoochJson(deleteSnapshotFile);
+            const config = await readConfigFromSmoochJson();
+            application = await Application.create(config, deleteSnapshotFile);
             await application.start();
         }
         catch (e) {
@@ -79,11 +81,10 @@ export async function main() {
     }
 }
 
-export async function createApplicationFromSmoochJson(deleteSnapshotFile: boolean) {
+export async function readConfigFromSmoochJson() {
     const configJson = await JsonFile.read('smooch.json');
     delete configJson['$schema'];
-	const smoochConfig = validateOptions(configJson, SmoochConfig);
-    return await Application.create(smoochConfig, deleteSnapshotFile);
+	return validateOptions(configJson, SmoochConfig);
 }
 
 class Application {
@@ -91,7 +92,7 @@ class Application {
         private readonly _watcher: FsWatcher,
         private readonly _workers: SmoochWorkers,
         readonly config: SmoochConfigType,) {
-            ApplicationSingleton = this;
+            SmoochConfigSingleton.set(config);
     }
 
     static async create(config: SmoochConfigType, deleteSnapshotFile: boolean) {
@@ -135,9 +136,7 @@ class Application {
     }
 }
 
-export let ApplicationSingleton: Application; 
-
-function createPipelinesFromSmoochConfig({ core, ...rest }: SmoochConfigType, workers: SmoochWorkers) {
+export function createPipelinesFromSmoochConfig({ core, ...rest }: SmoochConfigType, workers: ISmoochWorkers) {
     const pipelines: SmoochWorkPipeline[] = [];
 
     for (const key in SmoochRecipes.available) {
