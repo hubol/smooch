@@ -55,7 +55,14 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
 
     logger.log(`Found ${filesToConvert.length} file(s) to convert to formats: ${chalk.white(describeList(options.convert.map(x => x.format)))}`);
 
-    await Promise.all(options.convert.map(({ directory }) => Fs.mkdir(directory, { recursive: true })));
+    await Promise.all([
+        ...options.convert.map(({ directory }) => Fs.mkdir(directory, { recursive: true })),
+        ...options.convert
+            .map(x => x.zip)
+            .filter(zip => !!zip)
+            .map(zip => Fs.parse(zip!).dir)
+            .map(directory => Fs.mkdir(directory, { recursive: true })),
+    ]);
 
     const globRoot = Gwob.root(options.glob);
     await Promise.all(options.convert.flatMap(({ directory, format }) => uniqueFiles.map(async srcFile => {
