@@ -1,6 +1,6 @@
 import { Infer, Struct } from "superstruct";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
-import { SmoochWorkFn, SmoochWorker, SmoochWork, SmoochWorkers } from "./smooch-worker";
+import { SmoochWorkFn, SmoochWorker, SmoochWork, ISmoochWorkers } from "./smooch-worker";
 import ParcelWatcher from "@parcel/watcher";
 
 type InferLoose<T> =
@@ -34,7 +34,7 @@ export class SmoochWorkPipeline {
 
         }
 
-    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: InferLoose<TConfig>, context: SmoochWorkers) {
+    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: InferLoose<TConfig>, context: ISmoochWorkers) {
         const acceptor = recipe.acceptorFactory(config);
         const queue = recipe.queueFactory(config);
         const workFn = recipe.workFnFactory(config);
