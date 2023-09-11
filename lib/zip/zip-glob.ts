@@ -5,6 +5,7 @@ import { Path } from "../common/path";
 import { Gwob } from "../common/gwob";
 import { Now } from "../common/now";
 import { printMs } from "../common/print-ms";
+import chalk from "chalk";
 
 const logger = new Logger('ZipGlob', 'yellow');
 
@@ -23,7 +24,8 @@ export async function zipGlob(srcGlob: Path.Glob.t, dstFile: Path.File.t, option
 
     const start = Now.ms;
     
-    logger.log(`Zipping ${srcGlob} to ${dstFile}...`);
+    logger.log(`Zipping ${chalk.blue(srcGlob)}
+=> ${chalk.green(dstFile)}...`);
 
     for (const file of files)
         archive.file(file, { name: file.substring(root.length) });
@@ -35,5 +37,5 @@ export async function zipGlob(srcGlob: Path.Glob.t, dstFile: Path.File.t, option
         archive.finalize();
     });
 
-    logger.log(`Done after ${printMs(Now.ms - start)}: ${dstFile}`);
+    logger.log(`Done after ${printMs(Now.ms - start)}: ${chalk.green(dstFile)}`);
 }

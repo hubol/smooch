@@ -38,11 +38,11 @@ export class JsTemplate {
 
 	async renderToFile(context: Record<string, any>, outputFile: PathLike) {
 		try {
-			logger.log(`Rendering templated output with context ${chalk.magenta(describeBrief(context))}...`);
+			logger.log(`Rendering ${chalk.blue(this._srcFile)} with context ${chalk.magenta(describeBrief(context))}
+=> ${chalk.green(outputFile)}...`);
 			const text = await this._render(context);
-			logger.log(`Writing output to ${outputFile}...`);
     		await Fs.writeFile(outputFile, text);
-			logger.log(`Done!`);
+			logger.log(`Done: ${chalk.green(outputFile)}`);
 		}
 		catch (e) {
 			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context=${describeBrief(context)}:`, e);

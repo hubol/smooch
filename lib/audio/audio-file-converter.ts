@@ -4,6 +4,7 @@ import { Path } from "../common/path";
 import { Logger } from "../common/logger";
 import { Now } from "../common/now";
 import { printMs } from "../common/print-ms";
+import chalk from "chalk";
 
 Ffmpeg.setFfmpegPath(ffmpegBinary.path);
 
@@ -15,7 +16,8 @@ export class AudioFileConverter {
 
     static convert(srcFile: Path.File.t, dstFile: Path.File.t) {
         const start = Now.ms;
-        this._logger.log(`${srcFile} -> ${dstFile}...`);
+        this._logger.log(`Converting ${chalk.blue(srcFile)}
+=> ${chalk.green(dstFile)}...`);
         return new Promise<void>((resolve, reject) => {
             Ffmpeg(this._ffmpegOptions)
                 .on('end', resolve)
@@ -23,7 +25,7 @@ export class AudioFileConverter {
                 .input(srcFile)
                 .save(dstFile);
         })
-        .then(() => this._logger.log(`Done after ${printMs(Now.ms - start)}: ${dstFile}`));
+        .then(() => this._logger.log(`Done after ${printMs(Now.ms - start)}: ${chalk.green(dstFile)}`));
     }
 }
 

@@ -139,7 +139,7 @@ export const Sfx = {
 
     await smooch2.stdOut.untilPrinted('smooch.json change detected');
     await smooch2.stdOut.untilPrinted('AudioConverter Done converting 1 file');
-    await smooch2.stdOut.untilPrinted('to dst-audio/mp3.zip...');
+    await smooch2.stdOut.untilPrinted('=> dst-audio/mp3.zip...');
     await smooch2.stdOut.untilPrinted('Saved state.');
 
     await TestProject.fixture('dummyProgram', 'audio-convert.js');

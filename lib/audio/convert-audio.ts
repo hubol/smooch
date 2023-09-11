@@ -95,7 +95,8 @@ function validateOptions(options: Infer<typeof ConvertAudioOptions>) {
                 SmoochConfigSingleton.value.core.cacheFolder,
                 makeDirectoryName(options.glob, convert.zip ?? 'nozip', hubhash(`${options.glob}%${convert.zip}`))
             ));
-        logger.log(`Generated directory name in cache folder for audio conversion ${options.glob} -> ${convert.format} -> ${convert.directory}${convert.zip ? ` -> ${convert.zip}` : ''}`);
+        logger.log(`Generated directory name in cache folder for audio conversion:
+${chalk.blue(options.glob)} -> ${chalk.white(convert.format)} -> ${chalk[convert.zip ? 'gray' : 'green'](convert.directory)}${convert.zip ? ` -> ${chalk.green(convert.zip)}` : ''}`);
     }
 
     return options as ValidatedOptions;
