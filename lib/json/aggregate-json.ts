@@ -47,6 +47,7 @@ export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>)
         }
     }));
     
+    await Fs.mkdir(Fs.parse(options.outFile).dir, { recursive: true });
     await template.renderToFile(<AggregateJsonTemplateContext>{ files }, options.outFile);
 }
 
