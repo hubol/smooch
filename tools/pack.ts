@@ -1,7 +1,7 @@
-import { TestCommands } from "../test/utils/test-commands";
+import { NpmExecutable } from "../lib/common/process/npm-executable";
 import packageJson from "../package.json";
 import { Fs } from "../lib/common/fs";
-import { TestProcess } from "../test/utils/test-process";
+import { ProcessWithLogger } from "../lib/common/process/process-with-logger";
 import { Logger } from "../lib/common/logger";
 
 process.chdir("./dist");
@@ -15,7 +15,7 @@ const packTarBallFileName = `${packageJson.name}-${packageJson.version}.tgz`;
 const logger = new Logger('pack.ts', 'yellow');
 
 async function main() {
-    await new TestProcess(TestCommands.npm, [ 'pack' ], {}).untilExited();
+    await new ProcessWithLogger(NpmExecutable.npm, [ 'pack' ], {}).untilExited();
 
     logger.log(`Rename ${packTarBallFileName} to ${destFileName}...`);
     if (await Fs.exists(destFileName))

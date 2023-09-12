@@ -1,11 +1,11 @@
 import { Fs } from "../../lib/common/fs";
 import { TestFixtures } from "./test-fixtures";
-import { TestProcess } from "./test-process";
+import { ProcessWithLogger } from "../../lib/common/process/process-with-logger";
 import { TextFile } from "../../lib/common/text-file";
 import { compareText } from "./compare-text";
 import { Logger } from "../../lib/common/logger";
 import { Path } from "../../lib/common/path";
-import { TestCommands } from "./test-commands";
+import { NpmExecutable } from "../../lib/common/process/npm-executable";
 import { SmoochConfigType } from "../../lib/main/smooch-config";
 
 const Paths = {
@@ -22,11 +22,11 @@ export const TestProject = {
         await Fs.mkdir(Paths.testEnv, { recursive: true });
 
         await TestProject.fixture('packageJson', 'package.json');
-        await TestProject.spawn(TestCommands.npm, ['i']).untilExited();
+        await TestProject.spawn(NpmExecutable.npm, ['i']).untilExited();
     },
     smooch(...args: string[]) {
         TestProject.log(`Starting smooch...`);
-        return TestProject.spawn(TestCommands.npx, ['smooch', ...args]);
+        return TestProject.spawn(NpmExecutable.npx, ['smooch', ...args]);
     },
     writeSmoochJson(config: any) {
         const configWithDefaults = { core: { cacheFolder: ".smooch" }, "$schema": "./node_modules/smooch/schema.json", ...config };
@@ -35,8 +35,8 @@ export const TestProject = {
     cleanUp() {
         return Fs.rm(Paths.testEnv, { recursive: true, force: true });
     },
-    spawn(command: string, args: string[], options: ConstructorParameters<typeof TestProcess>[2] = {}) {
-        return new TestProcess(command, args, { cwd: Paths.testEnv, ...options });
+    spawn(command: string, args: string[], options: ConstructorParameters<typeof ProcessWithLogger>[2] = {}) {
+        return new ProcessWithLogger(command, args, { cwd: Paths.testEnv, ...options });
     },
     mkdir(path: string) {
         return Fs.mkdir(envPath(path));
