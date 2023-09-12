@@ -1,11 +1,11 @@
 import { ChildProcess, spawn } from "child_process";
-import { wait } from "../../lib/common/wait";
+import { wait } from "../wait";
 import chalk from "chalk";
 import kill from "tree-kill";
 import { Readable } from "stream";
-import { Logger } from "../../lib/common/logger";
+import { Logger } from "../logger";
 
-export class TestProcess {
+export class ProcessWithLogger {
     private readonly _childProcess: ChildProcess;
 
     private _exited = false;
