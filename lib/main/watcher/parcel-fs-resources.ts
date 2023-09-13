@@ -1,13 +1,19 @@
-import ParcelWatcher, { SubscribeCallback, AsyncSubscription } from "@parcel/watcher";
+import { Boundary_ParcelWatcher } from "../../common/native/boundary/parcel-watcher-api";
 import { Fs } from "../../common/fs";
 import { Logger } from "../../common/logger";
 import { Path } from "../../common/path";
+import { Native } from "../../common/native/native-module";
+
+type Options = Boundary_ParcelWatcher.Options;
+type AsyncSubscription = Boundary_ParcelWatcher.AsyncSubscription;
+type SubscribeCallback = Boundary_ParcelWatcher.SubscribeCallback;
+const { ParcelWatcher } = Native;
 
 export class ParcelSnapshot {
     constructor(
         readonly watchedDirectoryPath: Path.Directory.t,
         readonly filePath: Path.File.t,
-        readonly options: ParcelWatcher.Options,
+        readonly options: Options,
     ) {}
 
     static async write(snapshot: ParcelSnapshot) {
@@ -31,7 +37,7 @@ export class ParcelSubscription {
 
     constructor(
         readonly watchedDirectoryPath: Path.Directory.t,
-        readonly options: ParcelWatcher.Options,
+        readonly options: Options,
     ) {}
 
     async start(cb: SubscribeCallback) {
@@ -68,7 +74,7 @@ export class ParcelFsResources {
         readonly subscription: ParcelSubscription,
     ) { }
 
-    static async create(directory: Path.Directory.t, snapshotFile: Path.File.t, options: ParcelWatcher.Options) {
+    static async create(directory: Path.Directory.t, snapshotFile: Path.File.t, options: Options) {
         if (!await Fs.exists(directory))
             throw new Error(`Can't create ${ParcelFsResources}: ${directory} does not exist!`);
 

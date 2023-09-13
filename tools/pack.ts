@@ -1,8 +1,8 @@
 import { NpmExecutable } from "../lib/common/process/npm-executable";
-import packageJson from "../package.json";
 import { Fs } from "../lib/common/fs";
 import { ProcessWithLogger } from "../lib/common/process/process-with-logger";
 import { Logger } from "../lib/common/logger";
+import { packageJson } from "../lib/common/package-json";
 
 process.chdir("./dist");
 

@@ -1,8 +1,10 @@
-import { Event } from "@parcel/watcher";
+import { Boundary_ParcelWatcher } from "../../common/native/boundary/parcel-watcher-api";
 import chalk from "chalk";
 import { ParcelSnapshot, ParcelFsResources, ParcelSubscription } from "./parcel-fs-resources";
 import { FsWatcherMessage, FsWatcherMessageFactory, FsWatcherMessageDescriber } from "./fs-watcher-message";
 import { Logger } from "../../common/logger";
+
+type Event = Boundary_ParcelWatcher.Event;
 
 interface FsWatcherSubscription {
     readonly identity: string;

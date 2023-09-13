@@ -3,14 +3,12 @@ import { wait } from "../../common/wait";
 import { createPipelinesFromSmoochConfig, readConfigFromSmoochJson } from "../main";
 import { AcceptResult } from "../pipeline/smooch-work-pipeline";
 import { ISmoochWorkers, SmoochWorker } from "../pipeline/smooch-worker";
-import { SmoochConfigSingleton } from "../smooch-config-singleton";
 
 const logger = new Logger('Build', 'green');
 
 export async function build() {
     const start = Date.now();
     const config = await readConfigFromSmoochJson();
-    SmoochConfigSingleton.set(config);
     
     const workers: SmoochWorker[] = [];
     const workersImpl: ISmoochWorkers = {

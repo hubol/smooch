@@ -1,9 +1,9 @@
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { AcceptResult, ISmoochWorkAcceptor } from "./smooch-work-pipeline";
 import { Gwob } from "../../common/gwob";
-import ParcelWatcher from "@parcel/watcher";
 import { Path } from "../../common/path";
-import { requireImpl } from "../../common/require-module";
+import { Boundary_ParcelWatcher } from "../../common/native/boundary/parcel-watcher-api";
+import { requireModule } from "../../common/require-module";
 
 export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
     constructor(
@@ -12,9 +12,9 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
         readonly outputGlobs: Path.Glob.t[],) {
     }
 
-    private readonly _workingAssetMatches: ParcelWatcher.Event[] = [];
-    private readonly _workingDependencyMatches: ParcelWatcher.Event[] = [];
-    private readonly _workingOutputMatches: ParcelWatcher.Event[] = [];
+    private readonly _workingAssetMatches: Boundary_ParcelWatcher.Event[] = [];
+    private readonly _workingDependencyMatches: Boundary_ParcelWatcher.Event[] = [];
+    private readonly _workingOutputMatches: Boundary_ParcelWatcher.Event[] = [];
 
     accept(message: FsWatcherMessage) {
         if (message.isNascent)
@@ -37,7 +37,7 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
             for (const event of message.events) {
                 if (match(event.path)) {
                     this._workingDependencyMatches.push(event);
-                    delete requireImpl.cache[event.path];
+                    delete requireModule.cache[event.path];
                 }
             }
         }

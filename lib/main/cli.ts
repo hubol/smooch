@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 import { handleFatalError } from "../common/handle-fatal-error";
-import { main } from "./main";
+import { NativeDependenciesChecker } from "./native-dependencies-checker";
 
 Promise.resolve()
-.then(main)
+.then(() => NativeDependenciesChecker.check())
+.then(() => require("./main").main())
 .catch(handleFatalError);

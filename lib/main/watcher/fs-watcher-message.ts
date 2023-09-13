@@ -1,8 +1,10 @@
-import { Event } from "@parcel/watcher";
+import { Boundary_ParcelWatcher } from "../../common/native/boundary/parcel-watcher-api";
 import chalk from "chalk";
 import { ParcelSnapshot } from "./parcel-fs-resources";
 import { Fs } from "../../common/fs";
 import { Logger } from "../../common/logger";
+
+type Event = Boundary_ParcelWatcher.Event;
 
 export interface FsWatcherMessage {
     readonly events: ReadonlyArray<Event>;
