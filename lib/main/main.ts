@@ -11,10 +11,13 @@ import { JsonFile } from "../common/json-file";
 import { sleep, wait } from "../common/wait";
 import { Logger } from "../common/logger";
 import { ErrorPrinter } from "../common/error-printer";
-import { SubscribeCallback } from "@parcel/watcher";
+import { Boundary_ParcelWatcher } from "../common/native/boundary/parcel-watcher-api";
 import { Gwob } from "../common/gwob";
 import { runCliUtilCommand } from "./cli-utils/commands";
-import { SmoochConfigSingleton } from "./smooch-config-singleton";
+import { Global } from "./global";
+;
+
+type SubscribeCallback = Boundary_ParcelWatcher.SubscribeCallback;
 
 const logger = new Logger('Main', 'green');
 
@@ -90,18 +93,13 @@ export async function readConfigFromSmoochJson() {
 class Application {
     private constructor(
         private readonly _watcher: FsWatcher,
-        private readonly _workers: SmoochWorkers,
-        readonly config: SmoochConfigType,) {
-            SmoochConfigSingleton.set(config);
-    }
+        private readonly _workers: SmoochWorkers,) { }
 
     static async create(config: SmoochConfigType, deleteSnapshotFile: boolean) {
-        const { core } = config;
-
-        await Fs.mkdir(core.cacheFolder, { recursive: true });
+        await Fs.mkdir(Global.cacheDir, { recursive: true });
 
         const workspaceDirectory = Path.Directory.create('./');
-        const snapshotFile = Path.File.create(Fs.resolve(core.cacheFolder, 'snapshot.txt'));
+        const snapshotFile = Path.File.create(Fs.resolve(Global.cacheDir, 'snapshot.txt'));
 
         if (deleteSnapshotFile && await Fs.exists(snapshotFile)) {
             logger.log(`Deleting snapshot file ${snapshotFile} to force Nascent message...`);
@@ -111,7 +109,7 @@ class Application {
         const resources = await ParcelFsResources.create(
             workspaceDirectory,
             snapshotFile,
-            { ignore: [ 'node_modules/', '.git/', snapshotFile ] });
+            { ignore: [ 'node_modules/', '.git/', '.smooch/snapshot.txt', '**/node_modules/**/*' ] });
         const watcher = new FsWatcher(resources);
 
         const workers = new SmoochWorkers();
@@ -120,7 +118,7 @@ class Application {
         for (const pipeline of pipelines)
             watcher.subscribe({ identity: pipeline.recipe.name, accept: x => pipeline.accept(x) });    
 
-        return new Application(watcher, workers, config);
+        return new Application(watcher, workers);
     }
 
     async start() {

@@ -1,7 +1,7 @@
 import { Infer, Struct } from "superstruct";
 import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { SmoochWorkFn, SmoochWorker, SmoochWork, ISmoochWorkers } from "./smooch-worker";
-import ParcelWatcher from "@parcel/watcher";
+import { Boundary_ParcelWatcher } from "../../common/native/boundary/parcel-watcher-api";
 
 type InferLoose<T> =
     T extends Struct<any, any>
@@ -63,9 +63,9 @@ export namespace AcceptResult {
     export namespace Accepted {
         export interface WithMatches {
             type: 'AcceptedWithMatches';
-            assetMatches: ParcelWatcher.Event[];
-            dependencyMatches: ParcelWatcher.Event[];
-            outputMatches: ParcelWatcher.Event[];
+            assetMatches: Boundary_ParcelWatcher.Event[];
+            dependencyMatches: Boundary_ParcelWatcher.Event[];
+            outputMatches: Boundary_ParcelWatcher.Event[];
             sourceMessage: FsWatcherMessage;
         }
 

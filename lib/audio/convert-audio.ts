@@ -1,4 +1,4 @@
-import { Infer, array, object, optional, string } from "superstruct";
+import { Infer, array, object, optional } from "superstruct";
 import { SmoochStruct } from "../common/custom-superstruct";
 import { Fs } from "../common/fs";
 import { JsTemplate } from "../common/template";
@@ -15,7 +15,7 @@ import chalk from "chalk";
 import { zipGlob } from "../zip/zip-glob";
 import { hubhash } from "../common/hubhash";
 import { WithRequired } from "../common/with-required";
-import { SmoochConfigSingleton } from "../main/smooch-config-singleton";
+import { Global } from "../main/global";
 
 export const ConvertAudioOptions = object({
     glob: SmoochStruct.GlobPath,
@@ -92,7 +92,7 @@ function validateOptions(options: Infer<typeof ConvertAudioOptions>) {
         
         convert.directory = Path.Directory.create(
             Fs.resolve(
-                SmoochConfigSingleton.value.core.cacheFolder,
+                Global.cacheDir,
                 makeDirectoryName(options.glob, convert.zip ?? 'nozip', hubhash(`${options.glob}%${convert.zip}`))
             ));
         logger.log(`Generated directory name in cache folder for audio conversion:
