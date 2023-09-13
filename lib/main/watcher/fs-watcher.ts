@@ -3,6 +3,7 @@ import chalk from "chalk";
 import { ParcelSnapshot, ParcelFsResources, ParcelSubscription } from "./parcel-fs-resources";
 import { FsWatcherMessage, FsWatcherMessageFactory, FsWatcherMessageDescriber } from "./fs-watcher-message";
 import { Logger } from "../../common/logger";
+import { describeList } from "../../common/describe-list";
 
 type Event = Boundary_ParcelWatcher.Event;
 
@@ -28,6 +29,8 @@ export class FsWatcher {
     }
 
     async start() {
+        const subscriptionsList = describeList(this._subscriptions.map(x => x.identity));
+        FsWatcher._logger.log(`Started with subscriptions: ${chalk.white(subscriptionsList)}`);
         await this._parcelSubscription.start((error, events) => this._onParcelEvent(error, events));
     }
 

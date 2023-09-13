@@ -23,11 +23,10 @@ export class ProcessWithLogger {
         const logger = new Logger(commandTitle, 'blue');
         this.stdOut = new TestStream(this._childProcess.stdout!, { logger, type: 'log' });
         this.stdErr = new TestStream(this._childProcess.stderr!, { logger, type: 'error' });
-        
-        this._childProcess.on('close', () => logger.log('Closed'));
 
         this._childProcess.on('exit', code => {
-            logger.log('Exited with code: ' + code);
+            if (code != 0)
+                logger.warn(chalk.red('Exited with non-zero code: ') + chalk.white(code));
             this._exited = true;
             this._exitCode = code;
         });

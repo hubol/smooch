@@ -15,7 +15,6 @@ import { Boundary_ParcelWatcher } from "../common/native/boundary/parcel-watcher
 import { Gwob } from "../common/gwob";
 import { runCliUtilCommand } from "./cli-utils/commands";
 import { Global } from "./global";
-;
 
 type SubscribeCallback = Boundary_ParcelWatcher.SubscribeCallback;
 

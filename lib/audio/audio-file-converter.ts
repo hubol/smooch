@@ -11,7 +11,7 @@ const ffmpegBinary = Native.FfmpegInstaller;
 Ffmpeg.setFfmpegPath(ffmpegBinary.path);
 
 const logger = new Logger('Ffmpeg', 'magenta');
-logger.info(`Set Ffmpeg path to ${ffmpegBinary.path}`);
+logger.info(`Set Ffmpeg path to ${chalk.white(ffmpegBinary.path)}`);
 
 export class AudioFileConverter {
     private static readonly _ffmpegOptions: Ffmpeg.FfmpegCommandOptions = { logger };
