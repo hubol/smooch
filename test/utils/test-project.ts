@@ -29,7 +29,7 @@ export const TestProject = {
         return TestProject.spawn(NpmExecutable.npx, ['smooch', ...args]);
     },
     writeSmoochJson(config: any) {
-        const configWithDefaults = { core: { cacheFolder: ".smooch" }, "$schema": "./node_modules/smooch/schema.json", ...config };
+        const configWithDefaults = { "$schema": "./node_modules/smooch/schema.json", ...config };
         return Fs.writeFile(envPath('smooch.json'), JSON.stringify(configWithDefaults, undefined, 2));
     },
     cleanUp() {

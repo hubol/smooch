@@ -112,12 +112,12 @@ class Application {
     }
 }
 
-export function createPipelinesFromSmoochConfig({ core, ...rest }: SmoochConfigType, workers: ISmoochWorkers) {
+export function createPipelinesFromSmoochConfig(smoochConfig: SmoochConfigType, workers: ISmoochWorkers) {
     const pipelines: SmoochWorkPipeline[] = [];
 
     for (const key in SmoochRecipes.available) {
         const recipe = SmoochRecipes.available[key];
-        for (const config of rest[key]) {
+        for (const config of smoochConfig[key]) {
             const pipeline = SmoochWorkPipeline.create(recipe, config, workers);
             pipelines.push(pipeline);
         }
