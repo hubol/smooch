@@ -1,5 +1,5 @@
 import { Fs } from "../common/fs";
-import { ParcelFsResources, ParcelSubscription } from "./watcher/parcel-fs-resources";
+import { ParcelFsResources } from "./watcher/parcel-fs-resources";
 import { FsWatcher } from "./watcher/fs-watcher";
 import { ISmoochWorkers, SmoochWorkers } from "./pipeline/smooch-worker";
 import { SmoochWorkPipeline } from "./pipeline/smooch-work-pipeline";
@@ -11,12 +11,9 @@ import { JsonFile } from "../common/json-file";
 import { sleep, wait } from "../common/wait";
 import { Logger } from "../common/logger";
 import { ErrorPrinter } from "../common/error-printer";
-import { Boundary_ParcelWatcher } from "../common/native/boundary/parcel-watcher-api";
-import { Gwob } from "../common/gwob";
 import { runCliUtilCommand } from "./cli-utils/commands";
 import { Global } from "./global";
-
-type SubscribeCallback = Boundary_ParcelWatcher.SubscribeCallback;
+import { SmoochJsonWatcher } from "./smooch-json-watcher";
 
 const logger = new Logger('Main', 'green');
 
@@ -24,25 +21,7 @@ export async function main() {
     if (await runCliUtilCommand())
         return;
 
-    const subscription =
-        new ParcelSubscription(Path.Directory.create('./'), { ignore: [ 'node_modules/', '.git/' ] });
-    
-    const smoochJsonMatch = Gwob.match(Path.Glob.create('smooch.json'));
-
-    let smoochJsonEvents = 0;
-
-    const cb: SubscribeCallback = (err, events) => {
-        if (err) {
-            logger.error('Received Parcel subscription error');
-            logger.error(ErrorPrinter.toPrintable(err));
-            return;
-        }
-
-        if (events.some(e => smoochJsonMatch(e.path)))
-            smoochJsonEvents += 1;
-    }
-
-    await subscription.start(cb);
+    await SmoochJsonWatcher.start();
 
     let deleteSnapshotFile = false;
     
@@ -50,6 +29,7 @@ export async function main() {
         let application: Application | undefined;
 
         try {
+            SmoochJsonWatcher.clearEvents();
             const config = await readConfigFromSmoochJson();
             application = await Application.create(config, deleteSnapshotFile);
             await application.start();
@@ -59,8 +39,7 @@ export async function main() {
             logger.error(ErrorPrinter.toPrintable(e));
         }
 
-        smoochJsonEvents = 0;
-        await wait(() => smoochJsonEvents > 0);
+        await wait(() => SmoochJsonWatcher.eventsCount > 0);
 
         deleteSnapshotFile = true;
 
@@ -108,7 +87,7 @@ class Application {
         const resources = await ParcelFsResources.create(
             workspaceDirectory,
             snapshotFile,
-            { ignore: [ 'node_modules/', '.git/', '.smooch/snapshot.txt', '**/node_modules/**/*' ] });
+            { ignore: [ ...ParcelFsResources.sensibleIgnoreGlobs ] });
         const watcher = new FsWatcher(resources);
 
         const workers = new SmoochWorkers();
