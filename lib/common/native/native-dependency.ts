@@ -46,7 +46,7 @@ export class NativeDependencies {
         try {
             const nativePackageJson = await JsonFile.read(getNativePath('package.json'));
             // TODO check that deps matches package.json !!
-            logger.warn(`Native dependencies appear to be installed.`);
+            logger.info(`Native dependencies appear to be installed.`);
             return true;
         }
         catch (e) {

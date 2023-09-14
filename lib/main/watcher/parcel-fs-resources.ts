@@ -83,4 +83,6 @@ export class ParcelFsResources {
             new ParcelSubscription(directory, options),
         )
     }
+
+    static readonly sensibleIgnoreGlobs = [ 'node_modules/', '.git/', '.smooch/snapshot.txt', '**/node_modules/**/*' ] as const;
 }
