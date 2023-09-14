@@ -11,7 +11,6 @@ export async function initializeSmoochConfig() {
     }
 
     const config: SmoochConfigType = {
-        core: { } as any,
         textures: [],
         audioFiles: [],
         jsonFiles: [],
@@ -20,7 +19,7 @@ export async function initializeSmoochConfig() {
     const json = JSON.stringify(
         { "$schema": "node_modules/smooch/schema.json", ...config },
         undefined,
-        4);
+        '\t');
 
     logger.log("Wrote smooch.json");
     await Fs.writeFile('smooch.json', json);
