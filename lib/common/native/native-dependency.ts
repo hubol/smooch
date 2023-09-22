@@ -65,6 +65,7 @@ export class NativeDependencies {
 
         const nativePackageJsonText = JSON.stringify(nativePackageJson, undefined, '\t');
 
+        await Fs.rm(getNativePath(), { recursive: true });
         await Fs.mkdir(getNativePath(), { recursive: true });
         await Fs.writeFile(getNativePath('package.json'), nativePackageJsonText);
 
