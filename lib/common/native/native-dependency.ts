@@ -45,7 +45,10 @@ export class NativeDependencies {
 
         try {
             const nativePackageJson = await JsonFile.read(getNativePath('package.json'));
-            // TODO check that deps matches package.json !!
+
+            if (!this.areInstalledVersionsCorrect(deps, nativePackageJson.dependencies))
+                return false;
+
             logger.info(`Native dependencies appear to be installed.`);
             return true;
         }
@@ -65,7 +68,7 @@ export class NativeDependencies {
 
         const nativePackageJsonText = JSON.stringify(nativePackageJson, undefined, '\t');
 
-        await Fs.rm(getNativePath(), { recursive: true });
+        await Fs.rm(getNativePath(), { recursive: true, force: true });
         await Fs.mkdir(getNativePath(), { recursive: true });
         await Fs.writeFile(getNativePath('package.json'), nativePackageJsonText);
 
@@ -76,6 +79,27 @@ export class NativeDependencies {
 
     static require<T extends ModuleName>(module: T): Dependencies[T] {
         return requireModule(getNativePath('node_modules', module));
+    }
+
+    private static areInstalledVersionsCorrect(
+            requiredVersions: NativeDependencyVersions,
+            installedVersions: NativeDependencyVersions) {
+        let unmetDepencyVersionsCount = 0;
+
+        for (const packageName in requiredVersions) {
+            const requiredVersion = requiredVersions[packageName];
+            const installedVersion = installedVersions[packageName];
+            if (requiredVersion === installedVersion)
+                continue;
+
+            unmetDepencyVersionsCount += 1;
+            if (!installedVersion)
+                logger.info(`${chalk.white(packageName)} does not appear to be installed.`);
+            else
+                logger.info(`${chalk.white(packageName)} version ${chalk.yellow(installedVersion)} appears to be installed, but expected ${chalk.green(requiredVersion)}.`);
+        }
+
+        return unmetDepencyVersionsCount === 0;
     }
 }
 
