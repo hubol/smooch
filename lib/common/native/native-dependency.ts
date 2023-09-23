@@ -81,6 +81,22 @@ export class NativeDependencies {
         return requireModule(getNativePath('node_modules', module));
     }
 
+    static async getRequiredVersions() {
+        const configuredVersions = await JsonFile.read(Global.nativeDepsJsonFile).catch(() => {
+            logger.log(`Could not read ${chalk.white(Global.nativeDepsJsonFile)}
+This is fine unless you want to set explicit versions of native dependencies.`);
+            return NativeDependencies.defaultVersions;
+        })
+
+        const requiredVersions = NativeDependencies.defaultVersions;
+
+        for (const packageName in requiredVersions) {
+            requiredVersions[packageName] = configuredVersions[packageName] ?? requiredVersions[packageName];
+        }
+
+        return requiredVersions;
+    }
+
     private static areInstalledVersionsCorrect(
             requiredVersions: NativeDependencyVersions,
             installedVersions: NativeDependencyVersions) {
