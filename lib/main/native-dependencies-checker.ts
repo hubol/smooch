@@ -6,8 +6,9 @@ export class NativeDependenciesChecker {
 
     static async check() {
         try {
-            if (!await NativeDependencies.isInstalled(NativeDependencies.defaultVersions))
-                await NativeDependencies.install(NativeDependencies.defaultVersions);
+            const requiredVersions = await NativeDependencies.getRequiredVersions();
+            if (!await NativeDependencies.isInstalled(requiredVersions))
+                await NativeDependencies.install(requiredVersions);
         }
         catch (e) {
             throw new RethrownError('An unexpected error occurred while checking native dependencies', e);
