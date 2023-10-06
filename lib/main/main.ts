@@ -14,6 +14,7 @@ import { ErrorPrinter } from "../common/error-printer";
 import { runCliUtilCommand } from "./cli-utils/commands";
 import { Global } from "./global";
 import { SmoochJsonWatcher } from "./smooch-json-watcher";
+import { SmoochEffectiveConfig } from "./smooch-effective-config";
 
 const logger = new Logger('Main', 'green');
 
@@ -31,8 +32,11 @@ export async function main() {
         try {
             SmoochJsonWatcher.clearEvents();
             const config = await readConfigFromSmoochJson();
+            if (!deleteSnapshotFile)
+                deleteSnapshotFile = await SmoochEffectiveConfig.checkIfChanged(config);
             application = await Application.create(config, deleteSnapshotFile);
             await application.start();
+            await SmoochEffectiveConfig.write(config);
         }
         catch (e) {
             logger.error('An error occurred while creating the application from smooch.json');
