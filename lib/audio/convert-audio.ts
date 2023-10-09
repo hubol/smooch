@@ -82,7 +82,7 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
     ]);
 
     const context: ConvertAudioTemplateContext = { files, zipFiles };
-    await template.renderToFile(context, options.template.out);
+    await template.renderToFile(context, options.template.out, { ensureDirectory: true });
 }
 
 function validateOptions(options: Infer<typeof ConvertAudioOptions>) {
