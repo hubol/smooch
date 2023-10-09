@@ -148,4 +148,12 @@ export const Sfx = {
 
     smooch2.kill();
     await smooch2.untilExited();
+
+    delete config.audioFiles;
+    await TestProject.writeSmoochJson(config);
+
+    const smooch3 = TestProject.smooch();
+    await smooch3.stdOut.untilPrinted('Creating Nascent Catch-up message');
+    smooch3.kill();
+    await smooch3.untilExited();
 }
