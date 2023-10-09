@@ -4,7 +4,6 @@ import { Path } from "../common/path";
 import { SmoochConfigType } from "./smooch-config";
 import { Global } from "./global";
 import { JsonFile } from "../common/json-file";
-import { ErrorPrinter } from "../common/error-printer";
 import chalk from "chalk";
 
 const logger = new Logger('SmoochEffectiveConfig', 'magenta');
@@ -42,8 +41,7 @@ This may be normal if your cache directory was deleted or this is your first tim
             logger.log(`Wrote effective config to ${this._file}`);
         }
         catch (e) {
-            logger.error(`Failed to write effective config to ${this._file}. This is not fatal but not good.
-${ErrorPrinter.toPrintable(e)}`);
+            logger.error(`Failed to write effective config to ${this._file}. This is not fatal but not good.`, e);
         }
     }
 }

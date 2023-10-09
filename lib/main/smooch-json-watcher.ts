@@ -1,6 +1,5 @@
 import chalk from "chalk";
 import { describeList } from "../common/describe-list";
-import { ErrorPrinter } from "../common/error-printer";
 import { Gwob } from "../common/gwob";
 import { Logger } from "../common/logger";
 import { Boundary_ParcelWatcher } from "../common/native/boundary/parcel-watcher-api";
@@ -39,8 +38,7 @@ export class SmoochJsonWatcher {
 
         const cb: Boundary_ParcelWatcher.SubscribeCallback = (err, events) => {
             if (err) {
-                logger.error('Received Parcel subscription error');
-                logger.error(ErrorPrinter.toPrintable(err));
+                logger.error('Received Parcel subscription error', err);
                 return;
             }
 
@@ -54,6 +52,6 @@ export class SmoochJsonWatcher {
 
         await subscription.start(cb);
 
-        logger.warn(`Started`);
+        logger.log(`Started`);
     }
 }

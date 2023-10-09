@@ -1,4 +1,3 @@
-import { PathLike } from "fs";
 import { pascalCase } from "pascal-case";
 import { camelCase } from "change-case";
 import { Fs } from "./fs";
@@ -36,7 +35,16 @@ export class JsTemplate {
 		return Promise.resolve(this._templateFn(context, utils));
 	}
 
-	async renderToFile(context: Record<string, any>, outputFile: PathLike) {
+	async renderToFile(context: Record<string, any>, outputFile: string, options: { ensureDirectory?: boolean } = {}) {
+		if (options.ensureDirectory) {
+			try {
+				await Fs.mkdir(Fs.parse(outputFile).dir, { recursive: true });
+			}
+			catch (e) {
+				logger.warn(`An unexpected error occurred while ensuring the directory for ${outputFile}:`, e);	
+			}
+		}
+
 		try {
 			logger.log(`Rendering ${chalk.blue(this._srcFile)} with context ${chalk.magenta(describeBrief(context))}
 => ${chalk.green(outputFile)}...`);

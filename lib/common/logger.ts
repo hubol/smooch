@@ -2,6 +2,7 @@ import chalk from "chalk";
 import { ForegroundColor } from "chalk";
 import { indent } from "./indent";
 import { normalizeWindowsPathSeparator } from "./gwob";
+import { ErrorPrinter } from "./error-printer";
 
 const cwd = process.cwd();
 const pathRegExp = new RegExp(`(${cwd.replace(/\\/g, '\\\\')}|${normalizeWindowsPathSeparator(cwd)})[\\/\\\\]*`, 'g');
@@ -29,12 +30,20 @@ export class Logger {
         this._print('debug', message, additional);
     }
 
-    error(message: any, ...additional: any[]) {
-        this._print('error', message, additional);
+    error(message: any, error?: any) {
+        if (error)
+            this._print('error', `${message}
+${ErrorPrinter.toPrintable(error)}`, []);
+        else
+            this._print('error', message, []);
     }
 
-    warn(message: any, ...additional: any[]) {
-        this._print('warn', message, additional);
+    warn(message: any, error?: any) {
+        if (error)
+            this._print('warn', `${message}
+${ErrorPrinter.toPrintable(error)}`, []);
+        else
+            this._print('warn', message, []);
     }
 
     private _print(key: 'log' | 'error' | 'warn' | 'debug' | 'info', message: any, additional: any[]) {
