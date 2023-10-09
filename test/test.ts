@@ -26,9 +26,14 @@ async function runTest() {
 
     const config: TestInlineConfig = {
         "textures": [{
-            "folder": "src-images",
-            "outFolder": "dst-images",
-            "outTemplateExtension": "ts",
+            "glob": "src-images/**/*.png",
+            atlas: {
+                directory: "dst-images",
+            },
+            template: {
+                program: 'texture-pack.js',
+                out: "dst-images/atlas.ts",
+            },
             "pack": {
                 "maxWidth": 1024,
                 "maxHeight": 1024,
