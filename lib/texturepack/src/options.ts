@@ -15,7 +15,6 @@ export const BinPackOptions = object({
 });
 
 export const RawPackerOptions = object({
-	fileName: defaulted(string(), "atlas"),
 	pack: defaulted(BinPackOptions, create({}, BinPackOptions))
 });
 
