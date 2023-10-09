@@ -56,7 +56,7 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 
 async function createAtlases(imageFilePaths: string[], options: Infer<typeof PackerOptions>) {
 	return (await packTextures(imageFilePaths, options))
-		.map((atlas, i) => merge(atlas, { fileName: `${options.fileName}${i}.png` }));
+		.map((atlas, i) => merge(atlas, { fileName: `${options.atlas.filePrefix}${i}.png` }));
 }
 
 type Atlases = AsyncReturnType<typeof createAtlases>;
