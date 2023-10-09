@@ -3,7 +3,6 @@ import { Logger } from "../../common/logger";
 import { sleep, wait } from "../../common/wait";
 import { FsWatcher } from "../watcher/fs-watcher";
 import { AcceptResult, ISmoochWorkDequeue } from "./smooch-work-pipeline";
-import { ErrorPrinter } from "../../common/error-printer";
 
 export type SmoochWork = AcceptResult.Accepted.t[];
 export type SmoochWorkFn = (work: SmoochWork) => unknown;
@@ -39,8 +38,7 @@ export class SmoochWorker {
                 catch (e) {
                     errorCount += 1;
 
-                    SmoochWorker._logger.error(chalk.red`Encountered error while working:`);
-                    SmoochWorker._logger.error(ErrorPrinter.toPrintable(e));
+                    SmoochWorker._logger.error(chalk.red`Encountered error while working:`, e);
 
                     const retryMs = SmoochWorker._retryMs[errorCount - 1];
 
@@ -96,8 +94,7 @@ export class SmoochWorkers implements ISmoochWorkers {
                     }
                 }
                 catch (e) {
-                    this._logger.error(`An error occurred during _step()`);
-                    this._logger.error(e);
+                    this._logger.error(`An error occurred during _step()`, e);
                 }
                 await sleep(16);
             }
@@ -124,8 +121,7 @@ export class SmoochWorkers implements ISmoochWorkers {
                     worker.work(worker.queue.dequeue());
                 }
                 catch (e) {
-                    this._logger.error(`An error occurred while giving ${worker} work from ${worker.queue}`);
-                    this._logger.error(e);
+                    this._logger.error(`An error occurred while giving ${worker} work from ${worker.queue}`, e);
                 }
             }
         }

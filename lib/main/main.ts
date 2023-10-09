@@ -10,7 +10,6 @@ import { validateOptions } from "../common/validate-options";
 import { JsonFile } from "../common/json-file";
 import { sleep, wait } from "../common/wait";
 import { Logger } from "../common/logger";
-import { ErrorPrinter } from "../common/error-printer";
 import { runCliUtilCommand } from "./cli-utils/commands";
 import { Global } from "./global";
 import { SmoochJsonWatcher } from "./smooch-json-watcher";
@@ -39,8 +38,7 @@ export async function main() {
             await SmoochEffectiveConfig.write(config);
         }
         catch (e) {
-            logger.error('An error occurred while creating the application from smooch.json');
-            logger.error(ErrorPrinter.toPrintable(e));
+            logger.error('An error occurred while creating the application from smooch.json', e);
         }
 
         await wait(() => SmoochJsonWatcher.eventsCount > 0);
@@ -56,8 +54,7 @@ export async function main() {
             }
         }
         catch (e) {
-            logger.error('An error occurred while stopping the application');
-            logger.error(ErrorPrinter.toPrintable(e));
+            logger.error('An error occurred while stopping the application', e);
         }
 
         logger.log('Waiting for 250ms...');

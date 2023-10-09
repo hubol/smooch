@@ -58,8 +58,7 @@ export class ParcelSubscription {
             this._started = false;
         }
         catch (e) {
-            ParcelSubscription._logger.warn(`An error occurred while stopping`);
-            ParcelSubscription._logger.warn(e);
+            ParcelSubscription._logger.warn(`An error occurred while stopping`, e);
         }
     }
 

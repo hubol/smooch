@@ -40,8 +40,11 @@ async function runTest() {
             }
         }],
         "jsonFiles": [{
-            "folder": "src-jsons",
-            "outFile": "dst-jsons/result.ts",
+            glob: "src-jsons/**/*.json",
+            template: {
+                program: 'json-aggregate.js',
+                out: 'dst-jsons/result.ts',
+            }
         }]
     };
     
