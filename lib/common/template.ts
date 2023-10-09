@@ -53,7 +53,7 @@ export class JsTemplate {
 			logger.log(`Done: ${chalk.green(outputFile)}`);
 		}
 		catch (e) {
-			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context=${describeBrief(context)}:`, e);
+			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context ${chalk.magenta(describeBrief(context))}:`, e);
 		}
 	}
 }

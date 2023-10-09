@@ -49,7 +49,7 @@ export const texturePack = async (options: Infer<typeof PackerOptions>) => {
 
 	const globRoot = Gwob.root(glob);
 	const context = createTemplateContext(atlases, globRoot);
-	await jsTemplate.renderToFile(context, options.template.out);
+	await jsTemplate.renderToFile(context, options.template.out, { ensureDirectory: true });
 
 	logger.log("Packed");
 };
