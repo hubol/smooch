@@ -1,5 +1,4 @@
 import { PackerOptions } from "./options";
-import { glob } from "glob";
 import { JsTemplate } from "../../common/template";
 import { packTextures } from "./raw-packer";
 import { Infer } from "superstruct";
@@ -12,6 +11,8 @@ import { SmoochWorkPipelineRecipeFactory } from "../../main/pipeline/smooch-work
 import { SmoochWorkAcceptor } from "../../main/pipeline/smooch-work-acceptor";
 import { SmoochWorkQueue } from "../../main/pipeline/smooch-work-queue";
 import { Path } from "../../common/path";
+import { Gwob } from "../../common/gwob";
+import { GlobRoot } from "../../common/glob-root";
 
 const logger = new Logger('TexturePacker', 'magenta');
 
@@ -19,37 +20,36 @@ export const TexturePackRecipe = SmoochWorkPipelineRecipeFactory.create({
 	name: 'texPack',
 	configSchema: PackerOptions,
 	acceptorFactory: options => {
-		const imagesFolder = Path.Glob.create(options.folder, '**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}');
-		return new SmoochWorkAcceptor([ imagesFolder ], [ Path.Glob.create(options.outTemplate) ], []);
+		return new SmoochWorkAcceptor([ options.glob ], [ Path.Glob.create(options.template.program) ], []);
 	},
 	queueFactory: () => new SmoochWorkQueue(),
 	workFnFactory: options => () => texturePack(options),
 });
 
 export const texturePack = async (options: Infer<typeof PackerOptions>) => {
-	const { folder: imagesFolder, outFolder, outTemplate, outTemplateExtension, ...rawPackerOptions } = options;
-	const { fileName } = rawPackerOptions;
+	const { glob } = options;
 
-	const template = await JsTemplate.fromFile(outTemplate);
+	const jsTemplate = await JsTemplate.fromFile(options.template.program);
 
-	logger.log(`Loading images from folder ${imagesFolder}...`);
+	logger.log(`Loading images from folder ${glob}...`);
 
-	const imageFilePaths = await glob(`/**/*.{png,jpeg,gif,jpg,tiff,webp,bmp}`, { root: imagesFolder });
+	const imageFilePaths = await Gwob.files(glob);
 
 	if (!imageFilePaths.length)
-	logger.warn(`No images found in ${imagesFolder}`);
+		logger.warn(`No images found matching ${glob}`);
 
 	const atlases = await createAtlases(imageFilePaths, options);
 
-	await Fs.mkdir(outFolder, { recursive: true });
+	await Fs.mkdir(options.atlas.directory, { recursive: true });
 	await Promise.all(atlases.map((atlas, i) => {
-		const file = Fs.resolve(outFolder, atlas.fileName);
+		const file = Fs.resolve(options.atlas.directory, atlas.fileName);
 		logger.log(`Writing atlas ${i + 1} of ${atlases.length} to ${file}...`);
 		return Fs.writeFile(file, atlas.imageBuffer);
 	}));
 
-	const context = createTemplateContext(atlases, imagesFolder);
-	await template.renderToFile(context, Fs.resolve(outFolder, `${fileName}.${outTemplateExtension}`));
+	const globRoot = Gwob.root(glob);
+	const context = createTemplateContext(atlases, globRoot);
+	await jsTemplate.renderToFile(context, options.template.out);
 
 	logger.log("Packed");
 };
@@ -61,16 +61,16 @@ async function createAtlases(imageFilePaths: string[], options: Infer<typeof Pac
 
 type Atlases = AsyncReturnType<typeof createAtlases>;
 
-function createTemplateContext(atlases: Atlases, imagesFolder: Path.Directory.t) {
-	const textures = sortArrayByKey(atlases.flatMap(atlas => convertRectsToContextTextures(atlas, imagesFolder)), 'fileName');
+function createTemplateContext(atlases: Atlases, globRoot: GlobRoot) {
+	const textures = sortArrayByKey(atlases.flatMap(atlas => convertRectsToContextTextures(atlas, globRoot)), 'fileName');
 	return { atlases, textures };
 }
 
 export type PackTextureTemplateContext = ReturnType<typeof createTemplateContext>;
 
-const convertRectsToContextTextures = (atlas: Atlases[number], imagesFolder: Path.Directory.t) => atlas.rects.map(rect => ({
+const convertRectsToContextTextures = (atlas: Atlases[number], globRoot: GlobRoot) => atlas.rects.map(rect => ({
 	atlasFileName: atlas.fileName,
-	fileName: rect.filePath.substring(Fs.resolve(imagesFolder).length),
+	fileName: rect.filePath.substring(Fs.resolve(globRoot).length),
 	x: rect.x,
 	y: rect.y,
 	width: rect.width,

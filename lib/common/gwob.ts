@@ -1,6 +1,7 @@
 import { GlobOptionsWithFileTypesUnset, glob } from "glob";
 import { minimatch } from "minimatch";
 import { Path } from "./path";
+import { GlobRoot } from "./glob-root";
 
 function globMatch(path: Path.Glob.t) {
     if (!cache[path])
@@ -36,10 +37,10 @@ function globRoot(glob: Path.Glob.t) {
         path += component + '/';
     }
 
-    return globRootCache[glob] = path;
+    return globRootCache[glob] = path as GlobRoot;
 }
 
-const globRootCache: Record<string, string> = {};
+const globRootCache: Record<string, GlobRoot> = {};
 
 export const Gwob = {
     match: globMatch,
