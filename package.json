@@ -1,7 +1,7 @@
 {
-  "name": "smooch",
+  "name": "@hubol/smooch",
   "version": "0.1.0",
-  "description": "Generate texture atlases, audio sprites, and source code from directories",
+  "description": "Generate texture atlases, browser-compatible audio, and source code from directories",
   "scripts": {
     "build": "npm run build:json-schema && npm run build:template-api-dts && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-pack",
     "build:json-schema": "ts-node ./tools/generate-config-schema.ts",

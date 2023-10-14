@@ -10,7 +10,11 @@ const destFileName = process.argv[2];
 if (!destFileName)
     throw new Error("Argument required for packed tar ball file name!")
 
-const packTarBallFileName = `${packageJson.name}-${packageJson.version}.tgz`;
+const packTarBallFileName = `${stripSymbols(packageJson.name)}-${packageJson.version}.tgz`;
+
+function stripSymbols(packageName: string) {
+    return packageName.replace('@', '').replace('/', '-');
+}
 
 const logger = new Logger('pack.ts', 'yellow');
 
