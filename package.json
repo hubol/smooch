@@ -3,11 +3,12 @@
   "version": "1.0.0-beta.2",
   "description": "Generate texture atlases, browser-compatible audio, and source code from directories",
   "scripts": {
-    "build": "npm run build:json-schema && npm run build:template-api-dts && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-pack",
+    "build": "npm run build:json-schema && npm run build:template-api-dts && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-readme && npm run build:npm-pack",
     "build:json-schema": "ts-node ./tools/generate-config-schema.ts",
     "build:template-api-dts": "npx tsup lib/template-api.ts --dts-only --dts-resolve",
     "build:bundle": "webpack",
     "build:distributable-package-json": "ts-node ./tools/generate-distributable-package-json.ts",
+    "build:npm-readme": "ts-node ./tools/generate-npm-readme.ts",
     "build:npm-pack": "ts-node ./tools/pack.ts ../smooch.tgz",
     "dev:build-and-test": "npm run build && npm run test",
     "dev:start": "node --nolazy -r ts-node/register ./lib/main/dev.ts",
@@ -18,6 +19,10 @@
   },
   "author": "Hubol",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hubol/smooch.git"
+  },
   "devDependencies": {
     "@jimp/custom": "^0.22.10",
     "@jimp/types": "^0.22.10",
