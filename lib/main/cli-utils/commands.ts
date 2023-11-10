@@ -16,7 +16,7 @@ ${commandMetadatas.map(({ name, args, description }) => `${chalk.yellow(name)}${
 ${description}`).join('\n\n')}`)
 }
 
-async function getCommandMetadatas() {
+export async function getCommandMetadatas() {
     return await Promise.all(Object.entries(cliUtilsCommands)
         .map(async ([ name, { args, description } ]) => ({
             name,
@@ -46,7 +46,7 @@ const cliUtilsCommands: Record<string, Command> = {
             .map(path => Fs.parse(path).name)
             .map(name => `- ${name}`)
             .join('\n');
-        return `Copy a default template JavaScript program **src** to **dst**. Available defaults are
+        return `Copy a default template JavaScript program from **src** to **dst**. Available defaults are
 ${defaultsList}`
     })()),
 

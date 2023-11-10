@@ -12,6 +12,7 @@
     "build:npm-pack": "ts-node ./tools/pack.ts ../smooch.tgz",
     "dev:build-and-test": "npm run build && npm run test",
     "dev:start": "node --nolazy -r ts-node/register ./lib/main/dev.ts",
+    "dev:update-readme": "ts-node ./lib/main/dev.ts ../../tools/update-readme-md.ts",
     "test": "ts-node --transpileOnly test/test.ts"
   },
   "bin": {
