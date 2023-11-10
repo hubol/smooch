@@ -104,6 +104,7 @@ jobs:
           sparse-checkout: |
             package.json
             package-lock.json
+            .github/
           sparse-checkout-cone-mode: false
       
       # - uses: actions/download-artifact@v3
