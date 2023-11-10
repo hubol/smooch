@@ -135,6 +135,9 @@ jobs:
       #     name: smooch.tgz
       #     path: ./
       
+      # export NODE_PATH
+      # Use global modules from NodeJS app
+      # https://stackoverflow.com/a/15646750
       - run: >
           npm install -g version-exists &&
           export NODE_PATH=$(npm root -g) &&
@@ -142,7 +145,8 @@ jobs:
           echo "--------" &&
           echo "--------" &&
           echo "--------" &&
-          node ./check-needs-published.js
+          node ./check-needs-published.js &&
+          echo "hewwo"
   
   cleanup:
     needs: all-tested
