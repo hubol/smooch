@@ -132,6 +132,8 @@ jobs:
           }
           
           main();" > check-needs-published.js
+
+      - run: cat check-needs-published.js
       
       # - uses: actions/download-artifact@v3
       #   with:
