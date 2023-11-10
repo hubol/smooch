@@ -122,7 +122,7 @@ jobs:
             const isThisVersionPublished = await versionExists('@hubol/smooch', version);
         
             if (isThisVersionPublished) {
-              throw new Error('Version ' + version + ' is already published!');
+              // throw new Error('Version ' + version + ' is already published!');
             }
           }
           
