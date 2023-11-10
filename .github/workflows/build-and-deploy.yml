@@ -145,8 +145,7 @@ jobs:
           echo "--------" &&
           echo "--------" &&
           echo "--------" &&
-          node ./check-needs-published.js &&
-          echo "hewwo"
+          [ node ./check-needs-published.js ] && echo "Yes" || echo "Not publishing package"
   
   cleanup:
     needs: all-tested
