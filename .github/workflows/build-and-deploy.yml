@@ -114,6 +114,7 @@ jobs:
       
       - run: npm install -g version-exists
       - run: ls -l
+      - run: cd ../ && ls -l
       - run: node ./.github/workflows/check-needs-published.js
   
   cleanup:
