@@ -132,7 +132,7 @@ jobs:
       #     path: ./
       
       - run: >
-          npm install -g version-exists
+          npm install -g version-exists &&
           export NODE_PATH=$(npm root -g) &&
           node ./check-needs-published.js
   
