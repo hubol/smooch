@@ -51,8 +51,6 @@ jobs:
   maybe-publish:
     needs: all-tested
     runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
     steps:
       # - uses: actions/checkout@v4
       #   with:
@@ -84,6 +82,9 @@ jobs:
       #     main();" > check-needs-published.js
 
       # - run: cat check-needs-published.js
+
+      # https://gist.github.com/nandorojo/46b3e46de12177b9ad7e4d454310de21
+      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
       
       - uses: actions/download-artifact@v3
         with:
