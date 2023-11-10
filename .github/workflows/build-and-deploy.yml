@@ -145,7 +145,7 @@ jobs:
           echo "--------" &&
           echo "--------" &&
           echo "--------" &&
-          if [[ node ./check-needs-published.js ]]; tehn echo "Yes"; else echo "Not publishing package"; fi
+          if [[ node ./check-needs-published.js ]]; then echo "Yes"; else echo "Not publishing package"; fi
   
   cleanup:
     needs: all-tested
