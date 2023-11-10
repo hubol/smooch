@@ -48,6 +48,19 @@ jobs:
     steps:
       - run: echo "🍆"
   
+  check-needs-published:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            package.json
+            package-lock.json
+          sparse-checkout-cone-mode: false
+      - run: echo "PACKAGE_JSON=$(jq -c . < package.json)" >> $GITHUB_ENV
+      - run: echo "PACKAGE_LOCK_JSON=$(jq -c . < package-lock.json)" >> $GITHUB_ENV
+      - run: echo 'package.json version=${{ fromJson(env.PACKAGE_JSON).version }} package-lock.json version=${{ fromJson(env.PACKAGE_LOCK_JSON).version }}'
+  
   cleanup:
     needs: all-tested
     runs-on: ubuntu-latest
