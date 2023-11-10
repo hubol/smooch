@@ -110,18 +110,23 @@ jobs:
           echo "const versionExists = require('version-exists');
           const packageJson = require('./package.json');
           const packageLockJson = require('./package-lock.json');
+
+          function error(message) {
+            console.error(message);
+            throw new Error(message);
+          }
           
           async function main() {
               console.log(`Got package.json version=${packageJson.version} and package-lock.json version=${packageLockJson.version}`);
               if (packageJson.version !== packageLockJson.version)
-                  throw new Error(`package.json version and package-lock.json version do not match!`);
+                  error(`package.json version and package-lock.json version do not match!`);
           
               const { version } = packageJson;
           
               const isThisVersionPublished = await versionExists('@hubol/smooch', version);
           
               if (isThisVersionPublished)
-                  throw new Error(`Version ${version} is already published!`);
+                  error(`Version ${version} is already published!`);
           }
           
           main();" > check-needs-published.js
@@ -134,6 +139,7 @@ jobs:
       - run: >
           npm install -g version-exists &&
           export NODE_PATH=$(npm root -g) &&
+          echo "--------\n\n\n\n" &&
           node ./check-needs-published.js
   
   cleanup:
