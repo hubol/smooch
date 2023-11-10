@@ -12,12 +12,43 @@ In addition, it is much more pleasurable to work in environments with a type sys
 
 ## Usage
 
-TODO
+<!-- smooch commands -->
+`smooch`
+
+Start smooch in watch mode. Aggregates and transforms assets as file changes are detected.
+Probably should be used while developing!
+
+`smooch init`
+
+Initialize a **smooch.json** configuration file.
+
+`smooch copy-program <src> <dst>`
+
+Copy a default template JavaScript program from **src** to **dst**. Available defaults are
+- texture-pack
+- json-aggregate
+- audio-convert
+
+`smooch build`
+
+Aggregate and transform assets according to your **smooch.json**. Probably should be used on a CI server!
+
+`smooch init-native-deps`
+
+Produce a **smooch-native-deps.json** configuration file.
+This is for a bizarre subsystem that sidesteps your **package.json**.
+You probably won't need to touch this!
+
+`smooch help`
+
+List these commands!
+<!-- smooch commands end -->
 
 ## Design goals
 
 - Not slow
-- Small install size
+- Simple installation
+- Zero dependencies
 - Informative console output
 - Watches directories
 - Recovers gracefully from IO errors
