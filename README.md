@@ -15,16 +15,16 @@ In addition, it is much more pleasurable to work in environments with a type sys
 <!-- smooch commands -->
 `smooch`
 
-Start smooch in watch mode. Aggregates and transforms assets as file changes are detected.
+Start in watch mode. Aggregates and transforms assets as file changes are detected.
 Probably should be used while developing!
 
 `smooch init`
 
 Initialize a **smooch.json** configuration file.
 
-`smooch copy-program <src> <dst>`
+`smooch copy-program <program> <dst>`
 
-Copy a default template JavaScript program from **src** to **dst**. Available defaults are
+Copy a default template JavaScript program **program** to **dst**. Available programs are
 - texture-pack
 - json-aggregate
 - audio-convert
@@ -36,7 +36,7 @@ Aggregate and transform assets according to your **smooch.json**. Probably shoul
 `smooch init-native-deps`
 
 Produce a **smooch-native-deps.json** configuration file.
-This is for a bizarre subsystem that sidesteps your **package.json**.
+This is for a bizarre subsystem that sidesteps your **package-lock.json**.
 You probably won't need to touch this!
 
 `smooch help`

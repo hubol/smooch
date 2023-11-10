@@ -20,7 +20,7 @@ async function createCommandsMarkdown() {
     const metadatas = await getCommandMetadatas();
     metadatas.unshift({
         name: '',
-        description: `Start smooch in watch mode. Aggregates and transforms assets as file changes are detected.
+        description: `Start in watch mode. Aggregates and transforms assets as file changes are detected.
 Probably should be used while developing!`,
         args: undefined,
     });
