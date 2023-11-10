@@ -40,13 +40,13 @@ const cliUtilsCommands: Record<string, Command> = {
     `Initialize a **smooch.json** configuration file.`),
     
     'copy-program': cmd((src, dst) => copyTemplateProgram(src, Path.File.create(dst)),
-    '<src> <dst>',
+    '<program> <dst>',
     (async () => {
         const defaultsList = (await getAvailableTemplatePrograms())
             .map(path => Fs.parse(path).name)
             .map(name => `- ${name}`)
             .join('\n');
-        return `Copy a default template JavaScript program from **src** to **dst**. Available defaults are
+        return `Copy a default template JavaScript program **program** to **dst**. Available programs are
 ${defaultsList}`
     })()),
 
@@ -55,7 +55,7 @@ ${defaultsList}`
 
     'init-native-deps': cmd(initializeNativeDepsConfig,
     `Produce a **smooch-native-deps.json** configuration file.
-This is for a bizarre subsystem that sidesteps your **package.json**.
+This is for a bizarre subsystem that sidesteps your **package-lock.json**.
 You probably won't need to touch this!`),
 
     'help': cmd(help, `List these commands!`),
