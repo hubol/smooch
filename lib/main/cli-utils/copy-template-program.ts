@@ -20,9 +20,13 @@ export async function copyTemplateProgram(src: string, dstFile: Path.File.t) {
     await Fs.copyFile(srcFile, dstFile);
 }
 
-async function findTemplateProgramFile(src: string) {
+export async function getAvailableTemplatePrograms() {
     const glob = Path.Glob.create(templateProgramDirectory, '*.js');
-    const files = await Gwob.files(glob);
+    return await Gwob.files(glob);
+}
+
+async function findTemplateProgramFile(src: string) {
+    const files = await getAvailableTemplatePrograms();
     for (const file of files) {
         const { base } = Fs.parse(file);
         if (base.includes(src))
