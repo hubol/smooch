@@ -57,9 +57,9 @@ jobs:
             package.json
             package-lock.json
           sparse-checkout-cone-mode: false
-      - run: echo "PACKAGE_JSON=$(jq -c . < package.json)" >> $GITHUB_ENV
-      - run: echo "PACKAGE_LOCK_JSON=$(jq -c . < package-lock.json)" >> $GITHUB_ENV
-      - run: echo 'package.json version=${{ fromJson(env.PACKAGE_JSON).version }} package-lock.json version=${{ fromJson(env.PACKAGE_LOCK_JSON).version }}'
+      - run: echo "PACKAGE_JSON_VERSION=$(jq -c . < package.json | jq '.version')" >> $GITHUB_ENV
+      - run: echo "PACKAGE_LOCK_JSON_VERSION=$(jq -c . < package-lock.json | jq '.version')" >> $GITHUB_ENV
+      - run: echo 'package.json version=${{ env.PACKAGE_JSON_VERSION }} package-lock.json version=${{ env.PACKAGE_LOCK_JSON_VERSION }}'
   
   cleanup:
     needs: all-tested
