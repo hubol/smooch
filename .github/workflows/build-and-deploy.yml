@@ -106,10 +106,10 @@ jobs:
             package-lock.json
           sparse-checkout-cone-mode: false
       
-      - uses: actions/download-artifact@v3
-        with:
-          name: smooch.tgz
-          path: ./
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: smooch.tgz
+      #     path: ./
       
       - run: npm install -g version-exists
       - run: ls -l
