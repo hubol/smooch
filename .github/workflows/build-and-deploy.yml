@@ -51,59 +51,15 @@ jobs:
   maybe-publish:
     needs: all-tested
     runs-on: ubuntu-latest
+    env:
+      NPM_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
     steps:
-      # - uses: actions/checkout@v4
-      #   with:
-      #     sparse-checkout: |
-      #       package.json
-      #       package-lock.json
-      #     sparse-checkout-cone-mode: false
-
-      # - run: >
-      #     echo "const versionExists = require('version-exists');
-      #     const packageJson = require('./package.json');
-      #     const packageLockJson = require('./package-lock.json');
-          
-      #     async function main() {
-      #       console.log('Got package.json version=' + packageJson.version + ' and package-lock.json version=' + packageLockJson.version);
-      #       if (packageJson.version !== packageLockJson.version) {
-      #         throw new Error('package.json version and package-lock.json version do not match!');
-      #       }
-        
-      #       const { version } = packageJson;
-        
-      #       const isThisVersionPublished = await versionExists('@hubol/smooch', version);
-        
-      #       if (isThisVersionPublished) {
-      #         throw new Error('Version ' + version + ' is already published!');
-      #       }
-      #     }
-          
-      #     main();" > check-needs-published.js
-
-      # - run: cat check-needs-published.js
-
-      # https://gist.github.com/nandorojo/46b3e46de12177b9ad7e4d454310de21
-      - run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-      
       - uses: actions/download-artifact@v3
         with:
           name: smooch.tgz
           path: ./
 
-      - run: if npm publish smooch.tgz; then echo "Published!"; else echo "Not publishing package"; fi
-      
-      # export NODE_PATH
-      # Use global modules from NodeJS app
-      # https://stackoverflow.com/a/15646750
-      # - run: >
-      #     npm install -g version-exists &&
-      #     export NODE_PATH=$(npm root -g) &&
-      #     echo "--------" &&
-      #     echo "--------" &&
-      #     echo "--------" &&
-      #     echo "--------" &&
-      #     if node ./check-needs-published.js; then npm publish smooch.tgz; else echo "Not publishing package"; fi
+      - run: npm publish smooch.tgz || echo "Not publishing package"
   
   cleanup:
     needs: maybe-publish
