@@ -76,8 +76,27 @@ jobs:
       #     path: ./
       # - run: npm publish smooch.tgz
 
+  # maybe-publish:
+  #   needs: all-tested
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         sparse-checkout: |
+  #           package.json
+  #           package-lock.json
+  #         sparse-checkout-cone-mode: false
+      
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: smooch.tgz
+  #         path: ./
+      
+  #     - run: npm install -g version-exists
+  #     - run: ls
+  #     - run: node ./.github/workflows/check-needs-published.js && npm publish smooch.tgz
+
   maybe-publish:
-    needs: all-tested
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,11 +112,11 @@ jobs:
           path: ./
       
       - run: npm install -g version-exists
-      - run: ls
-      - run: node ./.github/workflows/check-needs-published.js && npm publish smooch.tgz
+      - run: ls -l
+      - run: node ./.github/workflows/check-needs-published.js
   
   cleanup:
-    needs: maybe-publish
+    needs: all-tested
     runs-on: ubuntu-latest
     steps:
       - uses: geekyeggo/delete-artifact@v2
