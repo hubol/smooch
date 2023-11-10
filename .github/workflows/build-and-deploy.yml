@@ -48,7 +48,36 @@ jobs:
     steps:
       - run: echo "🍆"
   
-  check-needs-published:
+  # check-needs-published:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #       with:
+  #         sparse-checkout: |
+  #           package.json
+  #           package-lock.json
+  #         sparse-checkout-cone-mode: false
+  #     # - run: echo "PACKAGE_JSON_VERSION=$(jq -c . < package.json | jq '.version')" >> $GITHUB_ENV
+  #     # - run: echo "PACKAGE_LOCK_JSON_VERSION=$(jq -c . < package-lock.json | jq '.version')" >> $GITHUB_ENV
+  #     # - run: echo 'package.json version=${{ env.PACKAGE_JSON_VERSION }} package-lock.json version=${{ env.PACKAGE_LOCK_JSON_VERSION }}'
+  #     # - run: >
+  #     #     npm install -g version-exists
+  #     #     version-exists @hubol/smooch ${{ env.PACKAGE_JSON_VERSION }}
+  #     - run: npm install -g version-exists
+  #     - run: version-exists @hubol/smooch ${{ env.PACKAGE_JSON_VERSION }}
+
+  # publish:
+  #   needs: [all-tested, check-needs-published]
+  #   runs-on: ubuntu-latest
+  #   steps:
+      # - uses: actions/download-artifact@v3
+      #   with:
+      #     name: smooch.tgz
+      #     path: ./
+      # - run: npm publish smooch.tgz
+
+  maybe-publish:
+    needs: all-tested
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,12 +86,18 @@ jobs:
             package.json
             package-lock.json
           sparse-checkout-cone-mode: false
-      - run: echo "PACKAGE_JSON_VERSION=$(jq -c . < package.json | jq '.version')" >> $GITHUB_ENV
-      - run: echo "PACKAGE_LOCK_JSON_VERSION=$(jq -c . < package-lock.json | jq '.version')" >> $GITHUB_ENV
-      - run: echo 'package.json version=${{ env.PACKAGE_JSON_VERSION }} package-lock.json version=${{ env.PACKAGE_LOCK_JSON_VERSION }}'
+      
+      - uses: actions/download-artifact@v3
+        with:
+          name: smooch.tgz
+          path: ./
+      
+      - run: npm install -g version-exists
+      - run: ls
+      - run: node ./.github/workflows/check-needs-published.js && npm publish smooch.tgz
   
   cleanup:
-    needs: all-tested
+    needs: maybe-publish
     runs-on: ubuntu-latest
     steps:
       - uses: geekyeggo/delete-artifact@v2
