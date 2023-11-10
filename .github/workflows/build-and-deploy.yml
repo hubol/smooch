@@ -131,9 +131,10 @@ jobs:
       #     name: smooch.tgz
       #     path: ./
       
-      - run: npm install -g version-exists
-      - run: export NODE_PATH=$(npm root -g)
-      - run: node ./check-needs-published.js
+      - run: >
+          npm install -g version-exists
+          export NODE_PATH=$(npm root -g) &&
+          node ./check-needs-published.js
   
   cleanup:
     needs: all-tested
