@@ -1,6 +1,6 @@
 {
   "name": "@hubol/smooch",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "Generate texture atlases, browser-compatible audio, and source code from directories",
   "scripts": {
     "build": "npm run build:json-schema && npm run build:template-api-dts && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-readme && npm run build:npm-pack",
