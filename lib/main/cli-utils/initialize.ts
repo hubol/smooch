@@ -17,7 +17,7 @@ export async function initializeSmoochConfig() {
     };
 
     const json = JSON.stringify(
-        { "$schema": "node_modules/smooch/schema.json", ...config },
+        { "$schema": "node_modules/@hubol/smooch/schema.json", ...config },
         undefined,
         '\t');
 
