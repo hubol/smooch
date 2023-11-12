@@ -1,6 +1,6 @@
 /**
-@param {import("smooch/template-api").TemplateContext.AudioConvert} context;
-@param {import("smooch/template-api").Utils} utils;
+@param {import("@hubol/smooch/template-api").TemplateContext.AudioConvert} context;
+@param {import("@hubol/smooch/template-api").Utils} utils;
 */
 module.exports = function ({ files }, { pascal, noext }) {
     return `
