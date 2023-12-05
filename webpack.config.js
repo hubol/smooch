@@ -2,21 +2,14 @@ const path = require('path');
 const ShebangPlugin = require('webpack-shebang-plugin');
 const webpack = require('webpack');
 
-const externals = (...items) => {
-	const obj = {};
-	for (const item of items) {
-		obj[item] = `require("${item}");`;
-	}
-	
-	return obj;
-}
-
+/**
+ * @type {import('webpack').Configuration}
+ */
 module.exports = {
 	target: 'node',
-	externals: externals('@parcel/watcher', '@ffmpeg-installer/ffmpeg'), // removes node_modules from your final bundle
-	entry: './lib/main/cli.ts', // make sure this matches the main root of your code 
+	entry: './lib/main/cli.ts',
 	output: {
-		path: path.join(__dirname, 'dist'), // this can be any path and directory you want
+		path: path.join(__dirname, 'dist'),
 		filename: './index.js',
 	},
 	optimization: {
@@ -43,5 +36,6 @@ module.exports = {
 	ignoreWarnings: [
 		{ module: /lib\/common\/require-module.ts/, },
 		{ module: /node_modules\/fluent-ffmpeg\/lib\/options\/misc.js/, },
+		{ module: /node_modules\/prettier\/index.mjs/, },
 	],
 };
