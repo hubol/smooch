@@ -6,6 +6,7 @@ import chalk from "chalk";
 import { describeBrief } from "./describe-brief";
 import { requireModule } from "./require-module";
 import { jsBeautify } from "./js-beautify";
+import { countLines } from "./count-lines";
 
 const utils = {
 	camel: camelCase,
@@ -50,7 +51,7 @@ export class JsTemplate {
 => ${chalk.green(outputFile)}...`);
 			const text = await this._render(context);
     		await Fs.writeFile(outputFile, text);
-			logger.log(`Done: ${chalk.green(outputFile)}`);
+			logger.log(`Done: ${chalk.green(outputFile)} (${countLines(text)} lines)`);
 		}
 		catch (e) {
 			logger.error(`An unexpected error occurred while rendering ${this._srcFile} to file ${outputFile} with context ${chalk.magenta(describeBrief(context))}:`, e);
