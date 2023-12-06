@@ -9,10 +9,12 @@ import { Global } from "../../main/global";
 import { Boundary_FfmpegInstaller } from "./boundary/ffmpeg-installer-api";
 import { Boundary_ParcelWatcher } from "./boundary/parcel-watcher-api";
 import { requireModule } from "../require-module";
+import { Boundary_Prettier } from "./boundary/prettier-api";
 
 const defaultDependencies = {
     "@ffmpeg-installer/ffmpeg": dependency<Boundary_FfmpegInstaller.Api>("^1.1.0"),
     "@parcel/watcher": dependency<Boundary_ParcelWatcher.Api>("2.2.0"),
+    "prettier": dependency<Boundary_Prettier.Api>("3.1.0"),
 };
 
 export type ModuleName = keyof Dependencies;

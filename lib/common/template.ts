@@ -6,7 +6,7 @@ import chalk from "chalk";
 import { describeBrief } from "./describe-brief";
 import { requireModule } from "./require-module";
 import { countLines } from "./count-lines";
-import { format } from "prettier";
+import { Native } from "./native/native-module";
 
 const utils = {
 	camel: camelCase,
@@ -14,7 +14,7 @@ const utils = {
 	noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
 	json: (object: any) => JSON.stringify(object, undefined, 1),
 	oneline: (string: string) => string.replace(/\s+/g, ' '),
-	format,
+	format: Native.Prettier.format,
 };
 
 export type Utils = typeof utils;

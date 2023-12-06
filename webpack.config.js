@@ -36,6 +36,5 @@ module.exports = {
 	ignoreWarnings: [
 		{ module: /lib\/common\/require-module.ts/, },
 		{ module: /node_modules\/fluent-ffmpeg\/lib\/options\/misc.js/, },
-		{ module: /node_modules\/prettier\/index.mjs/, },
 	],
 };
