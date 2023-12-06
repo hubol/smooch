@@ -59,8 +59,6 @@ async function runTest() {
     }
     await smooch.stdOut.untilPrinted('Packed');
     await smooch.stdOut.untilPrinted('Saved state.');
-    smooch.kill();
-    await smooch.untilExited();
     
     TestProject.check('dst-jsons/result.ts', `// This file is generated.
 
@@ -69,6 +67,20 @@ export const JsonFiles = {
   "Json1": { "name": "Hubol", "level": 100 },
   "Json0": { "name": "Hubol", "level": 100 }
 }`).print();
+
+    await TestProject.fixture('prettierProgram', `json-aggregate.js`);
+    await smooch.stdOut.untilPrinted('Saved state.');
+
+    TestProject.check('dst-jsons/result.ts', `// Prettier
+
+    const aaaaaa = {
+      hello: "b",
+      c: "d",
+    };
+`).print();
+
+    smooch.kill();
+    await smooch.untilExited();
 
     await TestProject.fixture('image256Png', `src-images/image11.png`);
 

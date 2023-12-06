@@ -10,4 +10,5 @@ export const TestFixtures = {
     packageJson: fixturePath('package.json'),
     soundWav: fixturePath('sound.wav'),
     dummyProgram: fixturePath('dummy-program.js'),
+    prettierProgram: fixturePath('prettier-program.js'),
 }
