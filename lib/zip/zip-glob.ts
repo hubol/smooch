@@ -9,6 +9,10 @@ import chalk from "chalk";
 
 const logger = new Logger('ZipGlob', 'yellow');
 
+// Always add entries to the archive with a particular timestamp
+// To prevent false-positive differences when using git
+const date = new Date('2020-08-21T23:00:00Z');
+
 export async function zipGlob(srcGlob: Path.Glob.t, dstFile: Path.File.t, options?: archiver.ArchiverOptions) {
     const stream = Fs.createWriteStream(dstFile);
     const archive = archiver('zip', options);
@@ -28,7 +32,7 @@ export async function zipGlob(srcGlob: Path.Glob.t, dstFile: Path.File.t, option
 => ${chalk.green(dstFile)}...`);
 
     for (const file of files)
-        archive.file(file, { name: file.substring(root.length) });
+        archive.file(file, { name: file.substring(root.length), date });
 
     await new Promise((resolve, reject) => {
         stream.on('close', resolve);
