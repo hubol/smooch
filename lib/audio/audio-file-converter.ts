@@ -27,6 +27,7 @@ export class AudioFileConverter {
                 .on('end', resolve)
                 .on('error', reject)
                 .input(srcFile)
+                .addOption('-bitexact')
                 .save(dstFile);
         })
         .then(() => logger.log(`Done after ${printMs(Now.ms - start)}: ${chalk.green(dstFile)}`));
