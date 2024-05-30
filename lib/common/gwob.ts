@@ -19,7 +19,7 @@ export function normalizeWindowsPathSeparator(path: string) {
 
 async function globFiles(patterns: Path.Glob.t | Path.Glob.t[], options?: GlobOptionsWithFileTypesUnset) {
     const paths = await glob(patterns, options);
-    return paths.map(normalizeWindowsPathSeparator);
+    return paths.map(normalizeWindowsPathSeparator).sort();
 }
 
 const wildcardRegExp = /[*?[]+/;
