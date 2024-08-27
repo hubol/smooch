@@ -56,3 +56,5 @@ List these commands!
 - Keeps a cache for faster start-up
 - Build tool agnostic
 - Config file with schema
+
+<!-- To publish, use e.g. `npm version 1.0.0-beta.11` -->
