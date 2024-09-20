@@ -53,7 +53,12 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
 
     const uniqueFiles = [ ...new Set(filesToConvert) ];
 
-    logger.log(`Found ${filesToConvert.length} file(s) to convert to formats: ${chalk.white(describeList(options.convert.map(x => x.format)))}`);
+    logger.log(`Found ${uniqueFiles.length} file(s) to convert to formats: ${chalk.white(describeList(options.convert.map(x => x.format)))}`);
+
+    if (uniqueFiles.length === 0) {
+        logger.log(`Aborting, as there are no files to convert.`);
+        return;
+    }
 
     await Promise.all([
         ...options.convert.map(({ directory }) => Fs.mkdir(directory, { recursive: true })),
@@ -74,7 +79,7 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
         await AudioFileConverter.convert(Path.File.create(srcFile), dstFile);
     })));
 
-    logger.log(`Done converting ${filesToConvert.length} file(s).`);
+    logger.log(`Done converting ${uniqueFiles.length} file(s).`);
 
     const [ files, zipFiles ] = await Promise.all([
         getTemplateContextFilesFromDirectories(options),
@@ -208,7 +213,7 @@ namespace FilesToConvert {
             if (w.type === 'AcceptedNascent')
                 return { type: 'all' };
             
-            files.push(...w.assetMatches.map(x => x.path));
+            files.push(...w.assetMatches.filter(x => x.type !== 'delete').map(x => x.path));
         }
     
         return {
