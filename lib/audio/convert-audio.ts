@@ -55,11 +55,6 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
 
     logger.log(`Found ${uniqueFiles.length} file(s) to convert to formats: ${chalk.white(describeList(options.convert.map(x => x.format)))}`);
 
-    if (uniqueFiles.length === 0) {
-        logger.log(`Aborting, as there are no files to convert.`);
-        return;
-    }
-
     await Promise.all([
         ...options.convert.map(({ directory }) => Fs.mkdir(directory, { recursive: true })),
         ...options.convert
