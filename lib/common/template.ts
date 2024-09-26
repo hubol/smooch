@@ -1,5 +1,4 @@
-import { pascalCase } from "pascal-case";
-import { camelCase } from "change-case";
+import { camelCase, pascalCase } from "change-case";
 import { Fs } from "./fs";
 import { Logger } from "./logger";
 import chalk from "chalk";
@@ -9,8 +8,8 @@ import { countLines } from "./count-lines";
 import { Native } from "./native/native-module";
 
 const utils = {
-	camel: camelCase,
-	pascal: pascalCase,
+	camel: (string: string) => camelCase(string).replace(/_/g, ''),
+	pascal: (string: string) => pascalCase(string).replace(/_/g, ''),
 	noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
 	json: (object: any) => JSON.stringify(object, undefined, 1),
 	oneline: (string: string) => string.replace(/\s+/g, ' '),
