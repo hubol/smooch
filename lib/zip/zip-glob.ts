@@ -15,7 +15,10 @@ const date = new Date('2020-08-21T23:00:00Z');
 
 export async function zipGlob(srcGlob: Path.Glob.t, dstFile: Path.File.t, options?: archiver.ArchiverOptions) {
     const stream = Fs.createWriteStream(dstFile);
-    const archive = archiver('zip', options);
+    
+    // statConcurrency: 1 supposedly results in deterministic zips!
+    // https://github.com/archiverjs/node-archiver/issues/383#issuecomment-2253139948
+    const archive = archiver('zip', { statConcurrency: 1, ...options });
     archive.pipe(stream);
 
     const root = Gwob.root(srcGlob);
