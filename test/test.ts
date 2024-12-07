@@ -66,9 +66,9 @@ async function runTest() {
     TestProject.check('dst-jsons/result.ts', `// This file is generated.
 
 export const JsonFiles = {
-  "Json2": { "name": "Hubol", "level": 100 },
+  "Json0": { "name": "Hubol", "level": 100 },
   "Json1": { "name": "Hubol", "level": 100 },
-  "Json0": { "name": "Hubol", "level": 100 }
+  "Json2": { "name": "Hubol", "level": 100 }
 }`).print();
 
     await TestProject.fixture('prettierProgram', `json-aggregate.js`);
