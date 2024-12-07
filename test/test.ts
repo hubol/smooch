@@ -45,7 +45,10 @@ async function runTest() {
                 program: 'json-aggregate.js',
                 out: 'dst-jsons/result.ts',
             }
-        }]
+        }],
+        "global": {
+            endOfLineSequence: 'lf',
+        }
     };
     
     await TestProject.writeSmoochJson(config);

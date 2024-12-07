@@ -14,6 +14,9 @@ export async function initializeSmoochConfig() {
         textures: [],
         audioFiles: [],
         jsonFiles: [],
+        global: {
+            endOfLineSequence: 'os',
+        },
     };
 
     const json = JSON.stringify(

@@ -75,6 +75,8 @@ class Application {
         private readonly _workers: SmoochWorkers,) { }
 
     static async create(config: SmoochConfigType, deleteSnapshotFile: boolean) {
+        Fs._setWriteFileLineEnding(config.global.endOfLineSequence);
+
         await Fs.mkdir(Global.cacheDir, { recursive: true });
 
         const workspaceDirectory = Path.Directory.create('./');
