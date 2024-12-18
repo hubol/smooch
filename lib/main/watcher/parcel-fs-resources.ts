@@ -20,7 +20,8 @@ export class ParcelSnapshot {
         return await ParcelWatcher.writeSnapshot(
             snapshot.watchedDirectoryPath,
             snapshot.filePath,
-            snapshot.options);
+            snapshot.options,
+        );
     }
 
     static getEventsSince(snapshot: ParcelSnapshot) {
@@ -29,7 +30,7 @@ export class ParcelSnapshot {
 }
 
 export class ParcelSubscription {
-    private static _logger = new Logger(ParcelSubscription, 'yellow');
+    private static _logger = new Logger(ParcelSubscription, "yellow");
 
     private _started = false;
     private _stopped = false;
@@ -41,16 +42,18 @@ export class ParcelSubscription {
     ) {}
 
     async start(cb: SubscribeCallback) {
-        if (this._started)
+        if (this._started) {
             return ParcelSubscription._logger.warn(`Attempting to start, but already-started or starting!`);
+        }
         this._started = true;
         this._stopped = false;
         this._asyncSubscription = await ParcelWatcher.subscribe(this.watchedDirectoryPath, cb, this.options);
     }
 
     async stop() {
-        if (!this._started || this._stopped || !this._asyncSubscription)
+        if (!this._started || this._stopped || !this._asyncSubscription) {
             return ParcelSubscription._logger.warn(`Attempting to start, but unstarted or stopped!`);
+        }
 
         try {
             await this._asyncSubscription.unsubscribe();
@@ -71,17 +74,23 @@ export class ParcelFsResources {
     private constructor(
         readonly snapshot: ParcelSnapshot,
         readonly subscription: ParcelSubscription,
-    ) { }
+    ) {}
 
     static async create(directory: Path.Directory.t, snapshotFile: Path.File.t, options: Options) {
-        if (!await Fs.exists(directory))
+        if (!await Fs.exists(directory)) {
             throw new Error(`Can't create ${ParcelFsResources}: ${directory} does not exist!`);
+        }
 
         return new ParcelFsResources(
             new ParcelSnapshot(directory, snapshotFile, options),
             new ParcelSubscription(directory, options),
-        )
+        );
     }
 
-    static readonly sensibleIgnoreGlobs = [ 'node_modules/', '.git/', '.smooch/snapshot.txt', '**/node_modules/**/*' ] as const;
+    static readonly sensibleIgnoreGlobs = [
+        "node_modules/",
+        ".git/",
+        ".smooch/snapshot.txt",
+        "**/node_modules/**/*",
+    ] as const;
 }

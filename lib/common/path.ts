@@ -6,7 +6,7 @@ export namespace Path {
         export type t = string & {
             readonly __tag: unique symbol;
         };
-    
+
         export function create(value: string) {
             return value as t;
         }
@@ -16,7 +16,7 @@ export namespace Path {
         export type t = string & {
             readonly __tag: unique symbol;
         };
-    
+
         export function create(value: string) {
             return value as t;
         }
@@ -26,7 +26,7 @@ export namespace Path {
         export type t = string & {
             readonly __tag: unique symbol;
         };
-    
+
         export function create(value: string, ...rest: string[]) {
             return normalizeWindowsPathSeparator(Fs.resolve(value, ...rest)) as t;
         }

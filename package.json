@@ -33,6 +33,7 @@
     "archiver": "^6.0.0",
     "chalk": "^4.1.2",
     "change-case": "^4.1.2",
+    "dprint": "^0.47.6",
     "fluent-ffmpeg": "^2.1.2",
     "glob": "^10.3.3",
     "image-size": "^1.0.2",

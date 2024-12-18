@@ -7,15 +7,18 @@ export function compareText(actual: string, expected: string, options?: { defaul
     return {
         print(context = options?.defaultContext) {
             if (context) {
-                if (differences.length)
+                if (differences.length) {
                     TestProject.log(chalk.red`Difference detected in ${context}`);
-                else
+                }
+                else {
                     TestProject.log(chalk.green`${context} matches expected!`);
+                }
             }
-            
-            for (const difference of differences)
+
+            for (const difference of differences) {
                 TestProject.log(chalk.red(difference));
-        }
+            }
+        },
     };
 }
 
@@ -26,16 +29,18 @@ function compareTextImpl(actual: string, expected: string) {
 
     const minLineCount = Math.min(actualLines.length, expectedLines.length);
     for (let i = 0; i < minLineCount; i++) {
-        if (actualLines[i] !== expectedLines[i])
+        if (actualLines[i] !== expectedLines[i]) {
             differences.push(`Difference detected on line ${i + 1}`);
+        }
     }
 
-    if (actualLines.length !== expectedLines.length)
+    if (actualLines.length !== expectedLines.length) {
         differences.push(`Text differs in number of lines!`);
+    }
 
     return differences;
 }
 
 function sanitizeLines(src: string) {
-    return src.trim().split('\n').map(str => str.trim());
+    return src.trim().split("\n").map(str => str.trim());
 }

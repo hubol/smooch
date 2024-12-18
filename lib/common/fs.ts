@@ -5,7 +5,7 @@ import { normalizeWindowsPathSeparator } from "./gwob";
 import { Logger } from "./logger";
 import { EndOfLineSequence, forceEndOfLineSequence as forceEndOfLineSequence } from "./end-of-line-sequence";
 
-const logger = new Logger('Fs', 'magenta');
+const logger = new Logger("Fs", "magenta");
 
 function resolve(...paths: string[]) {
     return normalizeWindowsPathSeparator(path.resolve(...paths));
@@ -14,22 +14,23 @@ function resolve(...paths: string[]) {
 const fsMkdir = util.promisify(fs.mkdir);
 
 const mkdir = async (...args: Parameters<typeof fsMkdir>) => {
-    if (typeof args[0] === 'string' && !args[0].trim())
+    if (typeof args[0] === "string" && !args[0].trim()) {
         return;
+    }
     await fsMkdir(...args);
-}
+};
 
-let _writeFileEndOfLineSequence: EndOfLineSequence = 'os';
+let _writeFileEndOfLineSequence: EndOfLineSequence = "os";
 
 const promisifiedWriteFile = util.promisify(fs.writeFile);
 
 const writeFile = async (file: fs.PathOrFileDescriptor, data: string | NodeJS.ArrayBufferView) => {
-    if (typeof data === 'string') {
+    if (typeof data === "string") {
         data = forceEndOfLineSequence(data, _writeFileEndOfLineSequence);
     }
 
-    return await promisifiedWriteFile(file, data, {  });
-}
+    return await promisifiedWriteFile(file, data, {});
+};
 
 let loggedEndOfLineSequence = false;
 
@@ -39,7 +40,7 @@ const _setWriteFileEndOfLineSequence = (endOfLineSequence: EndOfLineSequence) =>
         loggedEndOfLineSequence = true;
     }
     _writeFileEndOfLineSequence = endOfLineSequence;
-}
+};
 
 export const Fs = {
     createWriteStream: fs.createWriteStream,
@@ -54,4 +55,4 @@ export const Fs = {
     ...path,
     resolve,
     _setWriteFileLineEnding: _setWriteFileEndOfLineSequence,
-}
+};

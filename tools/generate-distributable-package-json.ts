@@ -7,7 +7,7 @@ async function main() {
     delete json.scripts;
 
     const string = JSON.stringify(json, undefined, 2);
-    const dstFile = 'dist/package.json';
+    const dstFile = "dist/package.json";
     Fs.writeFile(dstFile, string);
     console.log(`Wrote distributable package.json to ${dstFile}`);
 }

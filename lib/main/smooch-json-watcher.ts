@@ -6,13 +6,13 @@ import { Boundary_ParcelWatcher } from "../common/native/boundary/parcel-watcher
 import { Path } from "../common/path";
 import { ParcelFsResources, ParcelSubscription } from "./watcher/parcel-fs-resources";
 
-const logger = new Logger('SmoochJsonWatcher', 'magenta');
+const logger = new Logger("SmoochJsonWatcher", "magenta");
 
 let started = false;
 let smoochJsonEventsCount = 0;
 
 export class SmoochJsonWatcher {
-    private constructor () { }
+    private constructor() {}
 
     static get eventsCount() {
         return smoochJsonEventsCount;
@@ -28,17 +28,16 @@ export class SmoochJsonWatcher {
             return;
         }
 
-        const subscription =
-            new ParcelSubscription(
-                Path.Directory.create('./'),
-                { ignore: [ ...ParcelFsResources.sensibleIgnoreGlobs ] }
-            );
-    
-        const smoochJsonMatch = Gwob.match(Path.Glob.create('smooch.json'));
+        const subscription = new ParcelSubscription(
+            Path.Directory.create("./"),
+            { ignore: [...ParcelFsResources.sensibleIgnoreGlobs] },
+        );
+
+        const smoochJsonMatch = Gwob.match(Path.Glob.create("smooch.json"));
 
         const cb: Boundary_ParcelWatcher.SubscribeCallback = (err, events) => {
             if (err) {
-                logger.error('Received Parcel subscription error', err);
+                logger.error("Received Parcel subscription error", err);
                 return;
             }
 
@@ -48,7 +47,7 @@ export class SmoochJsonWatcher {
                 logger.log(`Got smooch.json event(s): ${chalk.white(describeList(smoochJsonEvents.map(x => x.type)))}`);
                 smoochJsonEventsCount += smoochJsonEvents.length;
             }
-        }
+        };
 
         await subscription.start(cb);
 

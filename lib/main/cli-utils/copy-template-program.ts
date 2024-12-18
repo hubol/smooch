@@ -6,22 +6,24 @@ import { Gwob } from "../../common/gwob";
 import { Logger } from "../../common/logger";
 import { Path } from "../../common/path";
 
-const logger = new Logger('CopyTemplateProgram', 'green');
+const logger = new Logger("CopyTemplateProgram", "green");
 
 export async function copyTemplateProgram(src: string, dstFile: Path.File.t) {
     const srcFile = await findTemplateProgramFile(src);
-    if (!srcFile)
+    if (!srcFile) {
         return;
+    }
 
-    if (!dstFile)
+    if (!dstFile) {
         dstFile = Path.File.create(Fs.parse(srcFile).base);
+    }
 
     logger.log(`${srcFile} -> ${dstFile}`);
     await Fs.copyFile(srcFile, dstFile);
 }
 
 export async function getAvailableTemplatePrograms() {
-    const glob = Path.Glob.create(templateProgramDirectory, '*.js');
+    const glob = Path.Glob.create(templateProgramDirectory, "*.js");
     return await Gwob.files(glob);
 }
 
@@ -29,8 +31,9 @@ async function findTemplateProgramFile(src: string) {
     const files = await getAvailableTemplatePrograms();
     for (const file of files) {
         const { base } = Fs.parse(file);
-        if (base.includes(src))
+        if (base.includes(src)) {
             return file;
+        }
     }
 
     const list = describeList(files.map(file => Fs.parse(file).name));
@@ -41,5 +44,5 @@ Available template programs: ${chalk.white(list)}`);
 }
 
 const templateProgramDirectory = Environment.isDev
-    ? Fs.resolve(__filename, '../../../../dist/templates')
-    : Fs.resolve(__filename, '../templates');
+    ? Fs.resolve(__filename, "../../../../dist/templates")
+    : Fs.resolve(__filename, "../templates");

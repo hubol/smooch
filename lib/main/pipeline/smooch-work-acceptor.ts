@@ -9,7 +9,8 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
     constructor(
         readonly assetGlobs: Path.Glob.t[],
         readonly dependencyGlobs: Path.Glob.t[],
-        readonly outputGlobs: Path.Glob.t[],) {
+        readonly outputGlobs: Path.Glob.t[],
+    ) {
     }
 
     private readonly _workingAssetMatches: Boundary_ParcelWatcher.Event[] = [];
@@ -17,8 +18,9 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
     private readonly _workingOutputMatches: Boundary_ParcelWatcher.Event[] = [];
 
     accept(message: FsWatcherMessage) {
-        if (message.isNascent)
+        if (message.isNascent) {
             return AcceptResult.Accepted.Nascent.Instance;
+        }
 
         this._workingAssetMatches.length = 0;
         this._workingDependencyMatches.length = 0;
@@ -27,8 +29,9 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
         for (const assetGlob of this.assetGlobs) {
             const match = Gwob.match(assetGlob);
             for (const event of message.events) {
-                if (match(event.path))
+                if (match(event.path)) {
                     this._workingAssetMatches.push(event);
+                }
             }
         }
 
@@ -45,21 +48,25 @@ export class SmoochWorkAcceptor implements ISmoochWorkAcceptor {
         for (const outputGlob of this.outputGlobs) {
             const match = Gwob.match(outputGlob);
             for (const event of message.events) {
-                if (event.type === 'delete' && match(event.path))
+                if (event.type === "delete" && match(event.path)) {
                     this._workingOutputMatches.push(event);
+                }
             }
         }
 
-        if (this._workingAssetMatches.length || this._workingDependencyMatches.length || this._workingOutputMatches.length)
+        if (
+            this._workingAssetMatches.length || this._workingDependencyMatches.length
+            || this._workingOutputMatches.length
+        ) {
             return {
-                type: 'AcceptedWithMatches' as const,
-                assetMatches: [ ...this._workingAssetMatches ],
-                dependencyMatches: [ ...this._workingDependencyMatches ],
-                outputMatches: [ ...this._workingOutputMatches ],
+                type: "AcceptedWithMatches" as const,
+                assetMatches: [...this._workingAssetMatches],
+                dependencyMatches: [...this._workingDependencyMatches],
+                outputMatches: [...this._workingOutputMatches],
                 sourceMessage: message,
             };
+        }
 
         return AcceptResult.Rejected.Instance;
     }
-
 }

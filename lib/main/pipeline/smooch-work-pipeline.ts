@@ -3,11 +3,8 @@ import { FsWatcherMessage } from "../watcher/fs-watcher-message";
 import { SmoochWorkFn, SmoochWorker, SmoochWork, ISmoochWorkers } from "./smooch-worker";
 import { Boundary_ParcelWatcher } from "../../common/native/boundary/parcel-watcher-api";
 
-type InferLoose<T> =
-    T extends Struct<any, any>
-    ? Infer<T>
-    : T extends any
-    ? any
+type InferLoose<T> = T extends Struct<any, any> ? Infer<T>
+    : T extends any ? any
     : never;
 
 export interface SmoochWorkPipelineRecipe<T> {
@@ -19,7 +16,7 @@ export interface SmoochWorkPipelineRecipe<T> {
 }
 
 export class SmoochWorkPipelineRecipeFactory {
-    private constructor() { }
+    private constructor() {}
 
     static create<T>(t: SmoochWorkPipelineRecipe<T>) {
         return t;
@@ -30,11 +27,15 @@ export class SmoochWorkPipeline {
     private constructor(
         readonly recipe: SmoochWorkPipelineRecipe<unknown>,
         private readonly _acceptor: ISmoochWorkAcceptor,
-        private readonly _queue: ISmoochWorkEnqueue) {
+        private readonly _queue: ISmoochWorkEnqueue,
+    ) {
+    }
 
-        }
-
-    static create<TConfig>(recipe: SmoochWorkPipelineRecipe<TConfig>, config: InferLoose<TConfig>, context: ISmoochWorkers) {
+    static create<TConfig>(
+        recipe: SmoochWorkPipelineRecipe<TConfig>,
+        config: InferLoose<TConfig>,
+        context: ISmoochWorkers,
+    ) {
         const acceptor = recipe.acceptorFactory(config);
         const queue = recipe.queueFactory(config);
         const workFn = recipe.workFnFactory(config);
@@ -45,9 +46,10 @@ export class SmoochWorkPipeline {
 
     async accept(message: FsWatcherMessage): Promise<boolean> {
         const acceptResult = await Promise.resolve(this._acceptor.accept(message));
-        if (acceptResult.type === 'Rejected')
+        if (acceptResult.type === "Rejected") {
             return false;
-        
+        }
+
         this._queue.enqueue(acceptResult);
         return true;
     }
@@ -62,7 +64,7 @@ export const symbolFn = Symbol;
 export namespace AcceptResult {
     export namespace Accepted {
         export interface WithMatches {
-            type: 'AcceptedWithMatches';
+            type: "AcceptedWithMatches";
             assetMatches: Boundary_ParcelWatcher.Event[];
             dependencyMatches: Boundary_ParcelWatcher.Event[];
             outputMatches: Boundary_ParcelWatcher.Event[];
@@ -71,12 +73,12 @@ export namespace AcceptResult {
 
         export namespace Nascent {
             export interface t {
-                type: 'AcceptedNascent'
+                type: "AcceptedNascent";
             }
-    
+
             export const Instance: t = {
-                type: 'AcceptedNascent'
-            }
+                type: "AcceptedNascent",
+            };
         }
 
         export type t = WithMatches | Nascent.t;
@@ -84,12 +86,12 @@ export namespace AcceptResult {
 
     export namespace Rejected {
         export interface t {
-            type: 'Rejected'
+            type: "Rejected";
         }
 
         export const Instance: t = {
-            type: 'Rejected'
-        }
+            type: "Rejected",
+        };
     }
 
     export type t = Rejected.t | Accepted.t;

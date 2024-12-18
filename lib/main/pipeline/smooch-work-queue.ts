@@ -14,5 +14,4 @@ export class SmoochWorkQueue implements ISmoochWorkQueue {
     dequeue() {
         return this._queue.splice(0);
     }
-
 }

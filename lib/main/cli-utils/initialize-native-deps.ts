@@ -3,7 +3,7 @@ import { Logger } from "../../common/logger";
 import { NativeDependencies } from "../../common/native/native-dependency";
 import { Global } from "../global";
 
-const logger = new Logger('InitializeNativeDeps', 'green');
+const logger = new Logger("InitializeNativeDeps", "green");
 
 export async function initializeNativeDepsConfig() {
     if (await Fs.exists(Global.nativeDepsJsonFile)) {
@@ -14,7 +14,8 @@ export async function initializeNativeDepsConfig() {
     const json = JSON.stringify(
         NativeDependencies.defaultVersions,
         undefined,
-        '\t');
+        "\t",
+    );
 
     logger.log(`Wrote ${Global.nativeDepsJsonFile}`);
     await Fs.writeFile(Global.nativeDepsJsonFile, json);

@@ -1,3 +1,3 @@
 export function countLines(string: string) {
-    return (string.match(/\n/g) || '').length + 1
+    return (string.match(/\n/g) || "").length + 1;
 }

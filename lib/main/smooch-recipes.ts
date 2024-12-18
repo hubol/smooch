@@ -8,12 +8,13 @@ const recipes = {
     jsonFiles: AggregateJsonRecipe,
     textures: TexturePackRecipe,
     audioFiles: ConvertAudioRecipe,
-}
+};
 
 function getRecipeConfigs(): RecipeToConfigSchema<typeof recipes> {
     const obj = {};
-    for (const key in recipes)
+    for (const key in recipes) {
         obj[key] = getRecipeConfig(recipes[key]);
+    }
 
     return obj as any;
 }
@@ -21,7 +22,7 @@ function getRecipeConfigs(): RecipeToConfigSchema<typeof recipes> {
 export const SmoochRecipes = {
     available: recipes,
     getRecipeConfigs,
-}
+};
 
 function getRecipeConfig<T extends Struct<any, unknown>>(recipe: SmoochWorkPipelineRecipe<T>) {
     return defaulted(array(recipe.configSchema), []);
@@ -29,6 +30,6 @@ function getRecipeConfig<T extends Struct<any, unknown>>(recipe: SmoochWorkPipel
 
 type RecipeToConfigSchema<T> = {
     [k in keyof T]: T[k] extends SmoochWorkPipelineRecipe<infer E extends Struct<any, any>>
-        ? ReturnType<typeof getRecipeConfig<T[k]['configSchema']>>
+        ? ReturnType<typeof getRecipeConfig<T[k]["configSchema"]>>
         : never;
 };

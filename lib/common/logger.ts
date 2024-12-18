@@ -5,13 +5,12 @@ import { normalizeWindowsPathSeparator } from "./gwob";
 import { ErrorPrinter } from "./error-printer";
 
 const cwd = process.cwd();
-const pathRegExp = new RegExp(`(${cwd.replace(/\\/g, '\\\\')}|${normalizeWindowsPathSeparator(cwd)})[\\/\\\\]*`, 'g');
+const pathRegExp = new RegExp(`(${cwd.replace(/\\/g, "\\\\")}|${normalizeWindowsPathSeparator(cwd)})[\\/\\\\]*`, "g");
 
 const windowsPathSeparatorRegExp = /\\/g;
 
 export class Logger {
     constructor(readonly context: any, readonly color: typeof ForegroundColor) {
-        
     }
 
     private get _prefix() {
@@ -19,47 +18,63 @@ export class Logger {
     }
 
     info(message: any, ...additional: any[]) {
-        this._print('info', message, additional);
+        this._print("info", message, additional);
     }
 
     log(message: any, ...additional: any[]) {
-        this._print('log', message, additional);
+        this._print("log", message, additional);
     }
 
     debug(message: any, ...additional: any[]) {
-        this._print('debug', message, additional);
+        this._print("debug", message, additional);
     }
 
     error(message: any, error?: any) {
-        if (error)
-            this._print('error', `${message}
-${ErrorPrinter.toPrintable(error)}`, []);
-        else
-            this._print('error', message, []);
+        if (error) {
+            this._print(
+                "error",
+                `${message}
+${ErrorPrinter.toPrintable(error)}`,
+                [],
+            );
+        }
+        else {
+            this._print("error", message, []);
+        }
     }
 
     warn(message: any, error?: any) {
-        if (error)
-            this._print('warn', `${message}
-${ErrorPrinter.toPrintable(error)}`, []);
-        else
-            this._print('warn', message, []);
+        if (error) {
+            this._print(
+                "warn",
+                `${message}
+${ErrorPrinter.toPrintable(error)}`,
+                [],
+            );
+        }
+        else {
+            this._print("warn", message, []);
+        }
     }
 
-    private _print(key: 'log' | 'error' | 'warn' | 'debug' | 'info', message: any, additional: any[]) {
-        const filteredMessage = message.replace(pathRegExp, '').replace(windowsPathSeparatorRegExp, '/');
-        console[key](`${this._prefix}${indent(filteredMessage, Logger.globalOptions.maxContextLength + 1)}`, ...additional);
+    private _print(key: "log" | "error" | "warn" | "debug" | "info", message: any, additional: any[]) {
+        const filteredMessage = message.replace(pathRegExp, "").replace(windowsPathSeparatorRegExp, "/");
+        console[key](
+            `${this._prefix}${indent(filteredMessage, Logger.globalOptions.maxContextLength + 1)}`,
+            ...additional,
+        );
     }
 
     static readonly globalOptions = {
         maxContextLength: 30,
-    }
+    };
 }
 
 const spacesCache: Record<number, string> = {};
 function getPaddingSpaces(x: number) {
-    if (!spacesCache[x])
-        spacesCache[x] = new Array(x).map(() => '').join(' ');
+    if (!spacesCache[x]) {
+        spacesCache[x] = new Array(x).map(() => "").join(" ");
+    }
     return spacesCache[x];
 }
 
@@ -69,9 +84,10 @@ function padLeftWithSpaces(source: string) {
 }
 
 function eliminateVowels(source: string) {
-    if (source.length <= Logger.globalOptions.maxContextLength)
+    if (source.length <= Logger.globalOptions.maxContextLength) {
         return source;
-    
+    }
+
     const characters = [...source];
     let eliminateCount = characters.length - Logger.globalOptions.maxContextLength;
     for (let i = 0; i < characters.length; i++) {
@@ -81,34 +97,38 @@ function eliminateVowels(source: string) {
             characters[i] = nextCharacter;
             eliminateCount -= 1;
         }
-        if (eliminateCount <= 0)
+        if (eliminateCount <= 0) {
             break;
+        }
     }
-    return characters.join('');
+    return characters.join("");
 }
 
 function eliminateVowel(character: string) {
     switch (character.toLowerCase()) {
-        case 'a':
-        case 'e':
-        case 'i':
-        case 'o':
-        case 'u':
-            return '';
+        case "a":
+        case "e":
+        case "i":
+        case "o":
+        case "u":
+            return "";
         default:
             return character;
     }
 }
 
 function getPrintableContext(context: any): string {
-    if (context instanceof Function)
+    if (context instanceof Function) {
         return context.name;
+    }
 
     let str: string = context.toString();
-    if (str.charAt(0) === '[')
+    if (str.charAt(0) === "[") {
         str = str.substring(1);
-    if (str.charAt(str.length - 1) === ']')
+    }
+    if (str.charAt(str.length - 1) === "]") {
         str = str.substring(0, str.length - 1);
+    }
 
     return str;
 }

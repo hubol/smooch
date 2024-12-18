@@ -4,5 +4,5 @@ export const Now = {
     },
     get s() {
         return Date.now() / 1000;
-    }
-}
+    },
+};

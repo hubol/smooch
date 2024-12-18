@@ -1,7 +1,6 @@
 // https://stackoverflow.com/a/50270314
 
-function hasOwn(obj, prop)
-{
+function hasOwn(obj, prop) {
     return Object.prototype.hasOwnProperty.call(obj, prop);
 }
 

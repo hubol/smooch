@@ -16,16 +16,16 @@ export const AggregateJsonOptions = object({
 });
 
 export const AggregateJsonRecipe = SmoochWorkPipelineRecipeFactory.create({
-    name: 'jsonAgg',
+    name: "jsonAgg",
     configSchema: AggregateJsonOptions,
-	acceptorFactory: options => {
-		return new SmoochWorkAcceptor([ options.glob ], [ Path.Glob.create(options.template.program) ], []);
-	},
-	queueFactory: () => new SmoochWorkQueue(),
-	workFnFactory: options => () => aggregateJson(options),
+    acceptorFactory: options => {
+        return new SmoochWorkAcceptor([options.glob], [Path.Glob.create(options.template.program)], []);
+    },
+    queueFactory: () => new SmoochWorkQueue(),
+    workFnFactory: options => () => aggregateJson(options),
 });
 
-const logger = new Logger('JsonAggregator', 'cyan');
+const logger = new Logger("JsonAggregator", "cyan");
 
 export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>) {
     const template = await JsTemplate.fromFile(options.template.program);
@@ -45,10 +45,12 @@ export async function aggregateJson(options: Infer<typeof AggregateJsonOptions>)
             logger.error(`An error occurred while reading ${path}`, e);
         }
     }));
-    
-    await template.renderToFile(<AggregateJsonTemplateContext>{ files }, options.template.out, { ensureDirectory: true });
+
+    await template.renderToFile(<AggregateJsonTemplateContext> { files }, options.template.out, {
+        ensureDirectory: true,
+    });
 }
 
 export interface AggregateJsonTemplateContext {
-    files: { fileName: string, json: any }[];
+    files: { fileName: string; json: any }[];
 }

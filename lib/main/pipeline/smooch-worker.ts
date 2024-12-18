@@ -8,22 +8,24 @@ export type SmoochWork = AcceptResult.Accepted.t[];
 export type SmoochWorkFn = (work: SmoochWork) => unknown;
 
 export class SmoochWorker {
-    private static readonly _logger = new Logger(SmoochWorker, 'yellow');
+    private static readonly _logger = new Logger(SmoochWorker, "yellow");
 
     isWorking = false;
 
     constructor(
         readonly queue: ISmoochWorkDequeue,
-        private readonly _workFn: SmoochWorkFn) {
-        
+        private readonly _workFn: SmoochWorkFn,
+    ) {
     }
 
     work(work: SmoochWork) {
-        if (this.isWorking)
+        if (this.isWorking) {
             throw new Error(`SmoochWorker can't start working when already working!`);
+        }
 
-        if (work.length === 0)
+        if (work.length === 0) {
             throw new Error(`SmoochWorker shouldn't be given work without any FsWatcherMessages!`);
+        }
 
         this.isWorking = true;
 
@@ -48,17 +50,17 @@ export class SmoochWorker {
                     }
 
                     const ms = (errorCount - 1) * 67;
-                    SmoochWorker._logger.log(chalk.green`Retrying${ms ? ` (in ${ms}ms)` : ''}...`);
+                    SmoochWorker._logger.log(chalk.green`Retrying${ms ? ` (in ${ms}ms)` : ""}...`);
                     await sleep(ms);
                     SmoochWorker._logger.log(chalk.green`Retry #${errorCount}`);
                 }
             }
-            
+
             this.isWorking = false;
         });
     }
 
-    private static readonly _retryMs = [ 0, 67, 250, 1000 ];
+    private static readonly _retryMs = [0, 67, 250, 1000];
 }
 
 export interface ISmoochWorkers {
@@ -66,28 +68,30 @@ export interface ISmoochWorkers {
 }
 
 export class SmoochWorkers implements ISmoochWorkers {
-    private readonly _logger = new Logger(SmoochWorkers, 'yellow');
+    private readonly _logger = new Logger(SmoochWorkers, "yellow");
 
     private _stopping = false;
     private _stopped = false;
 
     private readonly _workers: SmoochWorker[] = [];
 
-    constructor() { }
+    constructor() {}
 
-    startAll(saveable: Pick<FsWatcher, 'save'>) {
+    startAll(saveable: Pick<FsWatcher, "save">) {
         setTimeout(async () => {
             let anyWorkCompletedSinceLastSave = false;
 
             while (true) {
-                if (this._stopping)
+                if (this._stopping) {
                     break;
-                
+                }
+
                 try {
                     this._step();
 
-                    if (!anyWorkCompletedSinceLastSave)
+                    if (!anyWorkCompletedSinceLastSave) {
                         anyWorkCompletedSinceLastSave = this._anyWorking;
+                    }
                     else if (!this._anyWorking) {
                         anyWorkCompletedSinceLastSave = false;
                         await saveable.save();
@@ -104,10 +108,10 @@ export class SmoochWorkers implements ISmoochWorkers {
     }
 
     async stop() {
-        this._logger.log('Waiting for work to complete before stopping...');
+        this._logger.log("Waiting for work to complete before stopping...");
         this._stopping = true;
         await wait(() => this._stopped);
-        this._logger.log('...Stopped!');
+        this._logger.log("...Stopped!");
     }
 
     register(worker: SmoochWorker) {
@@ -129,8 +133,9 @@ export class SmoochWorkers implements ISmoochWorkers {
 
     private get _anyWorking() {
         for (const worker of this._workers) {
-            if (worker.isWorking)
+            if (worker.isWorking) {
                 return true;
+            }
         }
         return false;
     }

@@ -15,7 +15,7 @@ export function hubhash(src: string, hashLength = 16) {
         bytesIndex += 1;
     }
 
-    let result = '';
+    let result = "";
     for (let i = 0; i < sums.length; i++) {
         const sum = sums[i];
         result += characters[sum % characters.length];
@@ -25,4 +25,4 @@ export function hubhash(src: string, hashLength = 16) {
 }
 
 const encoder = new TextEncoder();
-const characters = [ 'h', 'u', 'b', 'o', 'l' ];
+const characters = ["h", "u", "b", "o", "l"];

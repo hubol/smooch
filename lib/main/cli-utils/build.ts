@@ -4,12 +4,12 @@ import { createPipelinesFromSmoochConfig, readConfigFromSmoochJson } from "../ma
 import { AcceptResult } from "../pipeline/smooch-work-pipeline";
 import { ISmoochWorkers, SmoochWorker } from "../pipeline/smooch-worker";
 
-const logger = new Logger('Build', 'green');
+const logger = new Logger("Build", "green");
 
 export async function build() {
     const start = Date.now();
     const config = await readConfigFromSmoochJson();
-    
+
     const workers: SmoochWorker[] = [];
     const workersImpl: ISmoochWorkers = {
         register(worker) {
@@ -17,10 +17,11 @@ export async function build() {
         },
     };
     createPipelinesFromSmoochConfig(config, workersImpl);
-    
-    const work = [ AcceptResult.Accepted.Nascent.Instance ];
-    for (const worker of workers)
+
+    const work = [AcceptResult.Accepted.Nascent.Instance];
+    for (const worker of workers) {
         worker.work(work);
+    }
     await wait(() => workers.every(x => !x.isWorking));
     logger.log(`Done after ${Date.now() - start}ms`);
 }

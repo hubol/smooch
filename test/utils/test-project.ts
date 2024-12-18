@@ -9,8 +9,8 @@ import { NpmExecutable } from "../../lib/common/process/npm-executable";
 import { SmoochConfigType } from "../../lib/main/smooch-config";
 
 const Paths = {
-    testEnv: Path.Directory.create('./.test_env'),
-}
+    testEnv: Path.Directory.create("./.test_env"),
+};
 
 function envPath(filename: string) {
     return Fs.resolve(Paths.testEnv, filename);
@@ -21,16 +21,16 @@ export const TestProject = {
         await TestProject.cleanUp();
         await Fs.mkdir(Paths.testEnv, { recursive: true });
 
-        await TestProject.fixture('packageJson', 'package.json');
-        await TestProject.spawn(NpmExecutable.npm, ['i']).untilExited();
+        await TestProject.fixture("packageJson", "package.json");
+        await TestProject.spawn(NpmExecutable.npm, ["i"]).untilExited();
     },
     smooch(...args: string[]) {
         TestProject.log(`Starting smooch...`);
-        return TestProject.spawn(NpmExecutable.npx, ['smooch', ...args]);
+        return TestProject.spawn(NpmExecutable.npx, ["smooch", ...args]);
     },
     writeSmoochJson(config: any) {
         const configWithDefaults = { "$schema": "./node_modules/smooch/schema.json", ...config };
-        return Fs.writeFile(envPath('smooch.json'), JSON.stringify(configWithDefaults, undefined, 2));
+        return Fs.writeFile(envPath("smooch.json"), JSON.stringify(configWithDefaults, undefined, 2));
     },
     cleanUp() {
         return Fs.rm(Paths.testEnv, { recursive: true, force: true });
@@ -56,23 +56,18 @@ export const TestProject = {
     },
     log(message: string) {
         logger.log(message);
-    }
-}
+    },
+};
 
-const logger = new Logger('test', 'green');
+const logger = new Logger("test", "green");
 
-type PathType = Path.Directory.t | Path.File.t | Path.Glob.t
+type PathType = Path.Directory.t | Path.File.t | Path.Glob.t;
 
 type LoosenPathTypes<T> = {
-    [k in keyof T]:
-        T[k] extends PathType
-        ? string
-        : T[k] extends PathType | undefined
-        ? string | undefined
-        : T[k] extends Record<string, unknown>
-        ? Partial<LoosenPathTypes<T[k]>>
-        : T[k] extends Array<infer ArrayType>
-        ? Array<Partial<LoosenPathTypes<ArrayType>>>
+    [k in keyof T]: T[k] extends PathType ? string
+        : T[k] extends PathType | undefined ? string | undefined
+        : T[k] extends Record<string, unknown> ? Partial<LoosenPathTypes<T[k]>>
+        : T[k] extends Array<infer ArrayType> ? Array<Partial<LoosenPathTypes<ArrayType>>>
         : T[k];
 };
 

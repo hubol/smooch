@@ -5,18 +5,18 @@ import { Fs } from "../lib/common/fs";
 import { countLines } from "../lib/common/count-lines";
 
 async function generateSmoochConfigSchema() {
-    const rawJsonSchema = await interceptOneStdOutWrite(() => TJS.exec('tsconfig.json', 'SmoochConfigType'));
+    const rawJsonSchema = await interceptOneStdOutWrite(() => TJS.exec("tsconfig.json", "SmoochConfigType"));
     console.log(`Got raw schema with ${countLines(rawJsonSchema)} lines.`);
 
     const schemaObject = JSON.parse(rawJsonSchema);
-    for (const key of [ "Path.Directory.t", "Path.File.t", "Path.Glob.t" ]) {
-        schemaObject.definitions[key] = { type: 'string' };    
+    for (const key of ["Path.Directory.t", "Path.File.t", "Path.Glob.t"]) {
+        schemaObject.definitions[key] = { type: "string" };
     }
-    
+
     const transformedJsonSchema = JSON.stringify(schemaObject, undefined, 2);
     console.log(`Got transformed schema with ${countLines(transformedJsonSchema)} lines.`);
 
-    const dstFile = 'dist/schema.json';
+    const dstFile = "dist/schema.json";
     await Fs.writeFile(dstFile, transformedJsonSchema);
     console.log(`Wrote schema to ${dstFile}.`);
 }
@@ -30,7 +30,7 @@ async function interceptOneStdOutWrite(work: () => unknown) {
     function steal(text: string) {
         interceptedText = text;
     }
-    
+
     // @ts-ignore
     process.stdout.write = steal;
 

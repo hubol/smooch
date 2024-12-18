@@ -14,65 +14,70 @@ import { Path } from "../../common/path";
 import { Gwob } from "../../common/gwob";
 import { GlobRoot } from "../../common/glob-root";
 
-const logger = new Logger('TexturePacker', 'magenta');
+const logger = new Logger("TexturePacker", "magenta");
 
 export const TexturePackRecipe = SmoochWorkPipelineRecipeFactory.create({
-	name: 'texPack',
-	configSchema: PackerOptions,
-	acceptorFactory: options => {
-		return new SmoochWorkAcceptor([ options.glob ], [ Path.Glob.create(options.template.program) ], []);
-	},
-	queueFactory: () => new SmoochWorkQueue(),
-	workFnFactory: options => () => texturePack(options),
+    name: "texPack",
+    configSchema: PackerOptions,
+    acceptorFactory: options => {
+        return new SmoochWorkAcceptor([options.glob], [Path.Glob.create(options.template.program)], []);
+    },
+    queueFactory: () => new SmoochWorkQueue(),
+    workFnFactory: options => () => texturePack(options),
 });
 
 export const texturePack = async (options: Infer<typeof PackerOptions>) => {
-	const { glob } = options;
+    const { glob } = options;
 
-	const jsTemplate = await JsTemplate.fromFile(options.template.program);
+    const jsTemplate = await JsTemplate.fromFile(options.template.program);
 
-	logger.log(`Loading images from folder ${glob}...`);
+    logger.log(`Loading images from folder ${glob}...`);
 
-	const imageFilePaths = await Gwob.files(glob);
+    const imageFilePaths = await Gwob.files(glob);
 
-	if (!imageFilePaths.length)
-		logger.warn(`No images found matching ${glob}`);
+    if (!imageFilePaths.length) {
+        logger.warn(`No images found matching ${glob}`);
+    }
 
-	const atlases = await createAtlases(imageFilePaths, options);
+    const atlases = await createAtlases(imageFilePaths, options);
 
-	await Fs.mkdir(options.atlas.directory, { recursive: true });
-	await Promise.all(atlases.map((atlas, i) => {
-		const file = Fs.resolve(options.atlas.directory, atlas.fileName);
-		logger.log(`Writing atlas ${i + 1} of ${atlases.length} to ${file}...`);
-		return Fs.writeFile(file, atlas.imageBuffer);
-	}));
+    await Fs.mkdir(options.atlas.directory, { recursive: true });
+    await Promise.all(atlases.map((atlas, i) => {
+        const file = Fs.resolve(options.atlas.directory, atlas.fileName);
+        logger.log(`Writing atlas ${i + 1} of ${atlases.length} to ${file}...`);
+        return Fs.writeFile(file, atlas.imageBuffer);
+    }));
 
-	const globRoot = Gwob.root(glob);
-	const context = createTemplateContext(atlases, globRoot);
-	await jsTemplate.renderToFile(context, options.template.out, { ensureDirectory: true });
+    const globRoot = Gwob.root(glob);
+    const context = createTemplateContext(atlases, globRoot);
+    await jsTemplate.renderToFile(context, options.template.out, { ensureDirectory: true });
 
-	logger.log("Packed");
+    logger.log("Packed");
 };
 
 async function createAtlases(imageFilePaths: string[], options: Infer<typeof PackerOptions>) {
-	return (await packTextures(imageFilePaths, options))
-		.map((atlas, i) => merge(atlas, { fileName: `${options.atlas.filePrefix}${i}.png` }));
+    return (await packTextures(imageFilePaths, options))
+        .map((atlas, i) => merge(atlas, { fileName: `${options.atlas.filePrefix}${i}.png` }));
 }
 
 type Atlases = AsyncReturnType<typeof createAtlases>;
 
 function createTemplateContext(atlases: Atlases, globRoot: GlobRoot) {
-	const textures = sortArrayByKey(atlases.flatMap(atlas => convertRectsToContextTextures(atlas, globRoot)), 'fileName');
-	return { atlases, textures };
+    const textures = sortArrayByKey(
+        atlases.flatMap(atlas => convertRectsToContextTextures(atlas, globRoot)),
+        "fileName",
+    );
+    return { atlases, textures };
 }
 
 export type PackTextureTemplateContext = ReturnType<typeof createTemplateContext>;
 
-const convertRectsToContextTextures = (atlas: Atlases[number], globRoot: GlobRoot) => atlas.rects.map(rect => ({
-	atlasFileName: atlas.fileName,
-	fileName: rect.filePath.substring(Fs.resolve(globRoot).length),
-	x: rect.x,
-	y: rect.y,
-	width: rect.width,
-	height: rect.height,
-}));
+const convertRectsToContextTextures = (atlas: Atlases[number], globRoot: GlobRoot) =>
+    atlas.rects.map(rect => ({
+        atlasFileName: atlas.fileName,
+        fileName: rect.filePath.substring(Fs.resolve(globRoot).length),
+        x: rect.x,
+        y: rect.y,
+        width: rect.width,
+        height: rect.height,
+    }));

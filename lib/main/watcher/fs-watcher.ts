@@ -15,7 +15,7 @@ interface FsWatcherSubscription {
 type FsWatcherSubscribeCallback = (message: FsWatcherMessage) => boolean | Promise<boolean>;
 
 export class FsWatcher {
-    private static readonly _logger = new Logger(FsWatcher, 'blue');
+    private static readonly _logger = new Logger(FsWatcher, "blue");
 
     private readonly _parcelSnapshot: ParcelSnapshot;
     private readonly _parcelSubscription: ParcelSubscription;
@@ -23,7 +23,8 @@ export class FsWatcher {
     private readonly _subscriptions: FsWatcherSubscription[] = [];
 
     constructor(
-        parcelResources: ParcelFsResources) {
+        parcelResources: ParcelFsResources,
+    ) {
         this._parcelSnapshot = parcelResources.snapshot;
         this._parcelSubscription = parcelResources.subscription;
     }
@@ -54,8 +55,9 @@ export class FsWatcher {
     }
 
     private _onParcelEvent(error: Error | null, events: Event[]) {
-        if (!error)
+        if (!error) {
             return this._dispatch(FsWatcherMessageFactory.createMessage(events));
+        }
         FsWatcher._logger.error(`@parcel/watcher gave an error`, error);
     }
 
@@ -68,20 +70,29 @@ export class FsWatcher {
 
         await Promise.all(this._subscriptions.map(async subscription => {
             try {
-                if (await Promise.resolve(subscription.accept(message)))
+                if (await Promise.resolve(subscription.accept(message))) {
                     subscriptionAcceptedCount++;
+                }
             }
             catch (e) {
                 FsWatcher._logger.error(
-                    `An error occurred while Subscription ${subscription.identity} was accepting ${FsWatcherMessageDescriber.describeBrief(message)}`, e);
+                    `An error occurred while Subscription ${subscription.identity} was accepting ${
+                        FsWatcherMessageDescriber.describeBrief(message)
+                    }`,
+                    e,
+                );
             }
         }));
-        
-        if (subscriptionAcceptedCount)
-            FsWatcher._logger.debug(chalk.white
-            `${subscriptionAcceptedCount} subscription(s) accepted ${FsWatcherMessageDescriber.describe(message)}`);
-        else
-            FsWatcher._logger.debug(chalk.gray
-                `Ignored ${FsWatcherMessageDescriber.describe(message)}`);
+
+        if (subscriptionAcceptedCount) {
+            FsWatcher._logger.debug(
+                chalk.white`${subscriptionAcceptedCount} subscription(s) accepted ${
+                    FsWatcherMessageDescriber.describe(message)
+                }`,
+            );
+        }
+        else {
+            FsWatcher._logger.debug(chalk.gray`Ignored ${FsWatcherMessageDescriber.describe(message)}`);
+        }
     }
 }

@@ -6,12 +6,12 @@ import { Global } from "./global";
 import { JsonFile } from "../common/json-file";
 import chalk from "chalk";
 
-const logger = new Logger('SmoochEffectiveConfig', 'magenta');
+const logger = new Logger("SmoochEffectiveConfig", "magenta");
 
 export class SmoochEffectiveConfig {
-    private constructor() { }
+    private constructor() {}
 
-    private static readonly _file = Path.File.create(Fs.resolve(Global.cacheDir, 'previous-effective-smooch.json'))
+    private static readonly _file = Path.File.create(Fs.resolve(Global.cacheDir, "previous-effective-smooch.json"));
 
     static async checkIfChanged(config: SmoochConfigType) {
         let changed = false;
@@ -19,8 +19,9 @@ export class SmoochEffectiveConfig {
             const previousConfig = await JsonFile.read(this._file);
             changed = JSON.stringify(config) !== JSON.stringify(previousConfig);
 
-            if (changed)
-                logger.log(`${chalk.yellow('Hey cutie!')} Configuration appears to have changed.`);
+            if (changed) {
+                logger.log(`${chalk.yellow("Hey cutie!")} Configuration appears to have changed.`);
+            }
         }
         catch (e) {
             logger.log(`Got an error while reading ${this._file}, assuming configuration changed.
@@ -28,8 +29,9 @@ This may be normal if your cache directory was deleted or this is your first tim
             changed = true;
         }
 
-        if (!changed)
+        if (!changed) {
             logger.log(`Configuration does not appear to have changed.`);
+        }
 
         return changed;
     }

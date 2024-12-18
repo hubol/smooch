@@ -27,33 +27,37 @@ export const ConvertAudioOptions = object({
     })),
 });
 
-type ValidatedConvertOption = WithRequired<Infer<typeof ConvertAudioOptions>['convert'][0], 'directory'>;
-type ValidatedOptions = Omit<Infer<typeof ConvertAudioOptions>, 'convert'> & { convert: ValidatedConvertOption[] };
+type ValidatedConvertOption = WithRequired<Infer<typeof ConvertAudioOptions>["convert"][0], "directory">;
+type ValidatedOptions = Omit<Infer<typeof ConvertAudioOptions>, "convert"> & { convert: ValidatedConvertOption[] };
 
 export const ConvertAudioRecipe = SmoochWorkPipelineRecipeFactory.create({
-    name: 'audiCnv',
+    name: "audiCnv",
     configSchema: ConvertAudioOptions,
-	acceptorFactory: options => {
-		return new SmoochWorkAcceptor([ options.glob ], [ Path.Glob.create(options.template.program) ], []);
-	},
-	queueFactory: () => new SmoochWorkQueue(),
-	workFnFactory: options => (work) => convertAudio(options, work),
+    acceptorFactory: options => {
+        return new SmoochWorkAcceptor([options.glob], [Path.Glob.create(options.template.program)], []);
+    },
+    queueFactory: () => new SmoochWorkQueue(),
+    workFnFactory: options => (work) => convertAudio(options, work),
 });
 
-const logger = new Logger('AudioConverter', 'cyan');
+const logger = new Logger("AudioConverter", "cyan");
 
 export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>, work: SmoochWork) {
     const options = validateOptions(rawOptions);
     const template = await JsTemplate.fromFile(options.template.program);
     const filesToConvertResult = FilesToConvert.infer(work);
 
-    const filesToConvert = filesToConvertResult.type === 'some'
+    const filesToConvert = filesToConvertResult.type === "some"
         ? filesToConvertResult.files
         : await Gwob.files(options.glob);
 
-    const uniqueFiles = [ ...new Set(filesToConvert) ];
+    const uniqueFiles = [...new Set(filesToConvert)];
 
-    logger.log(`Found ${uniqueFiles.length} file(s) to convert to formats: ${chalk.white(describeList(options.convert.map(x => x.format)))}`);
+    logger.log(
+        `Found ${uniqueFiles.length} file(s) to convert to formats: ${
+            chalk.white(describeList(options.convert.map(x => x.format)))
+        }`,
+    );
 
     await Promise.all([
         ...options.convert.map(({ directory }) => Fs.mkdir(directory, { recursive: true })),
@@ -65,18 +69,20 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
     ]);
 
     const globRoot = Gwob.root(options.glob);
-    await Promise.all(options.convert.flatMap(({ directory, format }) => uniqueFiles.map(async srcFile => {
-        const parsed = Fs.parse(srcFile);
-        const fileNameNoExt = Fs.resolve(parsed.dir, parsed.name).substring(globRoot.length);
-        const dstFile = Path.File.create(Fs.resolve(directory, fileNameNoExt + "." + format));
+    await Promise.all(options.convert.flatMap(({ directory, format }) =>
+        uniqueFiles.map(async srcFile => {
+            const parsed = Fs.parse(srcFile);
+            const fileNameNoExt = Fs.resolve(parsed.dir, parsed.name).substring(globRoot.length);
+            const dstFile = Path.File.create(Fs.resolve(directory, fileNameNoExt + "." + format));
 
-        await Fs.mkdir(Fs.dirname(dstFile), { recursive: true });
-        await AudioFileConverter.convert(Path.File.create(srcFile), dstFile);
-    })));
+            await Fs.mkdir(Fs.dirname(dstFile), { recursive: true });
+            await AudioFileConverter.convert(Path.File.create(srcFile), dstFile);
+        })
+    ));
 
     logger.log(`Done converting ${uniqueFiles.length} file(s).`);
 
-    const [ files, zipFiles ] = await Promise.all([
+    const [files, zipFiles] = await Promise.all([
         getTemplateContextFilesFromDirectories(options),
         createZipFiles(options.convert.filter(isZipConvertOption)),
     ]);
@@ -87,16 +93,20 @@ export async function convertAudio(rawOptions: Infer<typeof ConvertAudioOptions>
 
 function validateOptions(options: Infer<typeof ConvertAudioOptions>) {
     for (const convert of options.convert) {
-        if (convert.directory)
+        if (convert.directory) {
             continue;
-        
+        }
+
         convert.directory = Path.Directory.create(
             Fs.resolve(
                 Global.cacheDir,
-                makeDirectoryName(options.glob, convert.zip ?? 'nozip', hubhash(`${options.glob}%${convert.zip}`))
-            ));
+                makeDirectoryName(options.glob, convert.zip ?? "nozip", hubhash(`${options.glob}%${convert.zip}`)),
+            ),
+        );
         logger.log(`Generated directory name in cache folder for audio conversion:
-${chalk.blue(options.glob)} -> ${chalk.white(convert.format)} -> ${chalk[convert.zip ? 'gray' : 'green'](convert.directory)}${convert.zip ? ` -> ${chalk.green(convert.zip)}` : ''}`);
+${chalk.blue(options.glob)} -> ${chalk.white(convert.format)} -> ${
+            chalk[convert.zip ? "gray" : "green"](convert.directory)
+        }${convert.zip ? ` -> ${chalk.green(convert.zip)}` : ""}`);
     }
 
     return options as ValidatedOptions;
@@ -106,12 +116,12 @@ function isZipConvertOption(convertOption: ValidatedConvertOption): convertOptio
     return !!convertOption.zip;
 }
 
-type ZipConvertOption = WithRequired<ValidatedConvertOption, 'zip'>;
+type ZipConvertOption = WithRequired<ValidatedConvertOption, "zip">;
 
 function makeDirectoryName(...parts: string[]) {
     const name = parts
-        .map(p => p.replace(nonAlphaNumRegex, ' ').trim().replace(whitespaceRegex, '_'))
-        .join('__');
+        .map(p => p.replace(nonAlphaNumRegex, " ").trim().replace(whitespaceRegex, "_"))
+        .join("__");
 
     return name.substring(name.length - 40);
 }
@@ -139,7 +149,7 @@ function createZipFileGlobCommands(commands: ZipConvertOption[]) {
     for (const command of commands) {
         const zipFile = Fs.resolve(command.zip);
         const previous = zipFilesToGlob[zipFile];
-        const current = Path.Glob.create(command.directory, '**/*');
+        const current = Path.Glob.create(command.directory, "**/*");
         if (previous && previous !== current) {
             logger.warn(`Zip file ${zipFile} needs more than one glob to be created:
 - ${previous}
@@ -149,7 +159,7 @@ This should not be possible!`);
         zipFilesToGlob[zipFile] = current;
     }
 
-    return Object.entries(zipFilesToGlob).map(([ zipFile, glob ]) => ({ zipFile: Path.File.create(zipFile), glob }));
+    return Object.entries(zipFilesToGlob).map(([zipFile, glob]) => ({ zipFile: Path.File.create(zipFile), glob }));
 }
 
 async function createZipFiles(commands: ZipConvertOption[]): Promise<TemplateContextZipFile[]> {
@@ -161,7 +171,7 @@ async function createZipFiles(commands: ZipConvertOption[]): Promise<TemplateCon
 
         return {
             path: Fs.resolve(zipFile).substring(root.length),
-        }
+        };
     }));
 }
 
@@ -176,19 +186,20 @@ async function getTemplateContextFilesFromDirectories(options: ValidatedOptions)
         const fileNameNoExt = Fs.resolve(parsed.dir, parsed.name).substring(rootLength);
         const path = file.substring(rootLength);
 
-        sourceFileToDestFiles[fileNameNoExt] = { path, convertedPaths: { } };
+        sourceFileToDestFiles[fileNameNoExt] = { path, convertedPaths: {} };
     }
 
     for (const { format, directory } of options.convert) {
-        const glob = Path.Glob.create(directory, '**/*.' + format);
+        const glob = Path.Glob.create(directory, "**/*." + format);
         const root = Gwob.root(glob);
         const dstFiles = await Gwob.files(glob);
         for (const file of dstFiles) {
             const parsed = Fs.parse(file);
             const srcRelativePath = Fs.resolve(parsed.dir, parsed.name).substring(root.length);
 
-            if (!sourceFileToDestFiles[srcRelativePath])
+            if (!sourceFileToDestFiles[srcRelativePath]) {
                 continue;
+            }
 
             const dstRelativePath = file.substring(root.length);
             sourceFileToDestFiles[srcRelativePath].convertedPaths[format] = dstRelativePath;
@@ -196,8 +207,9 @@ async function getTemplateContextFilesFromDirectories(options: ValidatedOptions)
     }
 
     const files: TemplateContextFile[] = [];
-    for (const key in sourceFileToDestFiles)
+    for (const key in sourceFileToDestFiles) {
         files.push(sourceFileToDestFiles[key]);
+    }
     return files;
 }
 
@@ -205,24 +217,25 @@ namespace FilesToConvert {
     export function infer(work: SmoochWork): Result {
         const files: string[] = [];
         for (const w of work) {
-            if (w.type === 'AcceptedNascent')
-                return { type: 'all' };
-            
-            files.push(...w.assetMatches.filter(x => x.type !== 'delete').map(x => x.path));
+            if (w.type === "AcceptedNascent") {
+                return { type: "all" };
+            }
+
+            files.push(...w.assetMatches.filter(x => x.type !== "delete").map(x => x.path));
         }
-    
+
         return {
-            type: 'some',
+            type: "some",
             files,
-        }
+        };
     }
 
     interface All {
-        type: 'all';
+        type: "all";
     }
 
     interface Some {
-        type: 'some';
+        type: "some";
         files: string[];
     }
 
