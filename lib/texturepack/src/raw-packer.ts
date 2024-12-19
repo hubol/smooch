@@ -7,13 +7,14 @@ import { Logger } from "../../common/logger";
 import { Jimp } from "../../common/jimp";
 import { readImageFileDimensions } from "../../common/read-image-file-dimensions";
 import { RethrownError } from "../../common/rethrown-error";
+import { Path } from "../../common/path";
 
 const logger = new Logger("RawPacker", "magenta");
 
 type Block = AsyncReturnType<typeof filePathToBlocks>[number];
 type PackedBlock = ReturnType<typeof binPack<Block>>[number]["rects"][number];
 
-const filePathToBlocks = async (filePath: string) => {
+const filePathToBlocks = async (filePath: Path.File.t) => {
     const result = await readImageFileDimensions(filePath);
 
     if (!result) {
@@ -53,7 +54,7 @@ const computeMainImage = async (width: number, height: number, blocks: PackedBlo
     return jimp.getBufferAsync(Jimp.MIME_PNG);
 };
 
-export const packTextures = async (filePaths: string[], options: Infer<typeof RawPackerOptions>) => {
+export const packTextures = async (filePaths: Path.File.t[], options: Infer<typeof RawPackerOptions>) => {
     const { pack: packOptions } = options;
     const blocks = (await Promise.all(filePaths.map(filePathToBlocks))).flat();
 
