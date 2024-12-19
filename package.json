@@ -1,6 +1,6 @@
 {
   "name": "@hubol/smooch",
-  "version": "1.0.0-beta.15",
+  "version": "1.0.0-beta.16",
   "description": "Generate texture atlases, browser-compatible audio, and source code from directories",
   "scripts": {
     "build": "npm run build:json-schema && npm run build:template-api-dts && npm run build:bundle && npm run build:distributable-package-json && npm run build:npm-readme && npm run build:npm-pack",
@@ -25,8 +25,6 @@
     "url": "https://github.com/hubol/smooch.git"
   },
   "devDependencies": {
-    "@jimp/custom": "^0.22.10",
-    "@jimp/types": "^0.22.10",
     "@types/archiver": "^5.3.2",
     "@types/fluent-ffmpeg": "^2.1.21",
     "@types/sharp": "^0.31.1",
@@ -36,7 +34,6 @@
     "dprint": "^0.47.6",
     "fluent-ffmpeg": "^2.1.2",
     "glob": "^10.3.3",
-    "image-size": "^1.0.2",
     "maxrects-packer": "^2.7.3",
     "minimatch": "^9.0.3",
     "superstruct": "^0.15.5",

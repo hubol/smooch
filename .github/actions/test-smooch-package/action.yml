@@ -2,7 +2,7 @@ name: Test Smooch Package
 description: Run test suite against Smooch package tarball
 inputs:
   node-version:
-    default: '16'
+    default: 16
 runs:
   using: "composite"
   steps:
