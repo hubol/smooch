@@ -16,7 +16,7 @@ const defaultDependencies = {
     "@ffmpeg-installer/ffmpeg": dependency<Boundary_FfmpegInstaller.Api>("^1.1.0"),
     "@parcel/watcher": dependency<Boundary_ParcelWatcher.Api>("2.2.0"),
     "prettier": dependency<Boundary_Prettier.Api>("3.1.0"),
-    "sharp": dependency<Boundary_Sharp.Api>("0.33.5"),
+    "sharp": dependency<Boundary_Sharp.Api>("0.32.6"),
 };
 
 export type ModuleName = keyof Dependencies;
