@@ -23,7 +23,7 @@ const defaultDependencies = {
     // https://github.com/parcel-bundler/watcher/issues/153
     "@parcel/watcher": dependency<Boundary_ParcelWatcher.Api>("2.5.0"),
     "prettier": dependency<Boundary_Prettier.Api>("3.1.0"),
-    "sharp": dependency<Boundary_Sharp.Api>("0.32.6"),
+    "sharp": dependency<Boundary_Sharp.Api>("0.33.5"),
 };
 
 export type ModuleName = keyof Dependencies;
