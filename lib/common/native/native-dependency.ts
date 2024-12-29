@@ -14,7 +14,14 @@ import { Boundary_Sharp } from "./boundary/sharp-api";
 
 const defaultDependencies = {
     "@ffmpeg-installer/ffmpeg": dependency<Boundary_FfmpegInstaller.Api>("^1.1.0"),
-    "@parcel/watcher": dependency<Boundary_ParcelWatcher.Api>("2.2.0"),
+    // The deadlock I observed in 2.3.0 might have been fixed
+    // https://cutey.zone/index.php?topic=231.msg6418#msg6418
+    // https://github.com/parcel-bundler/watcher/releases/tag/v2.5.0
+    // https://github.com/parcel-bundler/watcher/pull/189
+    // In addition, 2.2.0 shipped with a stupid install script
+    // That required consumers to have node-gyp, which needs all sorts of stupid native dependencies to work
+    // https://github.com/parcel-bundler/watcher/issues/153
+    "@parcel/watcher": dependency<Boundary_ParcelWatcher.Api>("2.5.0"),
     "prettier": dependency<Boundary_Prettier.Api>("3.1.0"),
     "sharp": dependency<Boundary_Sharp.Api>("0.32.6"),
 };

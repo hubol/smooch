@@ -5,6 +5,11 @@ import kill from "tree-kill";
 import { Readable } from "stream";
 import { Logger } from "../logger";
 
+interface ProcessWithLoggerOptions {
+    cwd?: string;
+    shell?: boolean;
+}
+
 export class ProcessWithLogger {
     private readonly _childProcess: ChildProcess;
 
@@ -14,10 +19,19 @@ export class ProcessWithLogger {
     readonly stdOut: TestStream;
     readonly stdErr: TestStream;
 
-    constructor(...args: Parameters<typeof spawn>) {
-        this._childProcess = spawn(...args);
+    constructor(executablePath: string, command: string[] = [], options: ProcessWithLoggerOptions = {}) {
+        // NodeJS was patched to prevent executing .cmd executables on Windows without shell: true
+        // https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
+        // Other people doing stupid shit like me were affected
+        // https://github.com/nodejs/node/issues/52554#issuecomment-2060024574
+        // I do not understand the consequences of shell: true :-/
+        if (executablePath.endsWith(".cmd")) {
+            options.shell = true;
+        }
 
-        const commandTitle = `${args[0]}${args[1].length > 0 ? " " : ""}${args[1].join(" ")}`;
+        this._childProcess = spawn(executablePath, command, options);
+
+        const commandTitle = `${executablePath}${command.length > 0 ? " " : ""}${command.join(" ")}`;
 
         // This might explain why stdout is nullable: https://stackoverflow.com/a/29024376
         const logger = new Logger(commandTitle, "blue");
