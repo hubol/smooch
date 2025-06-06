@@ -178,7 +178,17 @@ export const Sfx = {
 
     await TestProject.fixture("dummyProgram", "audio-convert.js");
     await smooch2.stdOut.untilPrinted("Saved state.");
-    TestProject.check("dst-audio/sound.ts", `// Dummy`).print();
+    TestProject.check("dst-audio/sound.ts", `// Dummy
+{
+  "camel": "function",
+  "pascal": "function",
+  "kebab": "function",
+  "noext": "function",
+  "json": "function",
+  "oneline": "function",
+  "format": "function",
+  "Fs": "object"
+}`).print();
 
     smooch2.kill();
     await smooch2.untilExited();

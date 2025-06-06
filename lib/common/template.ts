@@ -1,4 +1,4 @@
-import { camelCase, pascalCase } from "change-case";
+import { camelCase, pascalCase, paramCase } from "change-case";
 import { Fs } from "./fs";
 import { Logger } from "./logger";
 import chalk from "chalk";
@@ -7,19 +7,21 @@ import { requireModule } from "./require-module";
 import { countLines } from "./count-lines";
 import { Native } from "./native/native-module";
 
+const logger = new Logger("Template", "yellow");
+
 const utils = {
     camel: (string: string) => camelCase(string).replace(/_/g, ""),
     pascal: (string: string) => pascalCase(string).replace(/_/g, ""),
+    kebab: (string: string) => paramCase(string),
     noext: (string: string) => string.replace(/\.[^/\\.]+$/, ""),
     json: (object: any) => JSON.stringify(object, undefined, 1),
     oneline: (string: string) => string.replace(/\s+/g, " "),
     format: Native.Prettier.format,
+    Fs,
 };
 
 export type Utils = typeof utils;
 type JsTemplateFn = (context: Record<string, any>, utils: Utils) => string | Promise<string>;
-
-const logger = new Logger("Template", "yellow");
 
 export class JsTemplate {
     private constructor(
