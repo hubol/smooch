@@ -65,6 +65,8 @@ jobs:
           path: ./
 
       - run: npm publish smooch.tgz || echo "Not publishing package"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   
   cleanup:
     needs: maybe-publish
